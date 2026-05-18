@@ -16,5 +16,6 @@ build
 /folia-api
 
 .idea/
+.vscode/
 
 .DS_Store
