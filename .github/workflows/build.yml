@@ -34,5 +34,5 @@ jobs:
           name: folia-artifacts
           path: |
             build/libs/*.jar
-            folia-server/build/libs/*.jar
-            folia-api/build/libs/*.jar
+            koboshfolia-server/build/libs/*.jar
+            koboshfolia-api/build/libs/*.jar
