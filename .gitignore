@@ -1,0 +1,20 @@
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+
+/run
+
+/koboshfolia-server/build.gradle.kts
+/koboshfolia-server/src/minecraft
+/paper-server
+/folia-server
+/koboshfolia-api/build.gradle.kts
+/paper-api
+/paper-api-generator
+/folia-api
+
+.idea/
+
+.DS_Store
