@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Mon, 18 May 2026 04:21:44 -0700
+Subject: [PATCH] Rebrand to KoboshFolia
+
+
+diff --git a/src/main/java/io/papermc/paper/ServerBuildInfo.java b/src/main/java/io/papermc/paper/ServerBuildInfo.java
+index 652ff54e7c50412503725d628bfe72ed03059790..6316163866cd577af135553267465564094b288f 100644
+--- a/src/main/java/io/papermc/paper/ServerBuildInfo.java
++++ b/src/main/java/io/papermc/paper/ServerBuildInfo.java
+@@ -19,6 +19,16 @@ public interface ServerBuildInfo {
+      */
+     Key BRAND_PAPER_ID = Key.key("papermc", "paper");
+ 
++    /**
++     * The brand id for folia
++     */
++    Key BRAND_FOLIA_ID = Key.key("papermc", "folia");
++
++    /**
++     * The brand id for KoboshFolia.
++     */
++    Key BRAND_KOBOSHFOLIA_ID = Key.key("koboshchan", "koboshfolia");
++
+     /**
+      * Gets the {@code ServerBuildInfo}.
+      *

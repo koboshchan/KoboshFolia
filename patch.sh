@@ -1,1 +1,2 @@
 ./gradlew applyAllPatches
+./gradlew applyFoliaPatches
