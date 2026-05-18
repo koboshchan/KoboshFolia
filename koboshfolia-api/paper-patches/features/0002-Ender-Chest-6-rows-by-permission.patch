@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Fri, 15 May 2026 23:12:09 -0700
+Subject: [PATCH] Ender Chest: 6 rows by permission
+
+
+diff --git a/src/main/java/org/bukkit/util/permissions/DefaultPermissions.java b/src/main/java/org/bukkit/util/permissions/DefaultPermissions.java
+index e1a4ddf2c07cdd242fa8054a0152522fe4039e85..09474b52076f29f35799e3bb84a80ad7fab16205 100644
+--- a/src/main/java/org/bukkit/util/permissions/DefaultPermissions.java
++++ b/src/main/java/org/bukkit/util/permissions/DefaultPermissions.java
+@@ -89,6 +89,15 @@ public final class DefaultPermissions {
+         CommandPermissions.registerPermissions(parent);
+         BroadcastPermissions.registerPermissions(parent);
+ 
++        // Kobosh start - Barrels and enderchests 6 rows
++        DefaultPermissions.registerPermission("kobosh.enderchest.rows.six", "Enderchest six rows", PermissionDefault.FALSE, parent);
++        DefaultPermissions.registerPermission("kobosh.enderchest.rows.five", "Enderchest five rows", PermissionDefault.FALSE, parent);
++        DefaultPermissions.registerPermission("kobosh.enderchest.rows.four", "Enderchest four rows", PermissionDefault.FALSE, parent);
++        DefaultPermissions.registerPermission("kobosh.enderchest.rows.three", "Enderchest three rows", PermissionDefault.FALSE, parent);
++        DefaultPermissions.registerPermission("kobosh.enderchest.rows.two", "Enderchest two rows", PermissionDefault.FALSE, parent);
++        DefaultPermissions.registerPermission("kobosh.enderchest.rows.one", "Enderchest one row", PermissionDefault.FALSE, parent);
++        // Kobosh end - Barrels and enderchests 6 rows
++
+         parent.recalculatePermissibles();
+     }
+ }
