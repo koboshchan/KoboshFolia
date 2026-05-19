@@ -1,0 +1,52 @@
+--- a/net/minecraft/world/level/block/EnderChestBlock.java
++++ b/net/minecraft/world/level/block/EnderChestBlock.java
+@@ -1,6 +_,7 @@
+ package net.minecraft.world.level.block;
+ 
+ import com.mojang.serialization.MapCodec;
++import com.kobosh.koboshfolia.KoboshConfig;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Direction;
+ import net.minecraft.core.particles.ParticleTypes;
+@@ -100,6 +_,44 @@
+         }
+     }
+ 
++    // Kobosh start - Barrels and enderchests 6 rows
++    private ChestMenu getEnderChestSixRows(int syncId, net.minecraft.world.entity.player.Inventory inventory, Player player, PlayerEnderChestContainer playerEnderChestContainer) {
++        org.bukkit.craftbukkit.entity.CraftHumanEntity bukkitPlayer = player.getBukkitEntity();
++        if (bukkitPlayer.hasPermission("kobosh.enderchest.rows.six")) {
++            player.sixRowEnderchestSlotCount = 54;
++            return ChestMenu.sixRows(syncId, inventory, playerEnderChestContainer);
++        } else if (bukkitPlayer.hasPermission("kobosh.enderchest.rows.five")) {
++            player.sixRowEnderchestSlotCount = 45;
++            return ChestMenu.fiveRows(syncId, inventory, playerEnderChestContainer);
++        } else if (bukkitPlayer.hasPermission("kobosh.enderchest.rows.four")) {
++            player.sixRowEnderchestSlotCount = 36;
++            return ChestMenu.fourRows(syncId, inventory, playerEnderChestContainer);
++        } else if (bukkitPlayer.hasPermission("kobosh.enderchest.rows.three")) {
++            player.sixRowEnderchestSlotCount = 27;
++            return ChestMenu.threeRows(syncId, inventory, playerEnderChestContainer);
++        } else if (bukkitPlayer.hasPermission("kobosh.enderchest.rows.two")) {
++            player.sixRowEnderchestSlotCount = 18;
++            return ChestMenu.twoRows(syncId, inventory, playerEnderChestContainer);
++        } else if (bukkitPlayer.hasPermission("kobosh.enderchest.rows.one")) {
++            player.sixRowEnderchestSlotCount = 9;
++            return ChestMenu.oneRow(syncId, inventory, playerEnderChestContainer);
++        }
++
++        player.sixRowEnderchestSlotCount = KoboshConfig.defaultEnderChestSlots();
++        return switch (KoboshConfig.defaultEnderChestRows) {
++            case 1 -> ChestMenu.oneRow(syncId, inventory, playerEnderChestContainer);
++            case 2 -> ChestMenu.twoRows(syncId, inventory, playerEnderChestContainer);
++            case 4 -> ChestMenu.fourRows(syncId, inventory, playerEnderChestContainer);
++            case 5 -> ChestMenu.fiveRows(syncId, inventory, playerEnderChestContainer);
++            case 6 -> ChestMenu.sixRows(syncId, inventory, playerEnderChestContainer);
++            default -> ChestMenu.threeRows(syncId, inventory, playerEnderChestContainer);
++        };
++    }
++    // Kobosh end - Barrels and enderchests 6 rows
++
+     @Override
+     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+         return new EnderChestBlockEntity(pos, state);

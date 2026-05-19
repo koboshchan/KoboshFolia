@@ -4,36 +4,6 @@ Date: Fri, 15 May 2026 23:09:08 -0700
 Subject: [PATCH] Ender Chest: 6 rows by permission
 
 
-diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 8274afe0d07c50ece420b1d3cb20165ed0162acb..72d972c1721f05b8c89e1cf0fcf7181cfa3a419c 100644
---- a/net/minecraft/server/players/PlayerList.java
-+++ b/net/minecraft/server/players/PlayerList.java
-@@ -947,6 +947,25 @@ public abstract class PlayerList {
-         player.getBukkitEntity().recalculatePermissions(); // CraftBukkit
-         this.server.getCommands().sendCommands(player);
-         } // Paper - Add sendOpLevel API
-+
-+        // Kobosh start - Barrels and enderchests 6 rows
-+        org.bukkit.craftbukkit.entity.CraftHumanEntity bukkit = player.getBukkitEntity();
-+        if (bukkit.hasPermission("kobosh.enderchest.rows.six")) {
-+            player.sixRowEnderchestSlotCount = 54;
-+        } else if (bukkit.hasPermission("kobosh.enderchest.rows.five")) {
-+            player.sixRowEnderchestSlotCount = 45;
-+        } else if (bukkit.hasPermission("kobosh.enderchest.rows.four")) {
-+            player.sixRowEnderchestSlotCount = 36;
-+        } else if (bukkit.hasPermission("kobosh.enderchest.rows.three")) {
-+            player.sixRowEnderchestSlotCount = 27;
-+        } else if (bukkit.hasPermission("kobosh.enderchest.rows.two")) {
-+            player.sixRowEnderchestSlotCount = 18;
-+        } else if (bukkit.hasPermission("kobosh.enderchest.rows.one")) {
-+            player.sixRowEnderchestSlotCount = 9;
-+        } else {
-+            player.sixRowEnderchestSlotCount = -1;
-+        }
-+        // Kobosh end - Barrels and enderchests 6 rows
-     }
- 
-     // Paper start - whitelist verify event / login event
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
 index b39325b3c11b689a2fe7a57f679ec6a38563b257..dbd6c47a6d959b02a4c28a351a8d0c0a7251b8c5 100644
 --- a/net/minecraft/world/entity/player/Player.java
@@ -100,10 +70,10 @@ index 9749909b8253b432bb2f7fba2cd8ff17a8579b30..aa8d960bbf0e99090ba37f273ee5ec8c
          this.activeChest = enderChestBlockEntity;
      }
 diff --git a/net/minecraft/world/level/block/EnderChestBlock.java b/net/minecraft/world/level/block/EnderChestBlock.java
-index 383e8285d366c7f594b0b4ff55b367970c9b69e4..ef6e11f60163c0afe4b89d7d53b4f1154a0410bc 100644
+index d65a45fb9e012c0d9d0b599128675af75f4fc7ad..5091757860f20ee1ec6a90b3d79296878657dc8f 100644
 --- a/net/minecraft/world/level/block/EnderChestBlock.java
 +++ b/net/minecraft/world/level/block/EnderChestBlock.java
-@@ -85,7 +85,7 @@ public class EnderChestBlock extends AbstractChestBlock<EnderChestBlockEntity> i
+@@ -86,7 +86,7 @@ public class EnderChestBlock extends AbstractChestBlock<EnderChestBlockEntity> i
                  enderChestInventory.setActiveChest(enderChestBlockEntity); // Needs to happen before ChestMenu.threeRows as it is required for opening animations
                  if (level instanceof ServerLevel serverLevel && player.openMenu(
                      new SimpleMenuProvider(
@@ -112,38 +82,3 @@ index 383e8285d366c7f594b0b4ff55b367970c9b69e4..ef6e11f60163c0afe4b89d7d53b4f115
                      )
                  ).isPresent()) {
                  // Paper end - Fix InventoryOpenEvent cancellation - moved up;
-@@ -100,6 +100,34 @@ public class EnderChestBlock extends AbstractChestBlock<EnderChestBlockEntity> i
-         }
-     }
- 
-+    // Kobosh start - Barrels and enderchests 6 rows
-+    private ChestMenu getEnderChestSixRows(int syncId, net.minecraft.world.entity.player.Inventory inventory, Player player, PlayerEnderChestContainer playerEnderChestContainer) {
-+        org.bukkit.craftbukkit.entity.CraftHumanEntity bukkitPlayer = player.getBukkitEntity();
-+        if (bukkitPlayer.hasPermission("kobosh.enderchest.rows.six")) {
-+            player.sixRowEnderchestSlotCount = 54;
-+            return ChestMenu.sixRows(syncId, inventory, playerEnderChestContainer);
-+        } else if (bukkitPlayer.hasPermission("kobosh.enderchest.rows.five")) {
-+            player.sixRowEnderchestSlotCount = 45;
-+            return ChestMenu.fiveRows(syncId, inventory, playerEnderChestContainer);
-+        } else if (bukkitPlayer.hasPermission("kobosh.enderchest.rows.four")) {
-+            player.sixRowEnderchestSlotCount = 36;
-+            return ChestMenu.fourRows(syncId, inventory, playerEnderChestContainer);
-+        } else if (bukkitPlayer.hasPermission("kobosh.enderchest.rows.three")) {
-+            player.sixRowEnderchestSlotCount = 27;
-+            return ChestMenu.threeRows(syncId, inventory, playerEnderChestContainer);
-+        } else if (bukkitPlayer.hasPermission("kobosh.enderchest.rows.two")) {
-+            player.sixRowEnderchestSlotCount = 18;
-+            return ChestMenu.twoRows(syncId, inventory, playerEnderChestContainer);
-+        } else if (bukkitPlayer.hasPermission("kobosh.enderchest.rows.one")) {
-+            player.sixRowEnderchestSlotCount = 9;
-+            return ChestMenu.oneRow(syncId, inventory, playerEnderChestContainer);
-+        }
-+        
-+        player.sixRowEnderchestSlotCount = -1;
-+        return ChestMenu.threeRows(syncId, inventory, playerEnderChestContainer);
-+    }
-+    // Kobosh end - Barrels and enderchests 6 rows
-+
-     @Override
-     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-         return new EnderChestBlockEntity(pos, state);

@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Tue, 19 May 2026 05:53:33 -0700
+Subject: [PATCH] added and implemented enderchest row config
+
+
+diff --git a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+index 40f4ce0253883e0b111a95b82e70cfcd1fd55161..caa811465400322a28363f8f179f26fe8b0fa9c7 100644
+--- a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
++++ b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+@@ -21,6 +21,7 @@ public final class KoboshConfig {
+     public static YamlConfiguration config;
+ 
+     public static boolean allowClientRngManipulation = false;
++    public static int defaultEnderChestRows = 3;
+ 
+     public static boolean tpsbarEnabled = true;
+     public static boolean memoryBarEnabled = true;
+@@ -62,6 +63,14 @@ public final class KoboshConfig {
+         allowClientRngManipulation = config.getBoolean("allow-client-rng-manipulation", allowClientRngManipulation);
+         config.set("allow-client-rng-manipulation", allowClientRngManipulation);
+ 
++        defaultEnderChestRows = config.getInt("default-ender-chest-rows", defaultEnderChestRows);
++        if (defaultEnderChestRows < 1) {
++            defaultEnderChestRows = 1;
++        } else if (defaultEnderChestRows > 6) {
++            defaultEnderChestRows = 6;
++        }
++        config.set("default-ender-chest-rows", defaultEnderChestRows);
++
+         tpsbarEnabled = config.getBoolean("tpsbar.enabled", tpsbarEnabled);
+         config.set("tpsbar.enabled", tpsbarEnabled);
+ 
+@@ -167,4 +176,8 @@ public final class KoboshConfig {
+                 BossBar.Color.PURPLE
+         ));
+     }
++
++    public static int defaultEnderChestSlots() {
++        return defaultEnderChestRows * 9;
++    }
+ }
