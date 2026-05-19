@@ -1,0 +1,213 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Tue, 19 May 2026 04:58:30 -0700
+Subject: [PATCH] fix bars
+
+
+diff --git a/src/main/java/com/kobosh/koboshfolia/tpsbar/AbstractGlobalServerBar.java b/src/main/java/com/kobosh/koboshfolia/tpsbar/AbstractGlobalServerBar.java
+index dc30740c53944cb62091be89c105bb60806c1301..f244cdd2e33d02ecc228b28d3022c14adfa3ffb3 100644
+--- a/src/main/java/com/kobosh/koboshfolia/tpsbar/AbstractGlobalServerBar.java
++++ b/src/main/java/com/kobosh/koboshfolia/tpsbar/AbstractGlobalServerBar.java
+@@ -1,6 +1,7 @@
+ package com.kobosh.koboshfolia.tpsbar;
+ 
+ import com.google.common.collect.Maps;
++import com.kobosh.koboshfolia.util.NullPlugin;
+ import com.mojang.logging.LogUtils;
+ import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
+ import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+@@ -18,9 +19,7 @@ import java.util.UUID;
+ 
+ public abstract class AbstractGlobalServerBar {
+     protected static final Logger logger = LogUtils.getLogger();
+-    protected static final Plugin SCHEDULER_PLUGIN = Bukkit.getPluginManager().getPlugins().length > 0
+-            ? Bukkit.getPluginManager().getPlugins()[0]
+-            : null;
++    protected static final Plugin SCHEDULER_PLUGIN = new NullPlugin();
+ 
+     protected final Map<UUID, BossBar> uuid2Bossbars = Maps.newConcurrentMap();
+     protected final Map<UUID, ScheduledTask> scheduledTasks = new Object2ObjectLinkedOpenHashMap<>();
+@@ -91,7 +90,7 @@ public abstract class AbstractGlobalServerBar {
+     }
+ 
+     public boolean isPlayerVisible(Player player) {
+-        return !disabled && playerVisibility.getOrDefault(player.getUniqueId(), true);
++        return !disabled && playerVisibility.getOrDefault(player.getUniqueId(), false);
+     }
+ 
+     protected void setPlayerVisible(Player player, boolean canSee) {
+@@ -102,6 +101,10 @@ public abstract class AbstractGlobalServerBar {
+ 
+     public abstract boolean enabled();
+ 
++    public boolean isRunning() {
++        return this.scannerTask != null && !this.scannerTask.isCancelled();
++    }
++
+     private void update() {
+         for (Player player : Bukkit.getOnlinePlayers()) {
+             scheduledTasks.computeIfAbsent(player.getUniqueId(), unused -> createBossBarForPlayer(player));
+diff --git a/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/sub/ToggleCommand.java b/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/sub/ToggleCommand.java
+index 6d9f21d11c96d985bd467cf5d44a2ccae39acaa9..d3855ac86529df25c3fbc8910eb231afeabc3ad6 100644
+--- a/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/sub/ToggleCommand.java
++++ b/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/sub/ToggleCommand.java
+@@ -30,6 +30,10 @@ public final class ToggleCommand {
+             return true;
+         }
+ 
++        if (!bar.isRunning()) {
++            bar.init();
++        }
++
+         boolean currentlyVisible = bar.isPlayerVisible(target);
+         bar.setVisibilityForPlayer(target, !currentlyVisible);
+ 
+diff --git a/src/main/java/com/kobosh/koboshfolia/util/NullPlugin.java b/src/main/java/com/kobosh/koboshfolia/util/NullPlugin.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e4b719dd35168366b6a49cc7c775f19382594675
+--- /dev/null
++++ b/src/main/java/com/kobosh/koboshfolia/util/NullPlugin.java
+@@ -0,0 +1,142 @@
++package com.kobosh.koboshfolia.util;
++
++import org.bukkit.Server;
++import org.bukkit.command.Command;
++import org.bukkit.command.CommandSender;
++import org.bukkit.configuration.file.FileConfiguration;
++import org.bukkit.generator.BiomeProvider;
++import org.bukkit.generator.ChunkGenerator;
++import org.bukkit.plugin.PluginBase;
++import org.bukkit.plugin.PluginDescriptionFile;
++import org.bukkit.plugin.PluginLoader;
++import org.bukkit.plugin.PluginLogger;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.io.File;
++import java.io.InputStream;
++import java.util.List;
++
++public final class NullPlugin extends PluginBase {
++    private final PluginDescriptionFile description = new PluginDescriptionFile("KoboshFoliaInternal", "1.0", "nms");
++    private boolean enabled = true;
++
++    @Override
++    public @NotNull File getDataFolder() {
++        throw new UnsupportedOperationException("Not supported");
++    }
++
++    @Override
++    public @NotNull PluginDescriptionFile getDescription() {
++        return this.description;
++    }
++
++    @Override
++    public io.papermc.paper.plugin.configuration.@NotNull PluginMeta getPluginMeta() {
++        return this.description;
++    }
++
++    @Override
++    public @NotNull FileConfiguration getConfig() {
++        throw new UnsupportedOperationException("Not supported");
++    }
++
++    @Override
++    public @Nullable InputStream getResource(@NotNull String filename) {
++        throw new UnsupportedOperationException("Not supported");
++    }
++
++    @Override
++    public void saveConfig() {
++        throw new UnsupportedOperationException("Not supported");
++    }
++
++    @Override
++    public void saveDefaultConfig() {
++        throw new UnsupportedOperationException("Not supported");
++    }
++
++    @Override
++    public void saveResource(@NotNull String resourcePath, boolean replace) {
++        throw new UnsupportedOperationException("Not supported");
++    }
++
++    @Override
++    public void reloadConfig() {
++        throw new UnsupportedOperationException("Not supported");
++    }
++
++    @Override
++    public @NotNull PluginLogger getLogger() {
++        throw new UnsupportedOperationException("Not supported");
++    }
++
++    @Override
++    public @NotNull PluginLoader getPluginLoader() {
++        throw new UnsupportedOperationException("Not supported");
++    }
++
++    @Override
++    public @NotNull Server getServer() {
++        throw new UnsupportedOperationException("Not supported");
++    }
++
++    @Override
++    public boolean isEnabled() {
++        return this.enabled;
++    }
++
++    public void setEnabled(boolean enabled) {
++        this.enabled = enabled;
++    }
++
++    @Override
++    public void onDisable() {
++        throw new UnsupportedOperationException("Not supported");
++    }
++
++    @Override
++    public void onLoad() {
++        throw new UnsupportedOperationException("Not supported");
++    }
++
++    @Override
++    public void onEnable() {
++        throw new UnsupportedOperationException("Not supported");
++    }
++
++    @Override
++    public boolean isNaggable() {
++        throw new UnsupportedOperationException("Not supported");
++    }
++
++    @Override
++    public void setNaggable(boolean canNag) {
++        throw new UnsupportedOperationException("Not supported");
++    }
++
++    @Override
++    public @Nullable ChunkGenerator getDefaultWorldGenerator(@NotNull String worldName, @Nullable String id) {
++        throw new UnsupportedOperationException("Not supported");
++    }
++
++    @Override
++    public @Nullable BiomeProvider getDefaultBiomeProvider(@NotNull String worldName, @Nullable String id) {
++        throw new UnsupportedOperationException("Not supported");
++    }
++
++    @Override
++    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
++        throw new UnsupportedOperationException("Not supported");
++    }
++
++    @Override
++    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
++        throw new UnsupportedOperationException("Not supported");
++    }
++
++    @Override
++    public @NotNull io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager<org.bukkit.plugin.Plugin> getLifecycleManager() {
++        throw new UnsupportedOperationException("Not supported");
++    }
++}
+\ No newline at end of file
