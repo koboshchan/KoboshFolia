@@ -1,0 +1,43 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Tue, 19 May 2026 05:40:13 -0700
+Subject: [PATCH] updated default bar styling config
+
+
+diff --git a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+index 72088604e44dc46740f46787282a7e8e1f49450d..40f4ce0253883e0b111a95b82e70cfcd1fd55161 100644
+--- a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
++++ b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+@@ -28,9 +28,9 @@ public final class KoboshConfig {
+     public static int updateInterval = 20;
+     public static EnumStatusBarDisplay display = EnumStatusBarDisplay.BOSS_BAR;
+ 
+-    public static String tpsBarFormat = "<gray>TPS <tps> <dark_gray>|</dark_gray> MSPT <mspt> <dark_gray>|</dark_gray> Ping <ping><chunkhot>";
++    public static String tpsBarFormat = "<gray>TPS <tps> <dark_gray>|</dark_gray> MSPT <mspt> <dark_gray>|</dark_gray> Ping <ping> <dark_gray>|</dark_gray> HotChunks <chunkhot>";
+     public static String memBarFormat = "<gray>Mem <used>/<available> MiB";
+-    public static String regionBarFormat = "<gray>Region <util> <dark_gray>|</dark_gray> Chunks <chunks> <dark_gray>|</dark_gray> Players <players> <dark_gray>|</dark_gray> Entities <entities>";
++    public static String regionBarFormat = "<gray>Region <dark_gray>|</dark_gray> CPU <util> <dark_gray>|</dark_gray> Chunks <chunks> <dark_gray>|</dark_gray> Players <players> <dark_gray>|</dark_gray> Entities <entities>";
+ 
+     public static int precisionOfTPS = 1;
+     public static int precisionOfMSPT = 2;
+@@ -78,12 +78,20 @@ public final class KoboshConfig {
+         config.set("tpsbar.display", display.name());
+ 
+         tpsBarFormat = config.getString("tpsbar.tps-format", tpsBarFormat);
++        // Migrate old format that appended chunkhot directly after ping without label/separator.
++        if (tpsBarFormat != null && tpsBarFormat.contains("<ping><chunkhot>")) {
++            tpsBarFormat = tpsBarFormat.replace("<ping><chunkhot>", "<ping> <dark_gray>|</dark_gray> HotChunks <chunkhot>");
++        }
+         config.set("tpsbar.tps-format", tpsBarFormat);
+ 
+         memBarFormat = config.getString("tpsbar.mem-format", memBarFormat);
+         config.set("tpsbar.mem-format", memBarFormat);
+ 
+         regionBarFormat = config.getString("tpsbar.region-format", regionBarFormat);
++        // Migrate old prefix format: Region <util> ... -> Region | CPU <util> ...
++        if (regionBarFormat != null && regionBarFormat.contains("Region <util>") && !regionBarFormat.contains("CPU <util>")) {
++            regionBarFormat = regionBarFormat.replace("Region <util>", "Region <dark_gray>|</dark_gray> CPU <util>");
++        }
+         config.set("tpsbar.region-format", regionBarFormat);
+ 
+         precisionOfTPS = config.getInt("tpsbar.precision.tps", precisionOfTPS);
