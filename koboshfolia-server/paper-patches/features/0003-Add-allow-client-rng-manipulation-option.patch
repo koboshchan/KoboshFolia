@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Tue, 19 May 2026 02:17:22 -0700
+Subject: [PATCH] Add allow client rng manipulation option
+
+
+diff --git a/src/main/java/org/kobosh/koboshfolia/KoboshConfig.java b/src/main/java/org/kobosh/koboshfolia/KoboshConfig.java
+index 613f547ef5ad7823d37bc8f90bbdff6a91993c29..582e6ada83aae01c60ce41ad74015f8695e56d5f 100644
+--- a/src/main/java/org/kobosh/koboshfolia/KoboshConfig.java
++++ b/src/main/java/org/kobosh/koboshfolia/KoboshConfig.java
+@@ -26,11 +26,16 @@ public class KoboshConfig {
+         }
+         config.options().header(HEADER);
+         config.options().copyDefaults(true);
+-        
++
++        allowClientRngManipulation = config.getBoolean("allow-client-rng-manipulation", false);
++        config.set("allow-client-rng-manipulation", allowClientRngManipulation);
++
+         try {
+             config.save(CONFIG_FILE);
+         } catch (IOException ex) {
+             Bukkit.getLogger().log(Level.SEVERE, "Could not save kobosh.yml", ex);
+         }
+     }
++
++    public static boolean allowClientRngManipulation = false;
+ }
+\ No newline at end of file
