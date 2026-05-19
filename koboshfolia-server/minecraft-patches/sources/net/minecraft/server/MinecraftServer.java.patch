@@ -1,0 +1,67 @@
+--- a/net/minecraft/server/MinecraftServer.java
++++ b/net/minecraft/server/MinecraftServer.java
+@@ -661,8 +_,8 @@
+         }
+         // Paper end - Configurable player collision; Handle collideRule team for player collision toggle
+         this.server.enablePlugins(org.bukkit.plugin.PluginLoadOrder.POSTWORLD);
+-        this.server.spark.registerCommandBeforePlugins(this.server); // Paper - spark
+-        this.server.spark.enableAfterPlugins(this.server); // Paper - spark
++        if (false) this.server.spark.registerCommandBeforePlugins(this.server); // Paper - spark // Kobosh - force-disable built-in spark plugin
++        if (false) this.server.spark.enableAfterPlugins(this.server); // Paper - spark // Kobosh - force-disable built-in spark plugin
+         if (io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper != null) io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper.pluginsEnabled(); // Paper - Remap plugins
+         io.papermc.paper.command.brigadier.PaperCommands.INSTANCE.setValid(); // Paper - reset invalid state for event fire below
+         io.papermc.paper.plugin.lifecycle.event.LifecycleEventRunner.INSTANCE.callReloadableRegistrarEvent(io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents.COMMANDS, io.papermc.paper.command.brigadier.PaperCommands.INSTANCE, org.bukkit.plugin.Plugin.class, io.papermc.paper.plugin.lifecycle.event.registrar.ReloadableRegistrarEvent.Cause.INITIAL); // Paper - call commands event for regular plugins
+@@ -1080,7 +_,7 @@
+         Commands.COMMAND_SENDING_POOL.shutdownNow(); // Paper - Perf: Async command map building; Shutdown and don't bother finishing
+         // CraftBukkit start
+         if (this.server != null) {
+-            this.server.spark.disable(); // Paper - spark
++            if (false) this.server.spark.disable(); // Paper - spark // Kobosh - force-disable built-in spark plugin
+             this.server.disablePlugins();
+             this.server.waitForAsyncTasksShutdown(); // Paper - Wait for Async Tasks during shutdown
+         }
+@@ -1336,7 +_,7 @@
+             this.statusIcon = this.loadStatusIcon().orElse(null);
+             this.status = this.buildServerStatus();
+ 
+-            this.server.spark.enableBeforePlugins(); // Paper - spark
++            if (false) this.server.spark.enableBeforePlugins(); // Paper - spark // Kobosh - force-disable built-in spark plugin
+             // Folia start - region threading
+             if (true) {
+                 io.papermc.paper.threadedregions.RegionizedServer.getInstance().init(); // Folia - region threading - only after loading worlds
+@@ -1670,7 +_,7 @@
+             }
+ 
+             if (this.emptyTicks >= i) {
+-                this.server.spark.tickStart(); // Paper - spark
++                if (false) this.server.spark.tickStart(); // Paper - spark // Kobosh - force-disable built-in spark plugin
+                 if (this.emptyTicks == i) {
+                     LOGGER.info("Server empty for {} seconds, pausing", this.pauseWhenEmptySeconds());
+                     this.autoSave();
+@@ -1689,7 +_,7 @@
+                 // Paper end - avoid issues with certain tasks not processing during sleep
+                 //this.server.spark.executeMainThreadTasks(); // Paper - spark // Folia - region threading
+                 this.tickConnection();
+-                this.server.spark.tickEnd(((double)(System.nanoTime() - this.currentTickStart) / 1000000D)); // Paper - spark
++                if (false) this.server.spark.tickEnd(((double)(System.nanoTime() - this.currentTickStart) / 1000000D)); // Paper - spark // Kobosh - force-disable built-in spark plugin
+                 return;
+             }
+         }
+@@ -1702,7 +_,7 @@
+         };
+         // Folia end - region threading
+ 
+-        this.server.spark.tickStart(); // Paper - spark
++        if (false) this.server.spark.tickStart(); // Paper - spark // Kobosh - force-disable built-in spark plugin
+         new com.destroystokyo.paper.event.server.ServerTickStartEvent((int)region.getCurrentTick()).callEvent(); // Paper - Server Tick Events // Folia - region threading
+         // Folia start - region threading
+         if (region != null) {
+@@ -1777,7 +_,7 @@
+         long remaining = scheduledEnd - endTime; // Folia - region ticking
+         new com.destroystokyo.paper.event.server.ServerTickEndEvent((int)io.papermc.paper.threadedregions.RegionizedServer.getCurrentTick(), ((double)(endTime - startTime) / 1000000D), remaining).callEvent(); // Folia - region ticking
+         // Paper end - Server Tick Events
+-        this.server.spark.tickEnd(((double)(endTime - startTime) / 1000000D)); // Paper - spark // Folia - region threading
++        if (false) this.server.spark.tickEnd(((double)(endTime - startTime) / 1000000D)); // Paper - spark // Folia - region threading // Kobosh - force-disable built-in spark plugin
+         // Folia - region threading
+     }
+ 

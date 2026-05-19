@@ -1,0 +1,10 @@
+--- /dev/null
++++ b/me/earthme/luminol/config/modules/optimizations/GaleVariableEntityWakeupConfig.java
+@@ -1,0 +_,7 @@
++package me.earthme.luminol.config.modules.optimizations;
++
++public final class GaleVariableEntityWakeupConfig {
++    private GaleVariableEntityWakeupConfig() {}
++
++    public static double entityWakeUpDurationRatioStandardDeviation = 0.2;
++}

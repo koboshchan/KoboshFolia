@@ -1,0 +1,75 @@
+--- a/net/minecraft/world/entity/npc/villager/Villager.java
++++ b/net/minecraft/world/entity/npc/villager/Villager.java
+@@ -197,6 +_,51 @@
+         this.setVillagerData(this.getVillagerData().withType(villagerType).withProfession(level.registryAccess(), VillagerProfession.NONE));
+     }
+ 
++    // Kobosh start - Purpur - lobotomize stuck villagers
++    private boolean isLobotomized = false;
++    public boolean isLobotomized() {
++        return this.isLobotomized;
++    }
++    private int notLobotomizedCount = 0;
++
++    private boolean checkLobotomized() {
++        int interval = me.earthme.luminol.config.modules.optimizations.LobotomizeVillageConfig.villagerLobotomizeCheckInterval;
++        boolean shouldCheckForTradeLocked = me.earthme.luminol.config.modules.optimizations.LobotomizeVillageConfig.villagerLobotomizeWaitUntilTradeLocked;
++        if (this.notLobotomizedCount > 3) {
++            interval *= 2;
++        }
++        if (this.level().getGameTime() % interval == 0) {
++            this.isLobotomized = !(shouldCheckForTradeLocked && this.getVillagerXp() == 0)
++                && !canTravelFrom(BlockPos.containing(this.position().x, this.getBoundingBox().minY + 0.0625D, this.position().z));
++            if (this.isLobotomized) {
++                this.notLobotomizedCount = 0;
++            } else {
++                this.notLobotomizedCount++;
++            }
++        }
++        return this.isLobotomized;
++    }
++
++    private boolean canTravelFrom(BlockPos pos) {
++        return canTravelTo(pos.east()) || canTravelTo(pos.west()) || canTravelTo(pos.north()) || canTravelTo(pos.south());
++    }
++
++    private boolean canTravelTo(BlockPos pos) {
++        net.minecraft.world.level.block.state.BlockState state = this.level().getBlockStateIfLoaded(pos);
++        if (state == null) {
++            return false;
++        }
++        net.minecraft.world.level.block.Block bottom = state.getBlock();
++        if (bottom instanceof net.minecraft.world.level.block.FenceBlock
++            || bottom instanceof net.minecraft.world.level.block.FenceGateBlock
++            || bottom instanceof net.minecraft.world.level.block.WallBlock) {
++            return false;
++        }
++        net.minecraft.world.level.block.Block top = this.level().getBlockState(pos.above()).getBlock();
++        return !bottom.hasCollision && !top.hasCollision;
++    }
++    // Kobosh end - Purpur - lobotomize stuck villagers
++
+     @Override
+     public Brain<Villager> getBrain() {
+         return (Brain<Villager>)super.getBrain();
+@@ -293,11 +_,19 @@
+         // Paper start - EAR 2
+         this.customServerAiStep(level, false);
+     }
+-    protected void customServerAiStep(ServerLevel level, final boolean inactive) {
++    protected void customServerAiStep(ServerLevel level, boolean inactive) {
+         // Paper end - EAR 2
+         ProfilerFiller profilerFiller = Profiler.get();
+         profilerFiller.push("villagerBrain");
++        // Kobosh start - Purpur - lobotomize stuck villagers
++        if (me.earthme.luminol.config.modules.optimizations.LobotomizeVillageConfig.villagerLobotomizeEnabled) {
++            inactive = inactive || checkLobotomized();
++        } else {
++            this.isLobotomized = false;
++        }
++        // Kobosh end - Purpur - lobotomize stuck villagers
+         if (!inactive) this.getBrain().tick(level, this); // Paper - EAR 2
++        else if (this.isLobotomized && shouldRestock(level)) restock(); // Kobosh - Purpur - lobotomize stuck villagers
+         profilerFiller.pop();
+         if (this.assignProfessionWhenSpawned) {
+             this.assignProfessionWhenSpawned = false;

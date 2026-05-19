@@ -1,0 +1,12 @@
+--- /dev/null
++++ b/me/earthme/luminol/config/modules/optimizations/LobotomizeVillageConfig.java
+@@ -1,0 +_,9 @@
++package me.earthme.luminol.config.modules.optimizations;
++
++public final class LobotomizeVillageConfig {
++    private LobotomizeVillageConfig() {}
++
++    public static boolean villagerLobotomizeEnabled = false;
++    public static int villagerLobotomizeCheckInterval = 100;
++    public static boolean villagerLobotomizeWaitUntilTradeLocked = false;
++}

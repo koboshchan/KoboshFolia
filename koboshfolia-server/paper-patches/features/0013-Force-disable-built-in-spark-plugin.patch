@@ -1,0 +1,60 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Tue, 19 May 2026 09:04:18 -0700
+Subject: [PATCH] Force-disable built-in spark plugin
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+diff --git a/src/main/java/io/papermc/paper/plugin/provider/source/FileProviderSource.java b/src/main/java/io/papermc/paper/plugin/provider/source/FileProviderSource.java
+index a0b84535a9d3833d4df692b85b272f145559dd80..84e066cd61323c38c31b07ba672114b804660b36 100644
+--- a/src/main/java/io/papermc/paper/plugin/provider/source/FileProviderSource.java
++++ b/src/main/java/io/papermc/paper/plugin/provider/source/FileProviderSource.java
+@@ -87,7 +87,7 @@ public class FileProviderSource implements ProviderSource<Path, Path> {
+         }
+ 
+         final PluginMeta config = type.getConfig(file);
+-        if ((config.getName().equals("spark") && config.getMainClass().equals("me.lucko.spark.bukkit.BukkitSparkPlugin")) && !SparksFly.isPluginPreferred()) {
++        if ((config.getName().equals("spark") && config.getMainClass().equals("me.lucko.spark.bukkit.BukkitSparkPlugin")) && !SparksFly.isPluginPreferred() && false) { // Kobosh - force-disable built-in spark plugin
+             LOGGER.info("The spark plugin will not be loaded as this server bundles the spark profiler.");
+             return;
+         }
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index daea827602977965bcb0e648098b424dfb1e0636..fdf1ea33d4dd34532d5135541f08b9add14f319d 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -303,7 +303,7 @@ public final class CraftServer implements Server {
+     public static Exception excessiveVelEx;
+     private final io.papermc.paper.logging.SysoutCatcher sysoutCatcher = new io.papermc.paper.logging.SysoutCatcher();
+     private final io.papermc.paper.potion.PaperPotionBrewer potionBrewer;
+-    public final io.papermc.paper.SparksFly spark;
++    public io.papermc.paper.SparksFly spark; // Paper - spark // Kobosh - force-disable built-in spark plugin
+     private final ServerConfiguration serverConfig = new PaperServerConfiguration();
+ 
+     // Paper start - Folia region threading API
+@@ -484,7 +484,7 @@ public final class CraftServer implements Server {
+         }
+         this.potionBrewer = new io.papermc.paper.potion.PaperPotionBrewer(console); // Paper - custom potion mixes
+         datapackManager = new io.papermc.paper.datapack.PaperDatapackManager(console.getPackRepository()); // Paper
+-        this.spark = new io.papermc.paper.SparksFly(this); // Paper - spark
++        if (false) this.spark = new io.papermc.paper.SparksFly(this); // Paper - spark // Kobosh - force-disable built-in spark plugin
+     }
+ 
+     public boolean getCommandBlockOverride(String command) {
+@@ -1058,7 +1058,7 @@ public final class CraftServer implements Server {
+         org.spigotmc.SpigotConfig.registerCommands(); // Spigot
+         com.kobosh.koboshfolia.tpsbar.commands.BarCommand.register(); // Kobosh
+         io.papermc.paper.command.PaperCommands.registerCommands(this.console); // Paper
+-        this.spark.registerCommandBeforePlugins(this); // Paper - spark
++        if (false) this.spark.registerCommandBeforePlugins(this); // Paper - spark // Kobosh - force-disable built-in spark plugin
+         this.overrideAllCommandBlockCommands = this.commandsConfiguration.getStringList("command-block-overrides").contains("*");
+         this.ignoreVanillaPermissions = this.commandsConfiguration.getBoolean("ignore-vanilla-permissions");
+ 
+@@ -1087,7 +1087,7 @@ public final class CraftServer implements Server {
+         this.loadPlugins();
+         this.enablePlugins(PluginLoadOrder.STARTUP);
+         this.enablePlugins(PluginLoadOrder.POSTWORLD);
+-        this.spark.registerCommandAfterPlugins(this); // Paper - spark
++        if (false) this.spark.registerCommandAfterPlugins(this); // Paper - spark // Kobosh - force-disable built-in spark plugin
+         if (io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper != null) io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper.pluginsEnabled(); // Paper - Remap plugins
+         // Paper start - brigadier command API
+         io.papermc.paper.command.brigadier.PaperCommands.INSTANCE.setValid(); // to clear invalid state for event fire below

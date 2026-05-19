@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Tue, 19 May 2026 09:04:25 -0700
+Subject: [PATCH] Purpur: lobotomize stuck villagers impl
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftVillager.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftVillager.java
+index 5d640445b54c71867e286fb12ada04536acda014..8bf203ed33a940db663ceefb7406202c4c188d8c 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftVillager.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftVillager.java
+@@ -244,4 +244,9 @@ public class CraftVillager extends CraftAbstractVillager implements Villager {
+     public void restock() {
+         getHandle().restock();
+     }
++
++    @Override
++    public boolean isLobotomized() {
++        return getHandle().isLobotomized();
++    }
+ }

@@ -1,0 +1,51 @@
+--- a/net/minecraft/world/phys/AABB.java
++++ b/net/minecraft/world/phys/AABB.java
+@@ -18,6 +_,14 @@
+     public final double maxX;
+     public final double maxY;
+     public final double maxZ;
++    // Kobosh start - Lithium fastutil
++    static {
++        assert Direction.Axis.X.ordinal() == 0;
++        assert Direction.Axis.Y.ordinal() == 1;
++        assert Direction.Axis.Z.ordinal() == 2;
++        assert Direction.Axis.values().length == 3;
++    }
++    // Kobosh end - Lithium fastutil
+ 
+     public AABB(double x1, double y1, double z1, double x2, double y2, double z2) {
+         this.minX = Math.min(x1, x2);
+@@ -80,11 +_,31 @@
+     }
+ 
+     public double min(Direction.Axis axis) {
+-        return axis.choose(this.minX, this.minY, this.minZ);
++        // Kobosh start - Lithium fastutil
++        switch (axis.ordinal()) {
++            case 0:
++                return this.minX;
++            case 1:
++                return this.minY;
++            case 2:
++                return this.minZ;
++        }
++        throw new IllegalArgumentException();
++        // Kobosh end - Lithium fastutil
+     }
+ 
+     public double max(Direction.Axis axis) {
+-        return axis.choose(this.maxX, this.maxY, this.maxZ);
++        // Kobosh start - Lithium fastutil
++        switch (axis.ordinal()) {
++            case 0:
++                return this.maxX;
++            case 1:
++                return this.maxY;
++            case 2:
++                return this.maxZ;
++        }
++        throw new IllegalArgumentException();
++        // Kobosh end - Lithium fastutil
+     }
+ 
+     @Override

@@ -1,0 +1,10 @@
+--- /dev/null
++++ b/me/earthme/luminol/config/modules/optimizations/AsyncProtocolChangeConfig.java
+@@ -1,0 +_,7 @@
++package me.earthme.luminol.config.modules.optimizations;
++
++public final class AsyncProtocolChangeConfig {
++    private AsyncProtocolChangeConfig() {}
++
++    public static boolean enabled = false;
++}

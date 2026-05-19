@@ -1,0 +1,102 @@
+--- a/net/minecraft/network/Connection.java
++++ b/net/minecraft/network/Connection.java
+@@ -367,6 +_,99 @@
+         }
+     }
+ 
++    // Kobosh start - async protocol switching optimization
++    public <T extends PacketListener> void setupInboundProtocolAsync(ProtocolInfo<T> protocolInfo, T packetInfo, @Nullable Runnable callback, boolean resumeAutoReading) {
++        this.validateListener(protocolInfo, packetInfo);
++        if (protocolInfo.flow() != this.getReceiving()) {
++            throw new IllegalStateException("Invalid inbound protocol: " + protocolInfo.id());
++        }
++        this.packetListener = packetInfo;
++        this.disconnectListener = null;
++
++        UnconfiguredPipelineHandler.InboundConfigurationTask inboundConfigurationTask = UnconfiguredPipelineHandler.setupInboundProtocol(protocolInfo);
++        BundlerInfo bundlerInfo = protocolInfo.bundlerInfo();
++        if (bundlerInfo != null) {
++            PacketBundlePacker packetBundlePacker = new PacketBundlePacker(bundlerInfo);
++            inboundConfigurationTask = inboundConfigurationTask.andThen(ctx -> ctx.pipeline().addAfter("decoder", "bundler", packetBundlePacker));
++        }
++
++        this.channel.config().setAutoRead(false);
++        final UnconfiguredPipelineHandler.InboundConfigurationTask finalInboundConfigurationTask = inboundConfigurationTask;
++        Runnable toExecute = () -> this.channel.writeAndFlush(finalInboundConfigurationTask).addListener(future -> {
++            try {
++                if (future.isSuccess()) {
++                    if (callback != null) {
++                        callback.run();
++                    }
++                    return;
++                }
++                Throwable ex = future.cause();
++                if (ex instanceof ClosedChannelException) {
++                    LOGGER.info("Connection closed during protocol change");
++                } else {
++                    this.channel.pipeline().fireExceptionCaught(ex);
++                }
++            } finally {
++                if (resumeAutoReading) {
++                    this.channel.config().setAutoRead(true);
++                    this.channel.read();
++                }
++            }
++        });
++
++        if (!this.channel.eventLoop().inEventLoop()) {
++            this.channel.eventLoop().execute(toExecute);
++            return;
++        }
++        toExecute.run();
++    }
++
++    public void setupOutboundProtocolAsync(ProtocolInfo<?> protocolInfo, @Nullable Runnable callback, boolean resumeAutoReading) {
++        if (protocolInfo.flow() != this.getSending()) {
++            throw new IllegalStateException("Invalid outbound protocol: " + protocolInfo.id());
++        }
++        UnconfiguredPipelineHandler.OutboundConfigurationTask outboundConfigurationTask = UnconfiguredPipelineHandler.setupOutboundProtocol(protocolInfo);
++        BundlerInfo bundlerInfo = protocolInfo.bundlerInfo();
++        if (bundlerInfo != null) {
++            PacketBundleUnpacker packetBundleUnpacker = new PacketBundleUnpacker(bundlerInfo);
++            outboundConfigurationTask = outboundConfigurationTask.andThen(ctx -> ctx.pipeline().addAfter("encoder", "unbundler", packetBundleUnpacker));
++        }
++
++        boolean loginProtocol = protocolInfo.id() == ConnectionProtocol.LOGIN;
++        this.channel.config().setAutoRead(false);
++        final UnconfiguredPipelineHandler.OutboundConfigurationTask finalOutboundConfigurationTask = outboundConfigurationTask;
++        Runnable toExecute = () -> this.channel.writeAndFlush(
++            finalOutboundConfigurationTask.andThen(ctx -> this.sendLoginDisconnect = loginProtocol)
++        ).addListener(future -> {
++            try {
++                if (future.isSuccess()) {
++                    if (callback != null) {
++                        callback.run();
++                    }
++                    return;
++                }
++                Throwable ex = future.cause();
++                if (ex instanceof ClosedChannelException) {
++                    LOGGER.info("Connection closed during protocol change");
++                } else {
++                    this.channel.pipeline().fireExceptionCaught(ex);
++                }
++            } finally {
++                if (resumeAutoReading) {
++                    this.channel.config().setAutoRead(true);
++                    this.channel.read();
++                }
++            }
++        });
++
++        if (!this.channel.eventLoop().inEventLoop()) {
++            this.channel.eventLoop().execute(toExecute);
++            return;
++        }
++        toExecute.run();
++    }
++    // Kobosh end - async protocol switching optimization
++
+     public void setupOutboundProtocol(ProtocolInfo<?> protocolInfo) {
+         if (protocolInfo.flow() != this.getSending()) {
+             throw new IllegalStateException("Invalid outbound protocol: " + protocolInfo.id());

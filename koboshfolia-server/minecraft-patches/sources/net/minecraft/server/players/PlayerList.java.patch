@@ -11,7 +11,34 @@
  import com.mojang.authlib.GameProfile;
  import com.mojang.logging.LogUtils;
  import java.io.File;
-@@ -947,6 +_,28 @@
+@@ -235,10 +_,7 @@
+         // only after setting the connection listener to game type, add the connection to this regions list
+         serverLevel.getCurrentWorldData().connections.add(connection);
+         // Folia end - rewrite login process
+-        connection.setupInboundProtocol(
+-            GameProtocols.SERVERBOUND_TEMPLATE.bind(RegistryFriendlyByteBuf.decorator(this.server.registryAccess()), serverGamePacketListenerImpl),
+-            serverGamePacketListenerImpl
+-        );
++        // Kobosh - async protocol switching optimization - delayed to the end of login setup
+         serverGamePacketListenerImpl.suspendFlushing();
+         GameRules gameRules = serverLevel.getGameRules();
+         boolean flag = gameRules.get(GameRules.IMMEDIATE_RESPAWN);
+@@ -401,6 +_,14 @@
+             );
+         }
+         // Paper end - Send empty chunk
++        // Kobosh start - async protocol switching optimization
++        connection.setupInboundProtocolAsync(
++            GameProtocols.SERVERBOUND_TEMPLATE.bind(RegistryFriendlyByteBuf.decorator(this.server.registryAccess()), serverGamePacketListenerImpl),
++            serverGamePacketListenerImpl,
++            null,
++            true
++        );
++        // Kobosh end - async protocol switching optimization
+     }
+ 
+     public void updateEntireScoreboard(ServerScoreboard scoreboard, ServerPlayer player) {
+@@ -947,6 +_,25 @@
          player.getBukkitEntity().recalculatePermissions(); // CraftBukkit
          this.server.getCommands().sendCommands(player);
          } // Paper - Add sendOpLevel API

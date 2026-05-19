@@ -1,0 +1,11 @@
+--- /dev/null
++++ b/me/earthme/luminol/config/modules/optimizations/PetalReduceSensorWorkConfig.java
+@@ -1,0 +_,8 @@
++package me.earthme.luminol.config.modules.optimizations;
++
++public final class PetalReduceSensorWorkConfig {
++    private PetalReduceSensorWorkConfig() {}
++
++    public static boolean enabled = true;
++    public static int delayTicks = 10;
++}
