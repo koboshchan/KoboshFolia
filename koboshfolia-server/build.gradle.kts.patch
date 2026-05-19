@@ -1,6 +1,6 @@
 --- a/folia-server/build.gradle.kts
 +++ b/folia-server/build.gradle.kts
-@@ -32,7 +_,22 @@
+@@ -32,7 +32,22 @@
          }
      }
  
@@ -24,7 +24,7 @@
  
  
      spigot {
-@@ -121,10 +_,14 @@
+@@ -121,10 +136,14 @@
      main {
          java { srcDir("../paper-server/src/main/java"); srcDir("../paper-server/src/generated/java") }
          resources { srcDir("../paper-server/src/main/resources") }
@@ -39,7 +39,7 @@
      }
  }
  val log4jPlugins = sourceSets.create("log4jPlugins") {
-@@ -152,7 +_,7 @@
+@@ -152,7 +171,7 @@
  }
  
  dependencies {
@@ -48,3 +48,23 @@
      implementation("ca.spottedleaf:concurrentutil:0.0.8")
      implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
      implementation("org.jline:jline-terminal-jni:3.27.1") // fall back to jni on java 21
+@@ -223,14 +242,14 @@
+        val gitBranch = git.exec(providers, "rev-parse", "--abbrev-ref", "HEAD").get().trim()
+        attributes(
+            "Main-Class" to "org.bukkit.craftbukkit.Main",
+-            "Implementation-Title" to "Folia",
++            "Implementation-Title" to "KoboshFolia",
+            "Implementation-Version" to implementationVersion,
+            "Implementation-Vendor" to date,
+-            "Specification-Title" to "Folia",
++            "Specification-Title" to "KoboshFolia",
+            "Specification-Version" to project.version,
+-            "Specification-Vendor" to "Paper Team",
+-            "Brand-Id" to "papermc:folia",
+-            "Brand-Name" to "Folia",
++            "Specification-Vendor" to "koboshchan",
++            "Brand-Id" to "koboshchan:koboshfolia",
++            "Brand-Name" to "KoboshFolia",
+            "Build-Number" to (build ?: ""),
+            "Build-Time" to buildTime.toString(),
+            "Git-Branch" to gitBranch,
