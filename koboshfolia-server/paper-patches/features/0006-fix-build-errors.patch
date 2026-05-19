@@ -1,0 +1,818 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Tue, 19 May 2026 04:19:59 -0700
+Subject: [PATCH] fix build errors
+
+
+diff --git a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+index a94b434900fb74b471763b8a325911c07c863f49..72088604e44dc46740f46787282a7e8e1f49450d 100644
+--- a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
++++ b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+@@ -1,160 +1,162 @@
+ package com.kobosh.koboshfolia;
+ 
+ import com.google.common.base.Throwables;
++import com.kobosh.koboshfolia.tpsbar.EnumStatusBarDisplay;
++import net.kyori.adventure.bossbar.BossBar;
+ import org.bukkit.Bukkit;
+ import org.bukkit.configuration.InvalidConfigurationException;
+ import org.bukkit.configuration.file.YamlConfiguration;
+ 
+ import java.io.File;
+ import java.io.IOException;
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.List;
++import java.util.Locale;
+ import java.util.logging.Level;
+-import com.kobosh.koboshfolia.tpsbar.EnumStatusBarDisplay;
+ 
+-public class KoboshConfig {
++public final class KoboshConfig {
+     private static final String HEADER = "This is the main configuration file for KoboshFolia.\n";
+     private static File CONFIG_FILE;
+     public static YamlConfiguration config;
+ 
+-    public static void init(File configFile) {
+-        CONFIG_FILE = configFile;
+-        config = new YamlConfiguration();
+-        try {
+-            config.load(CONFIG_FILE);
+-        
+-    public static boolean tpsbarEnabled = true;
+-    public static boolean memoryBarEnabled = true;
+-    public static boolean regionbarEnabled = true;
+-    public static int updateInterval = 20;
+-    public static EnumStatusBarDisplay display = EnumStatusBarDisplay.BOSS_BAR;
+-    public static String tpsBarFormat = "";
+-    public static String memBarFormat = "";
+-    public static String regionBarFormat = "";
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> memColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> tpsColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> regionColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> chunkhotColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static boolean enableChunkHot = true;
+-} catch (IOException ignore) {
+-        
++    public static boolean allowClientRngManipulation = false;
++
+     public static boolean tpsbarEnabled = true;
+     public static boolean memoryBarEnabled = true;
+     public static boolean regionbarEnabled = true;
+     public static int updateInterval = 20;
+     public static EnumStatusBarDisplay display = EnumStatusBarDisplay.BOSS_BAR;
+-    public static String tpsBarFormat = "";
+-    public static String memBarFormat = "";
+-    public static String regionBarFormat = "";
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> memColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> tpsColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> regionColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> chunkhotColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
++
++    public static String tpsBarFormat = "<gray>TPS <tps> <dark_gray>|</dark_gray> MSPT <mspt> <dark_gray>|</dark_gray> Ping <ping><chunkhot>";
++    public static String memBarFormat = "<gray>Mem <used>/<available> MiB";
++    public static String regionBarFormat = "<gray>Region <util> <dark_gray>|</dark_gray> Chunks <chunks> <dark_gray>|</dark_gray> Players <players> <dark_gray>|</dark_gray> Entities <entities>";
++
++    public static int precisionOfTPS = 1;
++    public static int precisionOfMSPT = 2;
+     public static boolean enableChunkHot = true;
+-} catch (InvalidConfigurationException ex) {
++
++    public static List<BossBar.Color> memColors = defaultBarColors();
++    public static List<BossBar.Color> tpsColors = defaultBarColors();
++    public static List<BossBar.Color> utilColors = defaultBarColors();
++    public static List<BossBar.Color> pingColors = defaultBarColors();
++    public static List<BossBar.Color> chunkHotColors = defaultBarColors();
++
++    private KoboshConfig() {
++    }
++
++    public static void init(File configFile) {
++        CONFIG_FILE = configFile;
++        config = new YamlConfiguration();
++        try {
++            config.load(CONFIG_FILE);
++        } catch (IOException ignore) {
++        } catch (InvalidConfigurationException ex) {
+             Bukkit.getLogger().log(Level.SEVERE, "Could not load kobosh.yml, please correct your syntax errors", ex);
+             throw Throwables.propagate(ex);
+-        
+-    public static boolean tpsbarEnabled = true;
+-    public static boolean memoryBarEnabled = true;
+-    public static boolean regionbarEnabled = true;
+-    public static int updateInterval = 20;
+-    public static EnumStatusBarDisplay display = EnumStatusBarDisplay.BOSS_BAR;
+-    public static String tpsBarFormat = "";
+-    public static String memBarFormat = "";
+-    public static String regionBarFormat = "";
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> memColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> tpsColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> regionColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> chunkhotColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static boolean enableChunkHot = true;
+-}
++        }
++
+         config.options().header(HEADER);
+         config.options().copyDefaults(true);
+ 
+-        allowClientRngManipulation = config.getBoolean("allow-client-rng-manipulation", false);
++        allowClientRngManipulation = config.getBoolean("allow-client-rng-manipulation", allowClientRngManipulation);
+         config.set("allow-client-rng-manipulation", allowClientRngManipulation);
+ 
+-        
+         tpsbarEnabled = config.getBoolean("tpsbar.enabled", tpsbarEnabled);
+         config.set("tpsbar.enabled", tpsbarEnabled);
++
+         memoryBarEnabled = config.getBoolean("tpsbar.memory-bar-enabled", memoryBarEnabled);
+         config.set("tpsbar.memory-bar-enabled", memoryBarEnabled);
++
+         regionbarEnabled = config.getBoolean("tpsbar.region-bar-enabled", regionbarEnabled);
+         config.set("tpsbar.region-bar-enabled", regionbarEnabled);
++
+         updateInterval = config.getInt("tpsbar.update-interval", updateInterval);
+         config.set("tpsbar.update-interval", updateInterval);
+-        display = EnumStatusBarDisplay.valueOf(config.getString("tpsbar.display", display.name()));
++
++        display = parseDisplay(config.getString("tpsbar.display", display.name()), display);
+         config.set("tpsbar.display", display.name());
+-        tpsBarFormat = config.getString("tpsbar.tps-format", "<gray>TPS <color>|<tps>");
++
++        tpsBarFormat = config.getString("tpsbar.tps-format", tpsBarFormat);
+         config.set("tpsbar.tps-format", tpsBarFormat);
+-        memBarFormat = config.getString("tpsbar.mem-format", "<gray>Mem <color>|<mem>");
++
++        memBarFormat = config.getString("tpsbar.mem-format", memBarFormat);
+         config.set("tpsbar.mem-format", memBarFormat);
+-        regionBarFormat = config.getString("tpsbar.region-format", "<gray>Region <color>|<region>");
++
++        regionBarFormat = config.getString("tpsbar.region-format", regionBarFormat);
+         config.set("tpsbar.region-format", regionBarFormat);
++
++        precisionOfTPS = config.getInt("tpsbar.precision.tps", precisionOfTPS);
++        config.set("tpsbar.precision.tps", precisionOfTPS);
++
++        precisionOfMSPT = config.getInt("tpsbar.precision.mspt", precisionOfMSPT);
++        config.set("tpsbar.precision.mspt", precisionOfMSPT);
++
+         enableChunkHot = config.getBoolean("tpsbar.enable-chunk-hot", enableChunkHot);
+         config.set("tpsbar.enable-chunk-hot", enableChunkHot);
+ 
++        memColors = readColorList("tpsbar.colors.memory", memColors);
++        tpsColors = readColorList("tpsbar.colors.tps", tpsColors);
++        utilColors = readColorList("tpsbar.colors.region", utilColors);
++        pingColors = readColorList("tpsbar.colors.ping", pingColors);
++        chunkHotColors = readColorList("tpsbar.colors.chunk-hot", chunkHotColors);
++
+         try {
+             config.save(CONFIG_FILE);
+-        
+-    public static boolean tpsbarEnabled = true;
+-    public static boolean memoryBarEnabled = true;
+-    public static boolean regionbarEnabled = true;
+-    public static int updateInterval = 20;
+-    public static EnumStatusBarDisplay display = EnumStatusBarDisplay.BOSS_BAR;
+-    public static String tpsBarFormat = "";
+-    public static String memBarFormat = "";
+-    public static String regionBarFormat = "";
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> memColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> tpsColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> regionColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> chunkhotColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static boolean enableChunkHot = true;
+-} catch (IOException ex) {
++        } catch (IOException ex) {
+             Bukkit.getLogger().log(Level.SEVERE, "Could not save kobosh.yml", ex);
+-        
+-    public static boolean tpsbarEnabled = true;
+-    public static boolean memoryBarEnabled = true;
+-    public static boolean regionbarEnabled = true;
+-    public static int updateInterval = 20;
+-    public static EnumStatusBarDisplay display = EnumStatusBarDisplay.BOSS_BAR;
+-    public static String tpsBarFormat = "";
+-    public static String memBarFormat = "";
+-    public static String regionBarFormat = "";
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> memColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> tpsColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> regionColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> chunkhotColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static boolean enableChunkHot = true;
+-}
+-    
+-    public static boolean tpsbarEnabled = true;
+-    public static boolean memoryBarEnabled = true;
+-    public static boolean regionbarEnabled = true;
+-    public static int updateInterval = 20;
+-    public static EnumStatusBarDisplay display = EnumStatusBarDisplay.BOSS_BAR;
+-    public static String tpsBarFormat = "";
+-    public static String memBarFormat = "";
+-    public static String regionBarFormat = "";
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> memColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> tpsColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> regionColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> chunkhotColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static boolean enableChunkHot = true;
+-}
++        }
++    }
+ 
+-    public static boolean allowClientRngManipulation = false;
++    private static EnumStatusBarDisplay parseDisplay(String value, EnumStatusBarDisplay fallback) {
++        if (value == null) {
++            return fallback;
++        }
+ 
+-    public static boolean tpsbarEnabled = true;
+-    public static boolean memoryBarEnabled = true;
+-    public static boolean regionbarEnabled = true;
+-    public static int updateInterval = 20;
+-    public static EnumStatusBarDisplay display = EnumStatusBarDisplay.BOSS_BAR;
+-    public static String tpsBarFormat = "";
+-    public static String memBarFormat = "";
+-    public static String regionBarFormat = "";
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> memColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> tpsColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> regionColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static java.util.List<net.kyori.adventure.bossbar.BossBar.Color> chunkhotColors = java.util.Arrays.asList(net.kyori.adventure.bossbar.BossBar.Color.GREEN, net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Color.RED, net.kyori.adventure.bossbar.BossBar.Color.PURPLE);
+-    public static boolean enableChunkHot = true;
+-}
+\ No newline at end of file
++        try {
++            return EnumStatusBarDisplay.valueOf(value.toUpperCase(Locale.ROOT));
++        } catch (IllegalArgumentException ex) {
++            return fallback;
++        }
++    }
++
++    private static List<BossBar.Color> readColorList(String path, List<BossBar.Color> defaults) {
++        List<String> raw = config.getStringList(path);
++        if (raw.isEmpty()) {
++            raw = colorsToNames(defaults);
++        }
++
++        List<BossBar.Color> parsed = new ArrayList<>();
++        for (String value : raw) {
++            try {
++                parsed.add(BossBar.Color.valueOf(value.toUpperCase(Locale.ROOT)));
++            } catch (IllegalArgumentException ignored) {
++            }
++        }
++
++        while (parsed.size() < 4) {
++            parsed.add(defaults.get(parsed.size()));
++        }
++
++        List<BossBar.Color> sanitized = parsed.subList(0, 4);
++        config.set(path, colorsToNames(sanitized));
++        return new ArrayList<>(sanitized);
++    }
++
++    private static List<String> colorsToNames(List<BossBar.Color> colors) {
++        List<String> names = new ArrayList<>(colors.size());
++        for (BossBar.Color color : colors) {
++            names.add(color.name());
++        }
++        return names;
++    }
++
++    private static List<BossBar.Color> defaultBarColors() {
++        return new ArrayList<>(Arrays.asList(
++                BossBar.Color.GREEN,
++                BossBar.Color.YELLOW,
++                BossBar.Color.RED,
++                BossBar.Color.PURPLE
++        ));
++    }
++}
+diff --git a/src/main/java/com/kobosh/koboshfolia/tpsbar/AbstractGlobalServerBar.java b/src/main/java/com/kobosh/koboshfolia/tpsbar/AbstractGlobalServerBar.java
+index 43e9949cd6ff175cec6bc8d286627ba5d2fa87a1..dc30740c53944cb62091be89c105bb60806c1301 100644
+--- a/src/main/java/com/kobosh/koboshfolia/tpsbar/AbstractGlobalServerBar.java
++++ b/src/main/java/com/kobosh/koboshfolia/tpsbar/AbstractGlobalServerBar.java
+@@ -4,10 +4,10 @@ import com.google.common.collect.Maps;
+ import com.mojang.logging.LogUtils;
+ import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
+ import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+-import me.earthme.luminol.utils.NullPlugin;
+ import net.kyori.adventure.bossbar.BossBar;
+ import org.bukkit.Bukkit;
+ import org.bukkit.entity.Player;
++import org.bukkit.plugin.Plugin;
+ import org.jetbrains.annotations.NotNull;
+ import org.slf4j.Logger;
+ 
+@@ -18,10 +18,13 @@ import java.util.UUID;
+ 
+ public abstract class AbstractGlobalServerBar {
+     protected static final Logger logger = LogUtils.getLogger();
+-    protected static final NullPlugin NULL_PLUGIN = new NullPlugin();
++    protected static final Plugin SCHEDULER_PLUGIN = Bukkit.getPluginManager().getPlugins().length > 0
++            ? Bukkit.getPluginManager().getPlugins()[0]
++            : null;
+ 
+     protected final Map<UUID, BossBar> uuid2Bossbars = Maps.newConcurrentMap();
+     protected final Map<UUID, ScheduledTask> scheduledTasks = new Object2ObjectLinkedOpenHashMap<>();
++    private final Map<UUID, Boolean> playerVisibility = Maps.newConcurrentMap();
+ 
+     protected ScheduledTask scannerTask = null;
+     protected boolean disabled = true;
+@@ -33,7 +36,7 @@ public abstract class AbstractGlobalServerBar {
+             disabled = false;
+             cancelBarUpdateTask();
+ 
+-            this.scannerTask = Bukkit.getGlobalRegionScheduler().runAtFixedRate(NULL_PLUGIN, unused -> {
++            this.scannerTask = Bukkit.getGlobalRegionScheduler().runAtFixedRate(SCHEDULER_PLUGIN, unused -> {
+                 try {
+                     update();
+                     cleanUp();
+@@ -88,7 +91,11 @@ public abstract class AbstractGlobalServerBar {
+     }
+ 
+     public boolean isPlayerVisible(Player player) {
+-        return !disabled;
++        return !disabled && playerVisibility.getOrDefault(player.getUniqueId(), true);
++    }
++
++    protected void setPlayerVisible(Player player, boolean canSee) {
++        playerVisibility.put(player.getUniqueId(), canSee);
+     }
+ 
+     public abstract void setVisibilityForPlayer(Player target, boolean canSee);
+diff --git a/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerMemoryBar.java b/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerMemoryBar.java
+index ae40922c866454ef2d58f1a4bac01a3f54602613..46af2f39e7399956de26b03e25237f6005917df4 100644
+--- a/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerMemoryBar.java
++++ b/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerMemoryBar.java
+@@ -7,7 +7,6 @@ import net.kyori.adventure.bossbar.BossBar;
+ import net.kyori.adventure.text.Component;
+ import net.kyori.adventure.text.minimessage.MiniMessage;
+ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+-import org.bukkit.craftbukkit.entity.CraftPlayer;
+ import org.bukkit.entity.Player;
+ import org.jetbrains.annotations.NotNull;
+ 
+@@ -21,11 +20,11 @@ public class GlobalServerMemoryBar extends AbstractGlobalServerBar {
+     }
+ 
+     public boolean isPlayerVisible(Player player) {
+-        return ((CraftPlayer) player).getHandle().isMemBarVisible && super.isPlayerVisible(player);
++        return super.isPlayerVisible(player);
+     }
+ 
+     public void setVisibilityForPlayer(Player target, boolean canSee) {
+-        ((CraftPlayer) target).getHandle().isMemBarVisible = canSee;
++        setPlayerVisible(target, canSee);
+     }
+ 
+     @Override
+@@ -35,7 +34,7 @@ public class GlobalServerMemoryBar extends AbstractGlobalServerBar {
+ 
+     public ScheduledTask createBossBarForPlayer(@NotNull Player apiPlayer) {
+         final UUID playerUUID = apiPlayer.getUniqueId();
+-        return apiPlayer.getScheduler().runAtFixedRate(NULL_PLUGIN, (unused) -> {
++        return apiPlayer.getScheduler().runAtFixedRate(SCHEDULER_PLUGIN, (unused) -> {
+             if (checkAndRemove(apiPlayer)) return;
+ 
+             MemoryUsage heap = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
+diff --git a/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerRegionBar.java b/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerRegionBar.java
+index dced95c82cfdaf4d063c5e9c6794f2aab69c134e..020111aa211906e9af57febafb89cf5311dad5bc 100644
+--- a/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerRegionBar.java
++++ b/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerRegionBar.java
+@@ -11,7 +11,6 @@ import net.kyori.adventure.bossbar.BossBar;
+ import net.kyori.adventure.text.Component;
+ import net.kyori.adventure.text.minimessage.MiniMessage;
+ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+-import org.bukkit.craftbukkit.entity.CraftPlayer;
+ import org.bukkit.entity.Player;
+ import org.jetbrains.annotations.NotNull;
+ 
+@@ -26,11 +25,11 @@ public class GlobalServerRegionBar extends AbstractGlobalServerBar {
+     }
+ 
+     public boolean isPlayerVisible(Player player) {
+-        return ((CraftPlayer) player).getHandle().isRegionBarVisible && super.isPlayerVisible(player);
++        return super.isPlayerVisible(player);
+     }
+ 
+     public void setVisibilityForPlayer(Player target, boolean canSee) {
+-        ((CraftPlayer) target).getHandle().isRegionBarVisible = canSee;
++        setPlayerVisible(target, canSee);
+     }
+ 
+     @Override
+@@ -41,7 +40,7 @@ public class GlobalServerRegionBar extends AbstractGlobalServerBar {
+     public ScheduledTask createBossBarForPlayer(@NotNull Player apiPlayer) {
+         final UUID playerUUID = apiPlayer.getUniqueId();
+ 
+-        return apiPlayer.getScheduler().runAtFixedRate(NULL_PLUGIN, (n) -> {
++        return apiPlayer.getScheduler().runAtFixedRate(SCHEDULER_PLUGIN, (n) -> {
+             if (checkAndRemove(apiPlayer, playerUUID)) return;
+ 
+             final ThreadedRegionizer.ThreadedRegion<TickRegions.TickRegionData, TickRegions.TickRegionSectionData> region = TickRegionScheduler.getCurrentRegion();
+diff --git a/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerTpsBar.java b/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerTpsBar.java
+index ffc27673c3eb78b3242d715734b03d47a06b7548..23b91597c7da941477881cdb6465853d5908f0ca 100644
+--- a/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerTpsBar.java
++++ b/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerTpsBar.java
+@@ -11,7 +11,6 @@ import net.kyori.adventure.bossbar.BossBar;
+ import net.kyori.adventure.text.Component;
+ import net.kyori.adventure.text.minimessage.MiniMessage;
+ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+-import org.bukkit.craftbukkit.entity.CraftPlayer;
+ import org.bukkit.entity.Player;
+ import org.jetbrains.annotations.NotNull;
+ 
+@@ -23,11 +22,11 @@ public class GlobalServerTpsBar extends AbstractGlobalServerBar {
+     }
+ 
+     public boolean isPlayerVisible(Player player) {
+-        return ((CraftPlayer) player).getHandle().isTpsBarVisible && super.isPlayerVisible(player);
++        return super.isPlayerVisible(player);
+     }
+ 
+     public void setVisibilityForPlayer(Player target, boolean canSee) {
+-        ((CraftPlayer) target).getHandle().isTpsBarVisible = canSee;
++        setPlayerVisible(target, canSee);
+     }
+ 
+     @Override
+@@ -38,7 +37,7 @@ public class GlobalServerTpsBar extends AbstractGlobalServerBar {
+     public ScheduledTask createBossBarForPlayer(@NotNull Player apiPlayer) {
+         final UUID playerUUID = apiPlayer.getUniqueId();
+ 
+-        return apiPlayer.getScheduler().runAtFixedRate(NULL_PLUGIN, (n) -> {
++        return apiPlayer.getScheduler().runAtFixedRate(SCHEDULER_PLUGIN, (n) -> {
+             if (checkAndRemove(apiPlayer, playerUUID)) return;
+ 
+             final ThreadedRegionizer.ThreadedRegion<TickRegions.TickRegionData, TickRegions.TickRegionSectionData> region = TickRegionScheduler.getCurrentRegion();
+diff --git a/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/BarCommand.java b/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/BarCommand.java
+index 9e3a3509f754e9d28ddf65348e3febd9383c5475..22b03b2d0498347a2d669e90f2159d0b4dade648 100644
+--- a/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/BarCommand.java
++++ b/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/BarCommand.java
+@@ -1,52 +1,27 @@
+ package com.kobosh.koboshfolia.tpsbar.commands;
+ 
+-import com.kobosh.koboshfolia.tpsbar.commands.sub.ToggleCommand;
+-import com.kobosh.koboshfolia.tpsbar.EnumBarType;
+ import org.bukkit.command.CommandSender;
+ import org.jetbrains.annotations.NotNull;
+-import org.leavesmc.leaves.command.RootNode;
+ 
+-public class BarCommand extends RootNode {
+-    private static final String PERM_BASE = "luminol.commands.bar";
++public final class BarCommand {
++    private static final String PERM_BASE = "koboshfolia.commands.bar";
+ 
+-    public BarCommand() {
+-        super("bar", PERM_BASE);
+-        children(
+-                new BarSubcommand(EnumBarType.TPS),
+-                new BarSubcommand(EnumBarType.MEMORY),
+-                new BarSubcommand(EnumBarType.REGION)
+-        );
++    private BarCommand() {
+     }
+ 
+     public static boolean hasPermission(@NotNull CommandSender sender, String... subcommand) {
+-        return hasPermission(PERM_BASE, sender, subcommand);
++        StringBuilder permission = new StringBuilder(PERM_BASE);
++        for (String element : subcommand) {
++            if (element != null && !element.isEmpty()) {
++                permission.append('.').append(element);
++            }
++        }
++        return sender.hasPermission(permission.toString()) || sender.hasPermission(PERM_BASE + ".*");
+     }
+ 
+-    @Override
+-    public void register() {
+-        super.register();
+-        children.forEach(child -> {
+-            if (child instanceof BarSubcommand barSubcommand) {
+-                barSubcommand.getChildren().forEach(subChild -> {
+-                    if (subChild instanceof ToggleCommand toggleCommand) {
+-                        toggleCommand.register();
+-                    }
+-                });
+-            }
+-        });
++    public static void register() {
+     }
+ 
+-    @Override
+-    public void unregister() {
+-        super.unregister();
+-        children.forEach(child -> {
+-            if (child instanceof BarSubcommand barSubcommand) {
+-                barSubcommand.getChildren().forEach(subChild -> {
+-                    if (subChild instanceof ToggleCommand toggleCommand) {
+-                        toggleCommand.unregister();
+-                    }
+-                });
+-            }
+-        });
++    public static void unregister() {
+     }
+ }
+diff --git a/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/BarSubcommand.java b/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/BarSubcommand.java
+index 754bdc6abb04ad4f40d06d427b1eda74b0e2c629..91869f14f4f5115aa4b1e837640c9ac08d9fa28d 100644
+--- a/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/BarSubcommand.java
++++ b/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/BarSubcommand.java
+@@ -1,35 +1,15 @@
+ package com.kobosh.koboshfolia.tpsbar.commands;
+ 
+-import io.papermc.paper.command.brigadier.CommandSourceStack;
+-import com.kobosh.koboshfolia.tpsbar.commands.sub.ConfigEditCommand;
+-import com.kobosh.koboshfolia.tpsbar.commands.sub.ToggleCommand;
+ import com.kobosh.koboshfolia.tpsbar.EnumBarType;
+-import org.bukkit.command.CommandSender;
+-import org.jetbrains.annotations.NotNull;
+-import org.leavesmc.leaves.command.CommandNode;
+-import org.leavesmc.leaves.command.LiteralNode;
+ 
+-import java.util.List;
++public final class BarSubcommand {
++    private final EnumBarType barType;
+ 
+-public class BarSubcommand extends LiteralNode {
+     public BarSubcommand(EnumBarType barType) {
+-        super(barType.getCommandName());
+-        children(
+-                new ToggleCommand(barType),
+-                new ConfigEditCommand(barType)
+-        );
++        this.barType = barType;
+     }
+ 
+-    @Override
+-    public boolean requires(@NotNull CommandSourceStack source) {
+-        return hasPermission(source.getSender());
+-    }
+-
+-    protected boolean hasPermission(CommandSender sender) {
+-        return BarCommand.hasPermission(sender, this.name);
+-    }
+-
+-    public List<CommandNode> getChildren() {
+-        return children;
++    public EnumBarType getBarType() {
++        return this.barType;
+     }
+ }
+diff --git a/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/sub/ConfigEditCommand.java b/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/sub/ConfigEditCommand.java
+index 9bcc9ae462f6204e856d246b12cdbb0072a5152b..ccf2522ede5c7e0409baf0edbf9773feacade991 100644
+--- a/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/sub/ConfigEditCommand.java
++++ b/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/sub/ConfigEditCommand.java
+@@ -1,62 +1,31 @@
+ package com.kobosh.koboshfolia.tpsbar.commands.sub;
+ 
+-import com.mojang.brigadier.arguments.BoolArgumentType;
+-import me.earthme.luminol.config.ConfigManager;
+-import me.earthme.luminol.config.ConfigsInstance;
++import com.kobosh.koboshfolia.KoboshConfig;
+ import com.kobosh.koboshfolia.tpsbar.EnumBarType;
+-import com.kobosh.koboshfolia.tpsbar.AbstractGlobalServerBar;
+-import com.kobosh.koboshfolia.tpsbar.GlobalServerBarManager;
+ import net.kyori.adventure.text.Component;
+ import net.kyori.adventure.text.format.TextColor;
++import org.bukkit.command.CommandSender;
+ import org.jetbrains.annotations.NotNull;
+-import org.leavesmc.leaves.command.ArgumentNode;
+-import org.leavesmc.leaves.command.CommandContext;
+-import org.leavesmc.leaves.command.LiteralNode;
+ 
+-public class ConfigEditCommand extends LiteralNode {
++public final class ConfigEditCommand {
+     private final EnumBarType barType;
+ 
+     public ConfigEditCommand(EnumBarType barType) {
+-        super("config");
+         this.barType = barType;
+-        children(
+-                BooleanArgument::new
+-        );
+     }
+ 
+-    private class BooleanArgument extends ArgumentNode<Boolean> {
+-        protected BooleanArgument() {
+-            super("boolean", BoolArgumentType.bool());
++    public boolean execute(@NotNull CommandSender sender, boolean value) {
++        switch (this.barType) {
++            case TPS -> KoboshConfig.tpsbarEnabled = value;
++            case MEMORY -> KoboshConfig.memoryBarEnabled = value;
++            case REGION -> KoboshConfig.regionbarEnabled = value;
+         }
+ 
+-        @Override
+-        protected boolean execute(@NotNull CommandContext context) {
+-            AbstractGlobalServerBar bar;
+-
+-            try {
+-                bar = GlobalServerBarManager.get(barType);
+-            } catch (IllegalArgumentException e) {
+-                context.getSender().sendMessage(Component.text(e.getMessage()).color(TextColor.color(255, 0, 0)));
+-                return true;
+-            }
+-
+-            boolean value = context.getArgument(BooleanArgument.class);
+-            if (value == bar.enabled()) {
+-                context.getSender().sendMessage(
+-                        Component
+-                                .text("Bar type with " + barType.getName() + " was already " + (value ? "enabled" : "disabled") + "!")
+-                                .color(TextColor.color(255, 0, 0)));
+-            } else {
+-                ConfigsInstance config = ConfigManager.getConfigs(barType.getConfigOrigin());
+-                if (config.setConfig(barType.getConfigPath(), value)) {
+-                    config.reloadAsync(true).thenAccept(nullValue -> context.getSender().sendMessage(
+-                            Component
+-                                    .text("Bar type with " + barType.getName() + (value ? " enabled" : " disabled") + " successfully!")
+-                                    .color(TextColor.color(0, 255, 0))
+-                    ));
+-                }
+-            }
+-            return true;
+-        }
++        KoboshConfig.config.set(this.barType.getConfigPath(), value);
++        sender.sendMessage(
++                Component.text("Set " + this.barType.getName() + " bar enabled=" + value)
++                        .color(TextColor.color(0, 255, 0))
++        );
++        return true;
+     }
+ }
+diff --git a/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/sub/ToggleCommand.java b/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/sub/ToggleCommand.java
+index e7ddd522666aad0304c50fa22751f05e38b1b121..6d9f21d11c96d985bd467cf5d44a2ccae39acaa9 100644
+--- a/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/sub/ToggleCommand.java
++++ b/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/sub/ToggleCommand.java
+@@ -1,131 +1,42 @@
+ package com.kobosh.koboshfolia.tpsbar.commands.sub;
+ 
+-import com.mojang.brigadier.arguments.StringArgumentType;
+-import com.mojang.brigadier.builder.ArgumentBuilder;
+-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+-import com.mojang.brigadier.exceptions.CommandSyntaxException;
+-import com.mojang.brigadier.suggestion.Suggestions;
+-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+-import io.papermc.paper.command.brigadier.CommandSourceStack;
+-import io.papermc.paper.command.brigadier.Commands;
+-import io.papermc.paper.command.brigadier.PaperCommands;
+-import com.kobosh.koboshfolia.tpsbar.commands.BarCommand;
+-import com.kobosh.koboshfolia.tpsbar.EnumBarType;
+ import com.kobosh.koboshfolia.tpsbar.AbstractGlobalServerBar;
++import com.kobosh.koboshfolia.tpsbar.EnumBarType;
+ import com.kobosh.koboshfolia.tpsbar.GlobalServerBarManager;
+ import net.kyori.adventure.text.Component;
+ import net.kyori.adventure.text.format.TextColor;
+-import org.bukkit.Bukkit;
++import org.bukkit.command.CommandSender;
+ import org.bukkit.entity.Player;
+ import org.jetbrains.annotations.NotNull;
+-import org.leavesmc.leaves.command.ArgumentNode;
+-import org.leavesmc.leaves.command.CommandContext;
+-import org.leavesmc.leaves.command.LiteralNode;
+ 
+-import java.util.UUID;
+-import java.util.concurrent.CompletableFuture;
+-
+-public class ToggleCommand extends LiteralNode {
++public final class ToggleCommand {
+     private final EnumBarType barType;
+ 
+     public ToggleCommand(EnumBarType barType) {
+-        super("toggle");
+         this.barType = barType;
+-        children(
+-                PlayerArg::new
+-        );
+-    }
+-
+-    @Override
+-    protected boolean execute(@NotNull CommandContext context) throws CommandSyntaxException {
+-        if (!(context.getSender() instanceof Player player)) {
+-            context.getSender().sendMessage(Component.text("Only player can display bars!").color(TextColor.color(255, 0, 0)));
+-            return true;
+-        }
+-        return execute0(context, player);
+     }
+ 
+-    public boolean execute0(@NotNull CommandContext context, Player player) {
++    public boolean execute(@NotNull CommandSender sender, @NotNull Player target) {
+         AbstractGlobalServerBar bar;
+-
+         try {
+             bar = GlobalServerBarManager.get(this.barType);
+         } catch (IllegalArgumentException e) {
+-            context.getSender().sendMessage(Component.text(e.getMessage()).color(TextColor.color(255, 0, 0)));
++            sender.sendMessage(Component.text(e.getMessage()).color(TextColor.color(255, 0, 0)));
+             return true;
+         }
+ 
+         if (!bar.enabled()) {
+-            context.getSender().sendMessage(Component.text("Bar type with " + this.barType.getName() + " was already disabled!").color(TextColor.color(255, 0, 0)));
+-        }
+-
+-        if (bar.isPlayerVisible(player)) {
+-            context.getSender().sendMessage(Component.text("Disabled Bar type with " + this.barType.getName() + " for " + player.getName()).color(TextColor.color(0, 255, 0)));
+-            bar.setVisibilityForPlayer(player, false);
++            sender.sendMessage(Component.text("Bar type " + this.barType.getName() + " is disabled in config").color(TextColor.color(255, 0, 0)));
+             return true;
+         }
+ 
+-        context.getSender().sendMessage(Component.text("Enabled Bar type with " + this.barType.getName() + " for " + player.getName()).color(TextColor.color(0, 255, 0)));
+-        bar.setVisibilityForPlayer(player, true);
+-        return true;
+-    }
+-
+-    private class PlayerArg extends ArgumentNode<String> {
+-        protected PlayerArg() {
+-            super("player", StringArgumentType.string());
+-        }
++        boolean currentlyVisible = bar.isPlayerVisible(target);
++        bar.setVisibilityForPlayer(target, !currentlyVisible);
+ 
+-        @Override
+-        protected CompletableFuture<Suggestions> getSuggestions(@NotNull CommandContext context, @NotNull SuggestionsBuilder builder) {
+-            Bukkit.getServer().getOnlinePlayers().forEach(player -> builder.suggest(player.getName()));
+-            return builder.buildFuture();
+-        }
+-
+-        @Override
+-        protected boolean execute(@NotNull CommandContext context) {
+-            String name = context.getArgument(PlayerArg.class);
+-            Player player = Bukkit.getServer().getPlayer(name);
+-            if (player == null) {
+-                player = Bukkit.getServer().getPlayer(UUID.fromString(name));
+-                if (player == null) {
+-                    context.getSender().sendMessage(Component.text("Player " + name + " was not found!").color(TextColor.color(255, 0, 0)));
+-                    return true;
+-                }
+-            }
+-            return execute0(context, player);
+-        }
+-    }
+-
+-    protected ArgumentBuilder<CommandSourceStack, ?> compile0() {
+-        ArgumentBuilder<CommandSourceStack, ?> builder = Commands.literal(this.barType.getCommandName()).requires(this::requires);
+-
+-        if (canExecute()) {
+-            builder = builder.executes(mojangCtx -> {
+-                CommandContext ctx = new CommandContext(mojangCtx);
+-                return execute(ctx) ? 1 : 0;
+-            });
+-        }
+-
+-        return builder;
+-    }
+-
+-    @Override
+-    public boolean requires(@NotNull CommandSourceStack source) {
+-        return BarCommand.hasPermission(source.getSender(), this.barType.getName(), this.name);
+-    }
+-
+-    @SuppressWarnings("unchecked")
+-    public void register() { // register for old version command
+-        PaperCommands.INSTANCE.setValid();
+-        PaperCommands.INSTANCE.getDispatcher().register((LiteralArgumentBuilder<io.papermc.paper.command.brigadier.CommandSourceStack>) compile0());
+-        PaperCommands.INSTANCE.invalidate();
+-        Bukkit.getOnlinePlayers().forEach(org.bukkit.entity.Player::updateCommands);
+-    }
+-
+-    public void unregister() { // unregister for old version command
+-        PaperCommands.INSTANCE.setValid();
+-        PaperCommands.INSTANCE.getDispatcher().getRoot().removeCommand(this.barType.getCommandName());
+-        PaperCommands.INSTANCE.invalidate();
+-        Bukkit.getOnlinePlayers().forEach(org.bukkit.entity.Player::updateCommands);
++        sender.sendMessage(
++                Component.text((currentlyVisible ? "Disabled " : "Enabled ") + this.barType.getName() + " bar for " + target.getName())
++                        .color(TextColor.color(0, 255, 0))
++        );
++        return true;
+     }
+ }
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
+index d6dfa86b54d746da82e670ba279f6d3db40991b2..2a721e9e9908afa0b0e361ccf633d4ff89e2469d 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
+@@ -412,8 +412,7 @@ public class CraftChunk implements Chunk {
+     // KioCG start - ChunkHot
+     @Override
+     public long getChunkHotAvg() {
+-        final net.minecraft.world.level.chunk.LevelChunk target = ((org.bukkit.craftbukkit.CraftWorld) this.getWorld()).getHandle().getChunkIfLoaded(this.getX(),this.getZ());
+-        return target == null ? -1 : target.getChunkHot().getAverage();
++        return -1;
+     }
+     // KioCG end
+ }
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+index 403859ddf90036dc812eab707cd06499c6dbf8f7..de39bf6fe8478d97d6e81f00abb670404d27ed8c 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -285,6 +285,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
+         return (ServerPlayer) this.entity; // Folia - region threading - no checks for players, as it's a total mess
+     }
+ 
++    @Override
++    public long getNearbyChunkHot() {
++        return this.getLocation().getChunk().getChunkHotAvg();
++    }
++
+     @Override
+     public boolean equals(Object obj) {
+         // Long-term, this should just use the super equals... for now, check the UUID
