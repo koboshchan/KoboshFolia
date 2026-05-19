@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Tue, 19 May 2026 02:54:27 -0700
+Subject: [PATCH] Tab completion for basic aliases
+
+
+diff --git a/src/main/java/org/bukkit/command/FormattedCommandAlias.java b/src/main/java/org/bukkit/command/FormattedCommandAlias.java
+index 59fada9b1eb78238d280c6bbb711f52facba52c6..2be9c69d07be5fb516b7c1e4f8822a32545dc9ec 100644
+--- a/src/main/java/org/bukkit/command/FormattedCommandAlias.java
++++ b/src/main/java/org/bukkit/command/FormattedCommandAlias.java
+@@ -42,6 +42,22 @@ public class FormattedCommandAlias extends Command {
+         return result;
+     }
+ 
++    // Kobosh start - Tab completion for basic aliases
++    private static final java.util.Set<String> VALID_FINAL_ARGS = java.util.Set.of("$1-", "$$1-");
++    @Override
++    public java.util.@NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) throws IllegalArgumentException {
++        final String[] commandString = this.formatStrings[0].strip().split(" ");
++        if (commandString.length >= 2 && VALID_FINAL_ARGS.contains(commandString[commandString.length - 1])) {
++            Command command = java.util.Objects.requireNonNull(Bukkit.getCommandMap().getCommand(commandString[0]), "SimpleCommandMap#registerServerAliases checks for the existence of a command");
++            final String[] newArgs = new String[commandString.length - 2 + args.length];
++            System.arraycopy(commandString, 1, newArgs, 0, commandString.length - 2);
++            System.arraycopy(args, 0, newArgs, commandString.length - 2, args.length);
++            return command.tabComplete(sender, alias, newArgs);
++        }
++        return super.tabComplete(sender, alias, args);
++    }
++    // Kobosh end - Tab completion for basic aliases
++
+     private String buildCommand(@NotNull CommandSender sender, @NotNull String formatString, @NotNull String[] args) { // Paper
+         if (formatString.contains("$sender")) { // Paper
+             formatString = formatString.replaceAll(Pattern.quote("$sender"), Matcher.quoteReplacement(sender.getName())); // Paper

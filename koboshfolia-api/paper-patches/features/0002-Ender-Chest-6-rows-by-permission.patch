@@ -1,11 +1,11 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: koboshchan <lucaszhang1001@gmail.com>
-Date: Fri, 15 May 2026 23:12:09 -0700
+Date: Tue, 19 May 2026 02:52:33 -0700
 Subject: [PATCH] Ender Chest: 6 rows by permission
 
 
 diff --git a/src/main/java/org/bukkit/util/permissions/DefaultPermissions.java b/src/main/java/org/bukkit/util/permissions/DefaultPermissions.java
-index e1a4ddf2c07cdd242fa8054a0152522fe4039e85..09474b52076f29f35799e3bb84a80ad7fab16205 100644
+index e1a4ddf2c07cdd242fa8054a0152522fe4039e85..09db2ce6f571ca513b81c30f47f4ea09122dfecc 100644
 --- a/src/main/java/org/bukkit/util/permissions/DefaultPermissions.java
 +++ b/src/main/java/org/bukkit/util/permissions/DefaultPermissions.java
 @@ -89,6 +89,15 @@ public final class DefaultPermissions {
