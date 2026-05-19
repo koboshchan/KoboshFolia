@@ -1,0 +1,2 @@
+./gradlew fixupMinecraftSourcePatches
+./gradlew fixupMinecraftResourcePatches
