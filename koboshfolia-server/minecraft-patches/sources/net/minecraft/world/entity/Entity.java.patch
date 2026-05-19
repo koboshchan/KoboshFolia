@@ -5,7 +5,7 @@
      public double zOld;
      public boolean noPhysics;
 -    public final RandomSource random = SHARED_RANDOM; // Paper - Share random for entities to make them more random
-+    public final RandomSource random = org.kobosh.koboshfolia.KoboshConfig.allowClientRngManipulation ? RandomSource.create() : SHARED_RANDOM; // Kobosh - allow-client-rng-manipulation
++    public final RandomSource random = com.kobosh.koboshfolia.KoboshConfig.allowClientRngManipulation ? RandomSource.create() : SHARED_RANDOM; // Kobosh - allow-client-rng-manipulation
      public int tickCount;
      private int remainingFireTicks;
      public boolean wasTouchingWater;

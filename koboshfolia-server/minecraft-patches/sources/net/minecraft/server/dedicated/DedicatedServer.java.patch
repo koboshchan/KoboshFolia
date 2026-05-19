@@ -1,0 +1,10 @@
+--- a/net/minecraft/server/dedicated/DedicatedServer.java
++++ b/net/minecraft/server/dedicated/DedicatedServer.java
+@@ -254,6 +_,7 @@
+         // Spigot start
+         this.setPlayerList(new DedicatedPlayerList(this, this.registries(), this.playerDataStorage));
+         org.spigotmc.SpigotConfig.init((java.io.File) this.options.valueOf("spigot-settings"));
++        com.kobosh.koboshfolia.KoboshConfig.init((java.io.File) this.options.valueOf("kobosh-settings"));
+         org.spigotmc.SpigotConfig.registerCommands();
+         // Spigot end
+         io.papermc.paper.util.ObfHelper.INSTANCE.getClass(); // Paper - load mappings for stacktrace deobf and etc.
