@@ -1,0 +1,102 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Tue, 19 May 2026 05:21:36 -0700
+Subject: [PATCH] hotchunk implementation
+
+
+diff --git a/src/main/java/com/kiocg/ChunkHot.java b/src/main/java/com/kiocg/ChunkHot.java
+index 387bdafe0325004757edb391cd3b291238f3e203..2a5f1aac36b58c7187a223343d258dce392830d1 100644
+--- a/src/main/java/com/kiocg/ChunkHot.java
++++ b/src/main/java/com/kiocg/ChunkHot.java
+@@ -6,7 +6,7 @@ public class ChunkHot {
+     // 热度统计总区间数量
+     private static final int TIMES_LENGTH = 10;
+     // 当前统计区间下标
+-    private int index = -1;
++    private int index = 0;
+ 
+     // 热度统计区间
+     private final long[] times = new long[TIMES_LENGTH];
+@@ -55,7 +55,6 @@ public class ChunkHot {
+      * 开始一个具体统计
+      */
+     public void startTicking() {
+-        if (!started) return;
+         nanos = System.nanoTime();
+     }
+ 
+@@ -64,10 +63,14 @@ public class ChunkHot {
+      * 将统计值计入当前热度区间
+      */
+     public void stopTickingAndCount() {
+-        if (!started) return;
+         // 定义一个具体统计的最大值为 1,000,000
+         // 有时候某个具体统计的计算值会在某1刻飙升，可能是由于保存数据到磁盘？
+-        times[this.index] += Math.min(System.nanoTime() - nanos, 1000000L);
++        final long measured = Math.min(System.nanoTime() - nanos, 1000000L);
++
++        total -= times[this.index];
++        times[this.index] = measured;
++        total += measured;
++        this.index = (this.index + 1) % TIMES_LENGTH;
+     }
+ 
+     /**
+@@ -79,12 +82,13 @@ public class ChunkHot {
+         temp = 0L;
+         total = 0L;
+         nanos = 0L;
++        index = 0;
+     }
+ 
+     /**
+      * @return 获取区块热度平均值
+      */
+     public long getAverage() {
+-        return total / ((long) TIMES_LENGTH * 20L);
++        return total / (long) TIMES_LENGTH;
+     }
+ }
+\ No newline at end of file
+diff --git a/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerTpsBar.java b/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerTpsBar.java
+index 23b91597c7da941477881cdb6465853d5908f0ca..e18200d8b5c80b030efe559648d1dd610ebbbcf7 100644
+--- a/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerTpsBar.java
++++ b/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerTpsBar.java
+@@ -128,6 +128,10 @@ public class GlobalServerTpsBar extends AbstractGlobalServerBar {
+     }
+ 
+     private @NotNull Component getChunkHotComponent(long chunkHot) {
++        if (chunkHot < 0) {
++            return Component.empty();
++        }
++
+         final BossBar.Color colorBukkit = barColorFromChunkHot(chunkHot);
+         final String colorString = colorBukkit.name();
+ 
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
+index 2a721e9e9908afa0b0e361ccf633d4ff89e2469d..0018c2b985f057e27e73d936f827d40dcd8174ef 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
+@@ -412,7 +412,8 @@ public class CraftChunk implements Chunk {
+     // KioCG start - ChunkHot
+     @Override
+     public long getChunkHotAvg() {
+-        return -1;
++        final net.minecraft.world.level.chunk.LevelChunk target = ((org.bukkit.craftbukkit.CraftWorld) this.getWorld()).getHandle().getChunkIfLoaded(this.getX(), this.getZ());
++        return target == null ? -1 : target.getChunkHot().getAverage();
+     }
+     // KioCG end
+ }
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+index de39bf6fe8478d97d6e81f00abb670404d27ed8c..132bfa04de6bed9390061d7b12024eea11d8da48 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -287,7 +287,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
+ 
+     @Override
+     public long getNearbyChunkHot() {
+-        return this.getLocation().getChunk().getChunkHotAvg();
++        return this.getHandle().getNearbyChunkHot();
+     }
+ 
+     @Override

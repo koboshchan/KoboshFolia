@@ -1,0 +1,41 @@
+--- a/net/minecraft/world/level/chunk/LevelChunk.java
++++ b/net/minecraft/world/level/chunk/LevelChunk.java
+@@ -100,6 +_,7 @@
+     private final Int2ObjectMap<GameEventListenerRegistry> gameEventListenerRegistrySections;
+     private final LevelChunkTicks<Block> blockTicks;
+     private final LevelChunkTicks<Fluid> fluidTicks;
++    private final com.kiocg.ChunkHot chunkHot = new com.kiocg.ChunkHot();
+     private LevelChunk.UnsavedListener unsavedListener = chunkPos -> {};
+     // CraftBukkit start
+     public boolean mustNotSave;
+@@ -137,6 +_,10 @@
+     private final boolean debug;
+     private final BlockState defaultBlockState;
+ 
++    public com.kiocg.ChunkHot getChunkHot() {
++        return this.chunkHot;
++    }
++
+     @Override
+     public final BlockState moonrise$getBlock(final int x, final int y, final int z) {
+         return this.getBlockStateFinal(x, y, z);
+@@ -967,6 +_,7 @@
+                     try {
+                         ProfilerFiller profilerFiller = Profiler.get();
+                         profilerFiller.push(this::getType);
++                        LevelChunk.this.chunkHot.startTicking();
+                         profiler.startTimer(timerId); try { // Folia - profiler
+                         BlockState blockState = LevelChunk.this.getBlockState(blockPos);
+                         if (this.blockEntity.getType().isValid(blockState)) {
+@@ -981,7 +_,10 @@
+                             }
+                             // Paper end - Remove the Block Entity if it's invalid
+                         }
+-                        } finally { profiler.stopTimer(timerId); } // Folia - profiler
++                        } finally {
++                            profiler.stopTimer(timerId); // Folia - profiler
++                            LevelChunk.this.chunkHot.stopTickingAndCount();
++                        }
+ 
+                         profilerFiller.pop();
+                     } catch (Throwable var5) {
