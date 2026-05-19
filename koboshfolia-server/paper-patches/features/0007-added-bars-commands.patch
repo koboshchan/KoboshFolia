@@ -1,0 +1,203 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Tue, 19 May 2026 04:43:47 -0700
+Subject: [PATCH] added bars commands
+
+
+diff --git a/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/BarCommand.java b/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/BarCommand.java
+index 22b03b2d0498347a2d669e90f2159d0b4dade648..b7dbbe7d812701aff1ef2bc639f57d1444a0efde 100644
+--- a/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/BarCommand.java
++++ b/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/BarCommand.java
+@@ -1,10 +1,28 @@
+ package com.kobosh.koboshfolia.tpsbar.commands;
+ 
++import com.kobosh.koboshfolia.tpsbar.EnumBarType;
++import com.kobosh.koboshfolia.tpsbar.commands.sub.ToggleCommand;
++import net.kyori.adventure.text.Component;
++import net.kyori.adventure.text.format.TextColor;
++import net.minecraft.server.MinecraftServer;
++import org.bukkit.Bukkit;
++import org.bukkit.command.Command;
+ import org.bukkit.command.CommandSender;
++import org.bukkit.command.SimpleCommandMap;
++import org.bukkit.entity.Player;
+ import org.jetbrains.annotations.NotNull;
+ 
++import java.util.ArrayList;
++import java.util.HashMap;
++import java.util.List;
++import java.util.Locale;
++import java.util.Map;
++import java.util.UUID;
++
+ public final class BarCommand {
+     private static final String PERM_BASE = "koboshfolia.commands.bar";
++    private static final String ROOT_NAME = "bar";
++    private static final Map<String, Command> REGISTERED_COMMANDS = new HashMap<>();
+ 
+     private BarCommand() {
+     }
+@@ -20,8 +38,151 @@ public final class BarCommand {
+     }
+ 
+     public static void register() {
++        SimpleCommandMap commandMap = MinecraftServer.getServer().server.getCommandMap();
++        unregister();
++
++        REGISTERED_COMMANDS.put(ROOT_NAME, new RootBarCommand(ROOT_NAME));
++        for (EnumBarType type : EnumBarType.values()) {
++            REGISTERED_COMMANDS.put(type.getCommandName(), new DirectBarToggleCommand(type));
++        }
++
++        for (Map.Entry<String, Command> entry : REGISTERED_COMMANDS.entrySet()) {
++            commandMap.register(entry.getKey(), "Kobosh", entry.getValue());
++        }
+     }
+ 
+     public static void unregister() {
++        SimpleCommandMap commandMap = MinecraftServer.getServer().server.getCommandMap();
++        for (Command command : REGISTERED_COMMANDS.values()) {
++            command.unregister(commandMap);
++        }
++        REGISTERED_COMMANDS.clear();
++    }
++
++    private static final class RootBarCommand extends Command {
++        private RootBarCommand(String name) {
++            super(name);
++            this.description = "Manage Kobosh status bars";
++            this.usageMessage = "/bar <tpsbar|membar|regionbar> [player]";
++            this.setPermission(PERM_BASE);
++        }
++
++        @Override
++        public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
++            if (!this.testPermission(sender)) {
++                return true;
++            }
++
++            if (args.length < 1) {
++                sender.sendMessage(Component.text("Usage: " + this.usageMessage).color(TextColor.color(255, 0, 0)));
++                return true;
++            }
++
++            EnumBarType type = byCommandName(args[0]);
++            if (type == null) {
++                sender.sendMessage(Component.text("Unknown bar type: " + args[0]).color(TextColor.color(255, 0, 0)));
++                return true;
++            }
++
++            return executeToggle(type, sender, args.length > 1 ? args[1] : null);
++        }
++
++        @Override
++        public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
++            if (args.length == 1) {
++                String prefix = args[0].toLowerCase(Locale.ROOT);
++                List<String> completions = new ArrayList<>();
++                for (EnumBarType type : EnumBarType.values()) {
++                    if (type.getCommandName().startsWith(prefix)) {
++                        completions.add(type.getCommandName());
++                    }
++                }
++                return completions;
++            }
++
++            if (args.length == 2) {
++                String prefix = args[1].toLowerCase(Locale.ROOT);
++                List<String> completions = new ArrayList<>();
++                for (Player online : Bukkit.getOnlinePlayers()) {
++                    if (online.getName().toLowerCase(Locale.ROOT).startsWith(prefix)) {
++                        completions.add(online.getName());
++                    }
++                }
++                return completions;
++            }
++
++            return List.of();
++        }
++    }
++
++    private static final class DirectBarToggleCommand extends Command {
++        private final EnumBarType type;
++
++        private DirectBarToggleCommand(EnumBarType type) {
++            super(type.getCommandName());
++            this.type = type;
++            this.description = "Toggle Kobosh " + type.getName() + " bar";
++            this.usageMessage = "/" + type.getCommandName() + " [player]";
++            this.setPermission(PERM_BASE + "." + type.getName() + ".toggle");
++        }
++
++        @Override
++        public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
++            if (!this.testPermission(sender)) {
++                return true;
++            }
++
++            return executeToggle(this.type, sender, args.length > 0 ? args[0] : null);
++        }
++
++        @Override
++        public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
++            if (args.length != 1) {
++                return List.of();
++            }
++
++            String prefix = args[0].toLowerCase(Locale.ROOT);
++            List<String> completions = new ArrayList<>();
++            for (Player online : Bukkit.getOnlinePlayers()) {
++                if (online.getName().toLowerCase(Locale.ROOT).startsWith(prefix)) {
++                    completions.add(online.getName());
++                }
++            }
++            return completions;
++        }
++    }
++
++    private static boolean executeToggle(EnumBarType type, CommandSender sender, String optionalPlayer) {
++        Player target;
++        if (optionalPlayer == null || optionalPlayer.isBlank()) {
++            if (!(sender instanceof Player self)) {
++                sender.sendMessage(Component.text("Only players can toggle bars for themselves. Specify a player name.").color(TextColor.color(255, 0, 0)));
++                return true;
++            }
++            target = self;
++        } else {
++            target = Bukkit.getPlayer(optionalPlayer);
++            if (target == null) {
++                try {
++                    target = Bukkit.getPlayer(UUID.fromString(optionalPlayer));
++                } catch (IllegalArgumentException ignored) {
++                }
++            }
++            if (target == null) {
++                sender.sendMessage(Component.text("Player " + optionalPlayer + " was not found!").color(TextColor.color(255, 0, 0)));
++                return true;
++            }
++        }
++
++        return new ToggleCommand(type).execute(sender, target);
++    }
++
++    private static EnumBarType byCommandName(String value) {
++        for (EnumBarType type : EnumBarType.values()) {
++            if (type.getCommandName().equalsIgnoreCase(value)) {
++                return type;
++            }
++        }
++        return null;
+     }
+ }
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index 8156b7d75df7b92ba4f36a8ac84d51441fad9adc..daea827602977965bcb0e648098b424dfb1e0636 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -1056,6 +1056,7 @@ public final class CraftServer implements Server {
+         // Paper end
+         this.reloadData();
+         org.spigotmc.SpigotConfig.registerCommands(); // Spigot
++        com.kobosh.koboshfolia.tpsbar.commands.BarCommand.register(); // Kobosh
+         io.papermc.paper.command.PaperCommands.registerCommands(this.console); // Paper
+         this.spark.registerCommandBeforePlugins(this); // Paper - spark
+         this.overrideAllCommandBlockCommands = this.commandsConfiguration.getStringList("command-block-overrides").contains("*");
