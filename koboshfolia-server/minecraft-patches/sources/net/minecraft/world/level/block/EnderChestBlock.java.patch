@@ -8,7 +8,15 @@
  import net.minecraft.core.BlockPos;
  import net.minecraft.core.Direction;
  import net.minecraft.core.particles.ParticleTypes;
-@@ -99,6 +_,41 @@
+@@ -13,6 +_,7 @@
+ import net.minecraft.world.entity.monster.piglin.PiglinAi;
+ import net.minecraft.world.entity.player.Player;
+ import net.minecraft.world.inventory.ChestMenu;
++import net.minecraft.world.inventory.MenuType;
+ import net.minecraft.world.inventory.PlayerEnderChestContainer;
+ import net.minecraft.world.item.context.BlockPlaceContext;
+ import net.minecraft.world.level.BlockGetter;
+@@ -99,6 +_,34 @@
              return InteractionResult.SUCCESS;
          }
      }
@@ -17,31 +25,24 @@
 +    private ChestMenu getEnderChestSixRows(int syncId, net.minecraft.world.entity.player.Inventory inventory, Player player, PlayerEnderChestContainer playerEnderChestContainer) {
 +        org.bukkit.craftbukkit.entity.CraftHumanEntity bukkitPlayer = player.getBukkitEntity();
 +        if (bukkitPlayer.hasPermission("kobosh.enderchest.rows.six")) {
-+            player.sixRowEnderchestSlotCount = 54;
 +            return ChestMenu.sixRows(syncId, inventory, playerEnderChestContainer);
 +        } else if (bukkitPlayer.hasPermission("kobosh.enderchest.rows.five")) {
-+            player.sixRowEnderchestSlotCount = 45;
-+            return ChestMenu.fiveRows(syncId, inventory, playerEnderChestContainer);
++            return new ChestMenu(MenuType.GENERIC_9x5, syncId, inventory, playerEnderChestContainer, 5);
 +        } else if (bukkitPlayer.hasPermission("kobosh.enderchest.rows.four")) {
-+            player.sixRowEnderchestSlotCount = 36;
-+            return ChestMenu.fourRows(syncId, inventory, playerEnderChestContainer);
++            return new ChestMenu(MenuType.GENERIC_9x4, syncId, inventory, playerEnderChestContainer, 4);
 +        } else if (bukkitPlayer.hasPermission("kobosh.enderchest.rows.three")) {
-+            player.sixRowEnderchestSlotCount = 27;
 +            return ChestMenu.threeRows(syncId, inventory, playerEnderChestContainer);
 +        } else if (bukkitPlayer.hasPermission("kobosh.enderchest.rows.two")) {
-+            player.sixRowEnderchestSlotCount = 18;
-+            return ChestMenu.twoRows(syncId, inventory, playerEnderChestContainer);
++            return new ChestMenu(MenuType.GENERIC_9x2, syncId, inventory, playerEnderChestContainer, 2);
 +        } else if (bukkitPlayer.hasPermission("kobosh.enderchest.rows.one")) {
-+            player.sixRowEnderchestSlotCount = 9;
-+            return ChestMenu.oneRow(syncId, inventory, playerEnderChestContainer);
++            return new ChestMenu(MenuType.GENERIC_9x1, syncId, inventory, playerEnderChestContainer, 1);
 +        }
 +
-+        player.sixRowEnderchestSlotCount = KoboshConfig.defaultEnderChestSlots();
 +        return switch (KoboshConfig.defaultEnderChestRows) {
-+            case 1 -> ChestMenu.oneRow(syncId, inventory, playerEnderChestContainer);
-+            case 2 -> ChestMenu.twoRows(syncId, inventory, playerEnderChestContainer);
-+            case 4 -> ChestMenu.fourRows(syncId, inventory, playerEnderChestContainer);
-+            case 5 -> ChestMenu.fiveRows(syncId, inventory, playerEnderChestContainer);
++            case 1 -> new ChestMenu(MenuType.GENERIC_9x1, syncId, inventory, playerEnderChestContainer, 1);
++            case 2 -> new ChestMenu(MenuType.GENERIC_9x2, syncId, inventory, playerEnderChestContainer, 2);
++            case 4 -> new ChestMenu(MenuType.GENERIC_9x4, syncId, inventory, playerEnderChestContainer, 4);
++            case 5 -> new ChestMenu(MenuType.GENERIC_9x5, syncId, inventory, playerEnderChestContainer, 5);
 +            case 6 -> ChestMenu.sixRows(syncId, inventory, playerEnderChestContainer);
 +            default -> ChestMenu.threeRows(syncId, inventory, playerEnderChestContainer);
 +        };

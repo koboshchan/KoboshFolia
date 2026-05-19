@@ -38,29 +38,11 @@
      }
  
      public void updateEntireScoreboard(ServerScoreboard scoreboard, ServerPlayer player) {
-@@ -947,6 +_,25 @@
+@@ -947,6 +_,7 @@
          player.getBukkitEntity().recalculatePermissions(); // CraftBukkit
          this.server.getCommands().sendCommands(player);
          } // Paper - Add sendOpLevel API
 +
-+        // Kobosh start - Barrels and enderchests 6 rows
-+        org.bukkit.craftbukkit.entity.CraftHumanEntity bukkit = player.getBukkitEntity();
-+        if (bukkit.hasPermission("kobosh.enderchest.rows.six")) {
-+            player.sixRowEnderchestSlotCount = 54;
-+        } else if (bukkit.hasPermission("kobosh.enderchest.rows.five")) {
-+            player.sixRowEnderchestSlotCount = 45;
-+        } else if (bukkit.hasPermission("kobosh.enderchest.rows.four")) {
-+            player.sixRowEnderchestSlotCount = 36;
-+        } else if (bukkit.hasPermission("kobosh.enderchest.rows.three")) {
-+            player.sixRowEnderchestSlotCount = 27;
-+        } else if (bukkit.hasPermission("kobosh.enderchest.rows.two")) {
-+            player.sixRowEnderchestSlotCount = 18;
-+        } else if (bukkit.hasPermission("kobosh.enderchest.rows.one")) {
-+            player.sixRowEnderchestSlotCount = 9;
-+        } else {
-+            player.sixRowEnderchestSlotCount = KoboshConfig.defaultEnderChestSlots();
-+        }
-+        // Kobosh end - Barrels and enderchests 6 rows
      }
  
      // Paper start - whitelist verify event / login event
