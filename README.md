@@ -26,6 +26,8 @@ KoboshFolia is a fork of Folia, a high-performance Minecraft server software, op
 14. Lithium: compact sine LUT (16K entries instead of 64K) — better CPU cache usage for `Mth.sin`/`cos`.
 15. Lithium: pre-allocated `Direction.values()` constants in `PistonBaseBlock`, `PistonStructureResolver`, `RedStoneWireBlock` — avoids hot-loop array allocations.
 16. Lithium: static slot-array constants in `ComposterBlock` — avoids `int[]` allocation on every hopper tick.
+17. Lithium: precomputed piston collision shapes — 18 static shapes (3 offsets × 6 directions) eliminate `Shapes.or` allocations every tick during piston movement; non-standard offsets use a per-`VoxelShape` offset shape cache.
+18. Lithium: cached `isPushable()` per tick on `LivingEntity` — avoids repeated `onClimbable()` evaluations when many entities push the same target in a dense crowd.
 
 ## Building
 
