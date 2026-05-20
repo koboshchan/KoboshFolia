@@ -12,7 +12,15 @@ KoboshFolia is a fork of Folia, a high-performance Minecraft server software, op
     We use permissions to handle ender chest size. Players with the `koboshfolia.enderchest.size.six` permission will have access to a 6-row ender chest, while those without it will have access to a standard 3-row ender chest.
 2. Option to allow client side rng manipulation.
     This feature can be enabled with `allow-client-rng-manipulation` in `kobosh.yml`. When enabled, players will be able to manipulate the random number generator (RNG) on the client side, which can allow clients to predict enchantment outcomes and maybe other RNG-based mechanics in the game.
-3. 
+3. TPS/memory/region boss bar display.
+4. `/compass` command — toggles a boss bar compass showing the player's current direction.
+5. `/uptime` command — shows how long the server has been running.
+6. Configurable barrel rows (1–6, default 3) via `barrel-rows` in `kobosh.yml`.
+7. Configurable piston push limit (default 12) via `piston-block-push-limit`.
+8. Configurable powered rail activation range (default 8) via `powered-rail-activation-range`.
+9. Configurable hunger starvation damage (default 1.0) via `hunger-starvation-damage`.
+10. Infinity bow works without arrows in inventory, disabled by default (`infinity-bow-works-without-arrows`).
+11. FMA (fused multiply-add) `lerp` in `Mth`, ported from SuperFastMath.
 
 ## Building
 
