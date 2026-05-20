@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Tue, 19 May 2026 23:20:46 -0700
+Subject: [PATCH] Fix duplicate S in compass bar default title
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The trailing 'S • • • •' duplicated south since the window
+slides circularly over the string. Remove it so only one S
+exists; the wrap-around naturally shows south at both ends.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+diff --git a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+index 40c5a50dd783c05a4982827009a3c3c246db7430..e2fd220843d926fe488d7c8f30ea84adf2ed7154 100644
+--- a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
++++ b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+@@ -24,7 +24,7 @@ public final class KoboshConfig {
+     public static int defaultEnderChestRows = 3;
+ 
+     // Compass command
+-    public static String commandCompassBarTitle = "• • • • S • • • • SE • • E • • NE • • N • • NW • • W • • SW • • S • • • •";
++    public static String commandCompassBarTitle = "• • • • S • • • • SE • • E • • NE • • N • • NW • • W • • SW • •";
+     public static BossBar.Color commandCompassBarProgressColor = BossBar.Color.GREEN;
+     public static BossBar.Overlay commandCompassBarProgressOverlay = BossBar.Overlay.PROGRESS;
+     public static float commandCompassBarProgressPercent = 1.0f;
