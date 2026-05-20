@@ -1,5 +1,28 @@
 --- a/net/minecraft/util/Mth.java
 +++ b/net/minecraft/util/Mth.java
+@@ -31,7 +_,7 @@
+     private static final int SIN_MASK = 65535;
+     private static final int COS_OFFSET = 16384;
+     private static final double SIN_SCALE = 10430.378350470453;
+-    private static final float[] SIN = Util.make(new float[65536], floats -> {
++    public static final float[] SIN = Util.make(new float[65536], floats -> { // Kobosh - Lithium - made public for CompactSineLUT
+         for (int i1 = 0; i1 < floats.length; i1++) {
+             floats[i1] = (float)Math.sin(i1 / 10430.378350470453);
+         }
+@@ -48,11 +_,11 @@
+     private static final double[] COS_TAB = new double[257];
+ 
+     public static float sin(double value) {
+-        return SIN[(int)((long)(value * 10430.378350470453) & 65535L)];
++        return CompactSineLUT.sin(value); // Kobosh - Lithium - compact 16K sine LUT (was 64K); bit-for-bit identical
+     }
+ 
+     public static float cos(double value) {
+-        return SIN[(int)((long)(value * 10430.378350470453 + 16384.0) & 65535L)];
++        return CompactSineLUT.cos(value); // Kobosh - Lithium - compact 16K sine LUT (was 64K); bit-for-bit identical
+     }
+ 
+     public static float sqrt(float value) {
 @@ -60,18 +_,15 @@
      }
  

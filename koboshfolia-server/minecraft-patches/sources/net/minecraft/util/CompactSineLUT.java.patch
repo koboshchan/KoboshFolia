@@ -1,0 +1,58 @@
+--- /dev/null
++++ b/net/minecraft/util/CompactSineLUT.java
+@@ -1,0 +_,55 @@
++package net.minecraft.util;
++
++/**
++ * A replacement for the sine lookup table in {@link Mth}, reducing the table from 64K entries (256 KB)
++ * to 16K entries (64 KB) by exploiting sine symmetry identities:
++ *   sin(-x) = -sin(x)
++ *   sin(x)  = sin(pi/2 - x)
++ *
++ * The values returned are bit-for-bit identical to the original Mth LUT.
++ * Ported from Lithium (https://github.com/CaffeineMC/lithium-fabric) by Space Walker / jellysquid3.
++ */
++public final class CompactSineLUT {
++    private static final int[] SINE_TABLE_INT = new int[16384 + 1];
++    private static final float SINE_TABLE_MIDPOINT;
++
++    static {
++        float[] sin = Mth.SIN;
++        for (int i = 0; i < SINE_TABLE_INT.length; i++) {
++            SINE_TABLE_INT[i] = Float.floatToRawIntBits(sin[i]);
++        }
++        SINE_TABLE_MIDPOINT = sin[sin.length / 2];
++
++        // Validate table correctness
++        for (int i = 0; i < sin.length; i++) {
++            float expected = sin[i];
++            float value = lookup(i);
++            if (expected != value) {
++                throw new IllegalStateException(
++                    String.format("CompactSineLUT error at index %d (expected: %s, found: %s)", i, expected, value)
++                );
++            }
++        }
++    }
++
++    private CompactSineLUT() {}
++
++    public static float sin(double d) {
++        return lookup((int)(d * 10430.378350470453) & 0xFFFF);
++    }
++
++    public static float cos(double d) {
++        return lookup((int)(d * 10430.378350470453 + 16384.0) & 0xFFFF);
++    }
++
++    private static float lookup(int index) {
++        if (index == 32768) {
++            return SINE_TABLE_MIDPOINT;
++        }
++        int neg = (index & 0x8000) << 16;
++        int mask = (index << 17) >> 31;
++        int pos = (0x8001 & mask) + (index ^ mask);
++        pos &= 0x7fff;
++        return Float.intBitsToFloat(SINE_TABLE_INT[pos] ^ neg);
++    }
++}

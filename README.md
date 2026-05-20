@@ -23,6 +23,9 @@ KoboshFolia is a fork of Folia, a high-performance Minecraft server software, op
 11. FMA (fused multiply-add) `lerp` in `Mth`, ported from SuperFastMath.
 12. Lithium: optimized `PathNavigationRegion` chunk lookup — flat array + direct section access, avoids `EmptyLevelChunk` allocation.
 13. Lithium: optimized redstone wire power calculations — fewer `getBlockState` calls by skipping known-zero wire signals.
+14. Lithium: compact sine LUT (16K entries instead of 64K) — better CPU cache usage for `Mth.sin`/`cos`.
+15. Lithium: pre-allocated `Direction.values()` constants in `PistonBaseBlock`, `PistonStructureResolver`, `RedStoneWireBlock` — avoids hot-loop array allocations.
+16. Lithium: static slot-array constants in `ComposterBlock` — avoids `int[]` allocation on every hopper tick.
 
 ## Building
 

@@ -1,11 +1,12 @@
 --- a/net/minecraft/world/level/block/piston/PistonStructureResolver.java
 +++ b/net/minecraft/world/level/block/piston/PistonStructureResolver.java
-@@ -10,7 +_,7 @@
+@@ -10,7 +_,8 @@
  import net.minecraft.world.level.material.PushReaction;
  
  public class PistonStructureResolver {
 -    public static final int MAX_PUSH_DEPTH = 12;
 +    public static final int MAX_PUSH_DEPTH = 12; // KoboshFolia - kept for compatibility; actual limit is from KoboshConfig.pistonBlockPushLimit
++    private static final Direction[] ALL_DIRECTIONS = Direction.values(); // Kobosh - Lithium - avoid Direction.values() allocation in hot loops
      private final Level level;
      private final BlockPos pistonPos;
      private final boolean extending;
@@ -36,3 +37,12 @@
                          return false;
                      }
  
+@@ -168,7 +_,7 @@
+     private boolean addBranchingBlocks(BlockPos fromPos) {
+         BlockState blockState = this.level.getBlockState(fromPos);
+ 
+-        for (Direction direction : Direction.values()) {
++        for (Direction direction : ALL_DIRECTIONS) { // Kobosh - Lithium - avoid Direction.values() allocation
+             if (direction.getAxis() != this.pushDirection.getAxis()) {
+                 BlockPos blockPos = fromPos.relative(direction);
+                 BlockState blockState1 = this.level.getBlockState(blockPos);

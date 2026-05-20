@@ -1,0 +1,38 @@
+--- a/net/minecraft/world/level/block/ComposterBlock.java
++++ b/net/minecraft/world/level/block/ComposterBlock.java
+@@ -49,6 +_,8 @@
+     public static final IntegerProperty LEVEL = BlockStateProperties.LEVEL_COMPOSTER;
+     public static final Object2FloatMap<ItemLike> COMPOSTABLES = new Object2FloatOpenHashMap<>();
+     private static final int HOLE_WIDTH = 12;
++    private static final int[] SLOTS_FOR_UP = {0};   // Kobosh - Lithium - avoid int[] allocation on every hopper check
++    private static final int[] SLOTS_EMPTY = {};      // Kobosh - Lithium - avoid int[] allocation on every hopper check
+     private static final VoxelShape[] SHAPES = Util.make(
+         () -> {
+             VoxelShape[] voxelShapes = Block.boxes(
+@@ -419,7 +_,7 @@
+ 
+         @Override
+         public int[] getSlotsForFace(Direction side) {
+-            return new int[0];
++            return SLOTS_EMPTY; // Kobosh - Lithium
+         }
+ 
+         @Override
+@@ -454,7 +_,7 @@
+ 
+         @Override
+         public int[] getSlotsForFace(Direction side) {
+-            return side == Direction.UP ? new int[]{0} : new int[0];
++            return side == Direction.UP ? SLOTS_FOR_UP : SLOTS_EMPTY; // Kobosh - Lithium - avoid int[] allocation
+         }
+ 
+         @Override
+@@ -505,7 +_,7 @@
+ 
+         @Override
+         public int[] getSlotsForFace(Direction side) {
+-            return side == Direction.DOWN ? new int[]{0} : new int[0];
++            return side == Direction.DOWN ? SLOTS_FOR_UP : SLOTS_EMPTY; // Kobosh - Lithium - avoid int[] allocation
+         }
+ 
+         @Override
