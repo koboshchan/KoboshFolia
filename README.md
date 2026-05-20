@@ -58,3 +58,4 @@ These projects are referenced in the creation of KoboshFolia (in no particular o
 - [Purpur](https://github.com/PurpurMC/Purpur) GPL-3.0/MIT
 - [Luminol](https://github.com/LuminolMC/Luminol) GPL-3.0/MIT
 - [Lithium](https://github.com/CaffeineMC/lithium-fabric) LGPL-3.0
+- [Krypton](https://github.com/astei/krypton) LGPL-3.0
