@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Tue, 19 May 2026 23:28:26 -0700
+Subject: [PATCH] updated styling for "commandCompassBarTitle"
+
+
+diff --git a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+index e2fd220843d926fe488d7c8f30ea84adf2ed7154..2acae4e8e3f2e8435ad377a6f5fe52bffa45fca2 100644
+--- a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
++++ b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+@@ -24,7 +24,7 @@ public final class KoboshConfig {
+     public static int defaultEnderChestRows = 3;
+ 
+     // Compass command
+-    public static String commandCompassBarTitle = "• • • • S • • • • SE • • E • • NE • • N • • NW • • W • • SW • •";
++    public static String commandCompassBarTitle = "S  ·  ◈  ·  ◈  ·  ◈  ·  SW  ·  ◈  ·  ◈  ·  ◈  ·  W  ·  ◈  ·  ◈  ·  ◈  ·  NW  ·  ◈  ·  ◈  ·  ◈  ·  N  ·  ◈  ·  ◈  ·  ◈  ·  NE  ·  ◈  ·  ◈  ·  ◈  ·  E  ·  ◈  ·  ◈  ·  ◈  ·  SE  ·  ◈  ·  ◈  ·  ◈  ·  S  ·  ◈  ·  ◈  ·  ◈  ·  SW  ·  ◈  ·  ◈  ·  ◈  ·  W  ·  ◈  ·  ◈  ·  ◈  ·  NW  ·  ◈  ·  ◈  ·  ◈  ·  N  ·  ◈  ·  ◈  ·  ◈  ·  NE  ·  ◈  ·  ◈  ·  ◈  ·  E  ·  ◈  ·  ◈  ·  ◈  ·  SE  ·  ◈  ·  ◈  ·  ◈  ·  ";
+     public static BossBar.Color commandCompassBarProgressColor = BossBar.Color.GREEN;
+     public static BossBar.Overlay commandCompassBarProgressOverlay = BossBar.Overlay.PROGRESS;
+     public static float commandCompassBarProgressPercent = 1.0f;
