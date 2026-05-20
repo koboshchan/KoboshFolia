@@ -1,0 +1,152 @@
+--- a/net/minecraft/network/Varint21FrameDecoder.java
++++ b/net/minecraft/network/Varint21FrameDecoder.java
+@@ -1,16 +_,15 @@
+ package net.minecraft.network;
+ 
+ import io.netty.buffer.ByteBuf;
+-import io.netty.buffer.Unpooled;
+ import io.netty.channel.ChannelHandlerContext;
+ import io.netty.handler.codec.ByteToMessageDecoder;
+ import io.netty.handler.codec.CorruptedFrameException;
++import io.netty.util.ByteProcessor;
+ import java.util.List;
+ import org.jspecify.annotations.Nullable;
+ 
+ public class Varint21FrameDecoder extends ByteToMessageDecoder {
+     private static final int MAX_VARINT21_BYTES = 3;
+-    private final ByteBuf helperBuf = Unpooled.directBuffer(3);
+     private final @Nullable BandwidthDebugMonitor monitor;
+ 
+     public Varint21FrameDecoder(@Nullable BandwidthDebugMonitor monitor) {
+@@ -18,51 +_,90 @@
+     }
+ 
+     @Override
+-    protected void handlerRemoved0(ChannelHandlerContext ctx) {
+-        this.helperBuf.release();
+-    }
+-
+-    private static boolean copyVarint(ByteBuf in, ByteBuf out) {
+-        for (int i = 0; i < 3; i++) {
+-            if (!in.isReadable()) {
+-                return false;
+-            }
+-
+-            byte _byte = in.readByte();
+-            out.writeByte(_byte);
+-            if (!VarInt.hasContinuationBit(_byte)) {
+-                return true;
+-            }
+-        }
+-
+-        throw new CorruptedFrameException("length wider than 21-bit");
+-    }
+-
+-    @Override
+     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+-        // Paper start - Perf: Optimize exception handling; if channel is not active just discard the packet
+         if (!ctx.channel().isActive()) {
+-            in.skipBytes(in.readableBytes());
+-            return;
+-        }
+-        // Paper end - Perf: Optimize exception handling
++            in.clear();
++            return;
++        }
++
++        // Kobosh start - Krypton: skip leading null bytes (prevents nullping attacks), use fast bit-trick varint read
++        int packetStart = in.forEachByte(ByteProcessor.FIND_NON_NUL);
++        if (packetStart == -1) {
++            in.clear();
++            return;
++        }
++        in.readerIndex(packetStart);
++
+         in.markReaderIndex();
+-        this.helperBuf.clear();
+-        if (!copyVarint(in, this.helperBuf)) {
++        int preIndex = in.readerIndex();
++        int length = readVarInt21(in);
++        if (preIndex == in.readerIndex()) {
++            return; // not enough bytes yet
++        }
++        if (length < 0) {
++            throw new CorruptedFrameException("Bad packet length");
++        }
++        if (length == 0) {
++            throw new CorruptedFrameException("Frame length cannot be zero");
++        }
++
++        if (in.readableBytes() < length) {
+             in.resetReaderIndex();
+         } else {
+-            int i = VarInt.read(this.helperBuf);
+-            if (i == 0) {
+-                throw new CorruptedFrameException("Frame length cannot be zero");
+-            } else if (in.readableBytes() < i) {
+-                in.resetReaderIndex();
+-            } else {
+-                if (this.monitor != null) {
+-                    this.monitor.onReceive(i + VarInt.getByteSize(i));
+-                }
+-
+-                out.add(in.readBytes(i));
++            if (this.monitor != null) {
++                this.monitor.onReceive(length + VarInt.getByteSize(length));
+             }
+-        }
+-    }
++            out.add(in.readRetainedSlice(length)); // slice avoids a copy vs readBytes
++        }
++        // Kobosh end - Krypton
++    }
++
++    // Kobosh start - Krypton: fast 4-byte-at-once varint decoder
++    private static int readVarInt21(ByteBuf buffer) {
++        if (buffer.readableBytes() < 4) {
++            return readVarInt21SmallBuf(buffer);
++        }
++        int wholeOrMore = buffer.getIntLE(buffer.readerIndex());
++        // find which byte is the last (has high bit clear)
++        int atStop = ~wholeOrMore & 0x808080;
++        if (atStop == 0) {
++            throw new CorruptedFrameException("length wider than 21-bit");
++        }
++        int bitsToKeep = Integer.numberOfTrailingZeros(atStop) + 1;
++        buffer.skipBytes(bitsToKeep >> 3);
++        // extract and merge the 7-bit groups
++        int preservedBytes = wholeOrMore & (atStop ^ (atStop - 1));
++        preservedBytes = (preservedBytes & 0x007F007F) | ((preservedBytes & 0x00007F00) >> 1);
++        preservedBytes = (preservedBytes & 0x00003FFF) | ((preservedBytes & 0x3FFF0000) >> 2);
++        return preservedBytes;
++    }
++
++    private static int readVarInt21SmallBuf(ByteBuf buffer) {
++        if (!buffer.isReadable()) {
++            return 0;
++        }
++        buffer.markReaderIndex();
++        byte tmp = buffer.readByte();
++        if (tmp >= 0) {
++            return tmp;
++        }
++        int result = tmp & 0x7F;
++        if (!buffer.isReadable()) {
++            buffer.resetReaderIndex();
++            return 0;
++        }
++        if ((tmp = buffer.readByte()) >= 0) {
++            return result | (tmp << 7);
++        }
++        result |= (tmp & 0x7F) << 7;
++        if (!buffer.isReadable()) {
++            buffer.resetReaderIndex();
++            return 0;
++        }
++        if ((tmp = buffer.readByte()) >= 0) {
++            return result | (tmp << 14);
++        }
++        return result | ((tmp & 0x7F) << 14);
++    }
++    // Kobosh end - Krypton
+ }

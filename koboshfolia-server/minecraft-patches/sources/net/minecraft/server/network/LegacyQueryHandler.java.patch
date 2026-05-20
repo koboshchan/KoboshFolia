@@ -1,0 +1,14 @@
+--- a/net/minecraft/server/network/LegacyQueryHandler.java
++++ b/net/minecraft/server/network/LegacyQueryHandler.java
+@@ -22,6 +_,11 @@
+ 
+     @Override
+     public void channelRead(ChannelHandlerContext ctx, Object message) {
++        // Kobosh - Krypton: discard immediately on inactive channels
++        if (!ctx.channel().isActive()) {
++            ((ByteBuf) message).clear();
++            return;
++        }
+         ByteBuf byteBuf = (ByteBuf)message;
+         // Paper start - Make legacy ping handler more reliable
+         if (this.buf != null) {

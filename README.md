@@ -28,6 +28,9 @@ KoboshFolia is a fork of Folia, a high-performance Minecraft server software, op
 16. Lithium: static slot-array constants in `ComposterBlock` — avoids `int[]` allocation on every hopper tick.
 17. Lithium: precomputed piston collision shapes — 18 static shapes (3 offsets × 6 directions) eliminate `Shapes.or` allocations every tick during piston movement; non-standard offsets use a per-`VoxelShape` offset shape cache.
 18. Lithium: cached `isPushable()` per tick on `LivingEntity` — avoids repeated `onClimbable()` evaluations when many entities push the same target in a dense crowd.
+19. Krypton: optimized `Varint21FrameDecoder` — reads 4 bytes at once using bit tricks to locate the varint boundary; skips leading null bytes (prevents nullping); uses `readRetainedSlice` to avoid a buffer copy per packet.
+20. Krypton: Netty allocator `maxOrder=9` — reduces pool arena size from 16 MiB to 4 MiB, matching Minecraft's 2 MiB max packet size for lower memory use and GC pressure.
+21. Krypton: `LegacyQueryHandler` early-exit on inactive channels — discards packets immediately if the channel is no longer active.
 
 ## Building
 

@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Wed, 20 May 2026 08:35:35 -0700
+Subject: [PATCH] Krypton: set Netty allocator maxOrder=9 (4MiB arenas)
+
+Reduces memory waste and GC pressure; Minecraft's max packet is 2MiB
+so the default 16MiB arenas are unnecessarily large.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
+index c1537f47971da83596dbb95fc21547424d5fd567..2b6947345260d4f45a082a7e921df775d71bdaf2 100644
+--- a/src/main/java/org/bukkit/craftbukkit/Main.java
++++ b/src/main/java/org/bukkit/craftbukkit/Main.java
+@@ -24,6 +24,7 @@ public class Main {
+ 
+     public static void main(String[] args) {
+         if (System.getProperty("jdk.nio.maxCachedBufferSize") == null) System.setProperty("jdk.nio.maxCachedBufferSize", "262144"); // Paper - cap per-thread NIO cache size; https://www.evanjones.ca/java-bytebuffer-leak.html
++        if (System.getProperty("io.netty.allocator.maxOrder") == null) System.setProperty("io.netty.allocator.maxOrder", "9"); // Kobosh - Krypton: 4MiB Netty arenas instead of 16MiB; MC max packet is 2MiB
+         OptionParser parser = new OptionParser() {
+             {
+                 this.acceptsAll(asList("?", "help"), "Show the help");
