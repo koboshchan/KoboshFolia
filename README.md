@@ -1,6 +1,10 @@
+<div align="center">
+
 # KoboshFolia
 
-KoboshFolia is a fork of Folia, a Minecraft server software.
+KoboshFolia is a fork of Folia, a high-performance Minecraft server software, optimized and enhanced with additional features, and customizations.
+
+</div>
 
 ## Features
 
@@ -25,3 +29,13 @@ The built JAR file will be located in `koboshfolia-server/build/libs`.
 ## Contributing
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute to the project.
+
+## Thank you
+
+Thank you to everyone who has contributed to this project, whether through code, testing, or providing feedback. Your support is greatly appreciated!
+
+These projects are referenced in the creation of KoboshFolia (in no particular order):
+- [SuperFastMath](https://github.com/ItzjustElias/FastMathMod/) MIT
+- [Paper](https://github.com/papermc/paper) GPL-3.0/MIT
+- [Purpur](https://github.com/PurpurMC/Purpur) GPL-3.0/MIT
+- [Luminol](https://github.com/LuminolMC/Luminol) GPL-3.0/MIT
