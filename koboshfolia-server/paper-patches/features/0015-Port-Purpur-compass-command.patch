@@ -1,0 +1,228 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Tue, 19 May 2026 19:44:13 -0700
+Subject: [PATCH] Port Purpur compass command
+
+Adds /compass command that toggles a boss bar compass for the
+player. Direction string, color, overlay, and tick-interval are
+configurable in kobosh.yml under commands.compass.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+diff --git a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+index caa811465400322a28363f8f179f26fe8b0fa9c7..c7c7898cd4b9518976e5f3fa8cac22856b70b20a 100644
+--- a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
++++ b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+@@ -23,6 +23,13 @@ public final class KoboshConfig {
+     public static boolean allowClientRngManipulation = false;
+     public static int defaultEnderChestRows = 3;
+ 
++    // Compass command
++    public static String commandCompassBarTitle = "• • • • S • • • • SE • • E • • NE • • N • • NW • • W • • SW • • S • • • •";
++    public static BossBar.Color commandCompassBarProgressColor = BossBar.Color.GREEN;
++    public static BossBar.Overlay commandCompassBarProgressOverlay = BossBar.Overlay.PROGRESS;
++    public static float commandCompassBarProgressPercent = 1.0f;
++    public static int commandCompassBarTickInterval = 5;
++
+     public static boolean tpsbarEnabled = true;
+     public static boolean memoryBarEnabled = true;
+     public static boolean regionbarEnabled = true;
+@@ -118,6 +125,20 @@ public final class KoboshConfig {
+         pingColors = readColorList("tpsbar.colors.ping", pingColors);
+         chunkHotColors = readColorList("tpsbar.colors.chunk-hot", chunkHotColors);
+ 
++        // Compass command
++        commandCompassBarTitle = config.getString("commands.compass.bar-title", commandCompassBarTitle);
++        config.set("commands.compass.bar-title", commandCompassBarTitle);
++        commandCompassBarProgressColor = parseBarColor(config.getString("commands.compass.bar-color", commandCompassBarProgressColor.name()), commandCompassBarProgressColor);
++        config.set("commands.compass.bar-color", commandCompassBarProgressColor.name());
++        commandCompassBarProgressOverlay = parseOverlay(config.getString("commands.compass.bar-overlay", commandCompassBarProgressOverlay.name()), commandCompassBarProgressOverlay);
++        config.set("commands.compass.bar-overlay", commandCompassBarProgressOverlay.name());
++        commandCompassBarProgressPercent = (float) config.getDouble("commands.compass.bar-progress", commandCompassBarProgressPercent);
++        commandCompassBarProgressPercent = Math.max(0.0f, Math.min(1.0f, commandCompassBarProgressPercent));
++        config.set("commands.compass.bar-progress", commandCompassBarProgressPercent);
++        commandCompassBarTickInterval = config.getInt("commands.compass.tick-interval", commandCompassBarTickInterval);
++        if (commandCompassBarTickInterval < 1) commandCompassBarTickInterval = 1;
++        config.set("commands.compass.tick-interval", commandCompassBarTickInterval);
++
+         try {
+             config.save(CONFIG_FILE);
+         } catch (IOException ex) {
+@@ -180,4 +201,22 @@ public final class KoboshConfig {
+     public static int defaultEnderChestSlots() {
+         return defaultEnderChestRows * 9;
+     }
++
++    private static BossBar.Color parseBarColor(String value, BossBar.Color fallback) {
++        if (value == null) return fallback;
++        try {
++            return BossBar.Color.valueOf(value.toUpperCase(Locale.ROOT));
++        } catch (IllegalArgumentException ex) {
++            return fallback;
++        }
++    }
++
++    private static BossBar.Overlay parseOverlay(String value, BossBar.Overlay fallback) {
++        if (value == null) return fallback;
++        try {
++            return BossBar.Overlay.valueOf(value.toUpperCase(Locale.ROOT));
++        } catch (IllegalArgumentException ex) {
++            return fallback;
++        }
++    }
+ }
+diff --git a/src/main/java/com/kobosh/koboshfolia/command/CompassCommand.java b/src/main/java/com/kobosh/koboshfolia/command/CompassCommand.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ede8450b0d35b2af0560db243f0ad3052f24dab2
+--- /dev/null
++++ b/src/main/java/com/kobosh/koboshfolia/command/CompassCommand.java
+@@ -0,0 +1,61 @@
++package com.kobosh.koboshfolia.command;
++
++import com.kobosh.koboshfolia.tpsbar.CompassBar;
++import net.kyori.adventure.text.Component;
++import net.kyori.adventure.text.format.TextColor;
++import net.minecraft.server.MinecraftServer;
++import org.bukkit.command.Command;
++import org.bukkit.command.CommandSender;
++import org.bukkit.command.SimpleCommandMap;
++import org.bukkit.entity.Player;
++import org.jetbrains.annotations.NotNull;
++
++import java.util.List;
++
++public final class CompassCommand extends Command {
++    private static final String PERMISSION = "koboshfolia.commands.compass";
++
++    private CompassCommand() {
++        super("compass");
++        this.description = "Toggle the compass boss bar";
++        this.usageMessage = "/compass";
++        this.setPermission(PERMISSION);
++    }
++
++    public static void register() {
++        SimpleCommandMap commandMap = MinecraftServer.getServer().server.getCommandMap();
++        commandMap.register("compass", "Kobosh", new CompassCommand());
++    }
++
++    @Override
++    public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
++        if (!this.testPermission(sender)) {
++            return true;
++        }
++
++        if (!(sender instanceof Player player)) {
++            sender.sendMessage(Component.text("Only players can use this command.").color(TextColor.color(255, 0, 0)));
++            return true;
++        }
++
++        CompassBar compassBar = CompassBar.instance();
++        if (!compassBar.isRunning()) {
++            compassBar.init();
++        }
++
++        boolean currentlyVisible = compassBar.isPlayerVisible(player);
++        compassBar.setVisibilityForPlayer(player, !currentlyVisible);
++
++        if (currentlyVisible) {
++            sender.sendMessage(Component.text("Compass disabled.").color(TextColor.color(255, 255, 0)));
++        } else {
++            sender.sendMessage(Component.text("Compass enabled.").color(TextColor.color(0, 255, 0)));
++        }
++        return true;
++    }
++
++    @Override
++    public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
++        return List.of();
++    }
++}
+diff --git a/src/main/java/com/kobosh/koboshfolia/tpsbar/CompassBar.java b/src/main/java/com/kobosh/koboshfolia/tpsbar/CompassBar.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..0a4193529c72de3b18af8000c2a6539b23b23950
+--- /dev/null
++++ b/src/main/java/com/kobosh/koboshfolia/tpsbar/CompassBar.java
+@@ -0,0 +1,82 @@
++package com.kobosh.koboshfolia.tpsbar;
++
++import com.kobosh.koboshfolia.KoboshConfig;
++import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
++import net.kyori.adventure.bossbar.BossBar;
++import net.kyori.adventure.text.Component;
++import org.bukkit.entity.Player;
++import org.jetbrains.annotations.NotNull;
++
++import java.util.UUID;
++
++public class CompassBar extends AbstractGlobalServerBar {
++    private static final CompassBar INSTANCE = new CompassBar();
++
++    private CompassBar() {}
++
++    public static CompassBar instance() {
++        return INSTANCE;
++    }
++
++    @Override
++    public void init() {
++        init(KoboshConfig.commandCompassBarTickInterval);
++    }
++
++    @Override
++    public void setVisibilityForPlayer(Player target, boolean canSee) {
++        setPlayerVisible(target, canSee);
++        if (!canSee) {
++            BossBar bar = uuid2Bossbars.remove(target.getUniqueId());
++            if (bar != null) {
++                target.hideBossBar(bar);
++            }
++        }
++    }
++
++    @Override
++    public boolean enabled() {
++        return true;
++    }
++
++    @Override
++    public ScheduledTask createBossBarForPlayer(@NotNull Player apiPlayer) {
++        final UUID playerUUID = apiPlayer.getUniqueId();
++
++        return apiPlayer.getScheduler().runAtFixedRate(SCHEDULER_PLUGIN, task -> {
++            if (checkAndRemove(apiPlayer, playerUUID)) return;
++
++            BossBar bossBar = uuid2Bossbars.computeIfAbsent(playerUUID, unused ->
++                BossBar.bossBar(Component.empty(), KoboshConfig.commandCompassBarProgressPercent,
++                    KoboshConfig.commandCompassBarProgressColor, KoboshConfig.commandCompassBarProgressOverlay)
++            );
++
++            apiPlayer.showBossBar(bossBar);
++            bossBar.name(getCompassTitle(apiPlayer));
++        }, () -> {
++            BossBar removed = uuid2Bossbars.remove(playerUUID);
++            if (removed != null) {
++                apiPlayer.hideBossBar(removed);
++            }
++        }, 1, KoboshConfig.commandCompassBarTickInterval);
++    }
++
++    private Component getCompassTitle(Player player) {
++        String title = KoboshConfig.commandCompassBarTitle;
++        if (title == null || title.isEmpty()) return Component.empty();
++
++        // Minecraft yaw: 0 = south, 90 = west, 180/-180 = north, -90 = east
++        float yaw = player.getLocation().getYaw();
++        float normalized = ((yaw % 360.0f) + 360.0f) % 360.0f;
++        int titleLen = title.length();
++        int centerPos = (int) (normalized / 360.0f * titleLen);
++
++        int windowHalf = Math.min(30, titleLen / 2);
++        StringBuilder display = new StringBuilder(windowHalf * 2);
++        for (int i = -windowHalf; i < windowHalf; i++) {
++            int idx = ((centerPos + i) % titleLen + titleLen) % titleLen;
++            display.append(title.charAt(idx));
++        }
++        return Component.text(display.toString());
++    }
++}

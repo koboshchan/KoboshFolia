@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Tue, 19 May 2026 19:45:09 -0700
+Subject: [PATCH] Add powered-rail-activation-range config
+
+Configurable powered rail activation range (default 8). PoweredRailBlock
+uses KoboshConfig.poweredRailActivationRange instead of hardcoded 8.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+diff --git a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+index 7805c6903ce81d784cd222dcfbe5175a1108403f..da23ef1c965f6350714a0e6c1b5e9c7a39e9062c 100644
+--- a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
++++ b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+@@ -44,6 +44,7 @@ public final class KoboshConfig {
+ 
+     public static int barrelRows = 3;
+     public static int pistonBlockPushLimit = 12;
++    public static int poweredRailActivationRange = 8;
+ 
+     public static boolean tpsbarEnabled = true;
+     public static boolean memoryBarEnabled = true;
+@@ -185,6 +186,10 @@ public final class KoboshConfig {
+         if (pistonBlockPushLimit < 1) pistonBlockPushLimit = 1;
+         config.set("piston-block-push-limit", pistonBlockPushLimit);
+ 
++        poweredRailActivationRange = config.getInt("powered-rail-activation-range", poweredRailActivationRange);
++        if (poweredRailActivationRange < 1) poweredRailActivationRange = 1;
++        config.set("powered-rail-activation-range", poweredRailActivationRange);
++
+         try {
+             config.save(CONFIG_FILE);
+         } catch (IOException ex) {

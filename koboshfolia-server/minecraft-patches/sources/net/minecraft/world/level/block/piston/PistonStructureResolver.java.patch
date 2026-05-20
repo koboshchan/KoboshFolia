@@ -1,0 +1,38 @@
+--- a/net/minecraft/world/level/block/piston/PistonStructureResolver.java
++++ b/net/minecraft/world/level/block/piston/PistonStructureResolver.java
+@@ -10,7 +_,7 @@
+ import net.minecraft.world.level.material.PushReaction;
+ 
+ public class PistonStructureResolver {
+-    public static final int MAX_PUSH_DEPTH = 12;
++    public static final int MAX_PUSH_DEPTH = 12; // KoboshFolia - kept for compatibility; actual limit is from KoboshConfig.pistonBlockPushLimit
+     private final Level level;
+     private final BlockPos pistonPos;
+     private final boolean extending;
+@@ -81,7 +_,7 @@
+             return true;
+         } else {
+             int i = 1;
+-            if (i + this.toPush.size() > 12) {
++            if (i + this.toPush.size() > com.kobosh.koboshfolia.KoboshConfig.pistonBlockPushLimit) {
+                 return false;
+             } else {
+                 while (isSticky(blockState)) {
+@@ -95,7 +_,7 @@
+                         break;
+                     }
+ 
+-                    if (++i + this.toPush.size() > 12) {
++                    if (++i + this.toPush.size() > com.kobosh.koboshfolia.KoboshConfig.pistonBlockPushLimit) {
+                         return false;
+                     }
+                 }
+@@ -140,7 +_,7 @@
+                         return true;
+                     }
+ 
+-                    if (this.toPush.size() >= 12) {
++                    if (this.toPush.size() >= com.kobosh.koboshfolia.KoboshConfig.pistonBlockPushLimit) {
+                         return false;
+                     }
+ 

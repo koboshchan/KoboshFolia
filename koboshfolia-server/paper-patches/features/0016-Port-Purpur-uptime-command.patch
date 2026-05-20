@@ -1,0 +1,141 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Tue, 19 May 2026 19:44:31 -0700
+Subject: [PATCH] Port Purpur uptime command
+
+Adds /uptime command that shows how long the server has been running.
+Output format and time-unit strings are configurable in kobosh.yml
+under commands.uptime. Uses MinecraftServer.startTimeMillis.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+diff --git a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+index c7c7898cd4b9518976e5f3fa8cac22856b70b20a..847c1b3868594425536e28b3c7ebda222300bb2f 100644
+--- a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
++++ b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+@@ -30,6 +30,18 @@ public final class KoboshConfig {
+     public static float commandCompassBarProgressPercent = 1.0f;
+     public static int commandCompassBarTickInterval = 5;
+ 
++    // Uptime command
++    public static String uptimeFormat = "%days% %hours% %minutes% %seconds%";
++    public static String uptimeDay = "%value% day";
++    public static String uptimeDays = "%value% days";
++    public static String uptimeHour = "%value% hour";
++    public static String uptimeHours = "%value% hours";
++    public static String uptimeMinute = "%value% minute";
++    public static String uptimeMinutes = "%value% minutes";
++    public static String uptimeSecond = "%value% second";
++    public static String uptimeSeconds = "%value% seconds";
++    public static String uptimeCommandOutput = "Server has been running for: %uptime%";
++
+     public static boolean tpsbarEnabled = true;
+     public static boolean memoryBarEnabled = true;
+     public static boolean regionbarEnabled = true;
+@@ -139,6 +151,28 @@ public final class KoboshConfig {
+         if (commandCompassBarTickInterval < 1) commandCompassBarTickInterval = 1;
+         config.set("commands.compass.tick-interval", commandCompassBarTickInterval);
+ 
++        // Uptime command
++        uptimeFormat = config.getString("commands.uptime.format", uptimeFormat);
++        config.set("commands.uptime.format", uptimeFormat);
++        uptimeDay = config.getString("commands.uptime.day", uptimeDay);
++        config.set("commands.uptime.day", uptimeDay);
++        uptimeDays = config.getString("commands.uptime.days", uptimeDays);
++        config.set("commands.uptime.days", uptimeDays);
++        uptimeHour = config.getString("commands.uptime.hour", uptimeHour);
++        config.set("commands.uptime.hour", uptimeHour);
++        uptimeHours = config.getString("commands.uptime.hours", uptimeHours);
++        config.set("commands.uptime.hours", uptimeHours);
++        uptimeMinute = config.getString("commands.uptime.minute", uptimeMinute);
++        config.set("commands.uptime.minute", uptimeMinute);
++        uptimeMinutes = config.getString("commands.uptime.minutes", uptimeMinutes);
++        config.set("commands.uptime.minutes", uptimeMinutes);
++        uptimeSecond = config.getString("commands.uptime.second", uptimeSecond);
++        config.set("commands.uptime.second", uptimeSecond);
++        uptimeSeconds = config.getString("commands.uptime.seconds", uptimeSeconds);
++        config.set("commands.uptime.seconds", uptimeSeconds);
++        uptimeCommandOutput = config.getString("commands.uptime.output", uptimeCommandOutput);
++        config.set("commands.uptime.output", uptimeCommandOutput);
++
+         try {
+             config.save(CONFIG_FILE);
+         } catch (IOException ex) {
+diff --git a/src/main/java/com/kobosh/koboshfolia/command/UptimeCommand.java b/src/main/java/com/kobosh/koboshfolia/command/UptimeCommand.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..67c6fa19b797f8a23c42df9191ec6839accb1bb0
+--- /dev/null
++++ b/src/main/java/com/kobosh/koboshfolia/command/UptimeCommand.java
+@@ -0,0 +1,72 @@
++package com.kobosh.koboshfolia.command;
++
++import com.kobosh.koboshfolia.KoboshConfig;
++import net.kyori.adventure.text.Component;
++import net.minecraft.server.MinecraftServer;
++import org.bukkit.command.Command;
++import org.bukkit.command.CommandSender;
++import org.bukkit.command.SimpleCommandMap;
++import org.jetbrains.annotations.NotNull;
++
++import java.util.List;
++
++public final class UptimeCommand extends Command {
++    private static final String PERMISSION = "koboshfolia.commands.uptime";
++
++    private UptimeCommand() {
++        super("uptime");
++        this.description = "Display server uptime";
++        this.usageMessage = "/uptime";
++        this.setPermission(PERMISSION);
++    }
++
++    public static void register() {
++        SimpleCommandMap commandMap = MinecraftServer.getServer().server.getCommandMap();
++        commandMap.register("uptime", "Kobosh", new UptimeCommand());
++    }
++
++    @Override
++    public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
++        if (!this.testPermission(sender)) {
++            return true;
++        }
++
++        long uptimeMillis = System.currentTimeMillis() - net.minecraft.server.MinecraftServer.startTimeMillis;
++        String uptime = formatUptime(uptimeMillis);
++        String output = KoboshConfig.uptimeCommandOutput.replace("%uptime%", uptime);
++        sender.sendMessage(Component.text(output));
++        return true;
++    }
++
++    private String formatUptime(long millis) {
++        long totalSeconds = millis / 1000L;
++        long days = totalSeconds / 86400L;
++        long hours = (totalSeconds % 86400L) / 3600L;
++        long minutes = (totalSeconds % 3600L) / 60L;
++        long seconds = totalSeconds % 60L;
++
++        String dayStr = days == 1
++            ? KoboshConfig.uptimeDay.replace("%value%", String.valueOf(days))
++            : KoboshConfig.uptimeDays.replace("%value%", String.valueOf(days));
++        String hourStr = hours == 1
++            ? KoboshConfig.uptimeHour.replace("%value%", String.valueOf(hours))
++            : KoboshConfig.uptimeHours.replace("%value%", String.valueOf(hours));
++        String minuteStr = minutes == 1
++            ? KoboshConfig.uptimeMinute.replace("%value%", String.valueOf(minutes))
++            : KoboshConfig.uptimeMinutes.replace("%value%", String.valueOf(minutes));
++        String secondStr = seconds == 1
++            ? KoboshConfig.uptimeSecond.replace("%value%", String.valueOf(seconds))
++            : KoboshConfig.uptimeSeconds.replace("%value%", String.valueOf(seconds));
++
++        return KoboshConfig.uptimeFormat
++            .replace("%days%", dayStr)
++            .replace("%hours%", hourStr)
++            .replace("%minutes%", minuteStr)
++            .replace("%seconds%", secondStr);
++    }
++
++    @Override
++    public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
++        return List.of();
++    }
++}

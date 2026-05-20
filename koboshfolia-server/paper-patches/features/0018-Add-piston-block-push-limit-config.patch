@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Tue, 19 May 2026 19:44:57 -0700
+Subject: [PATCH] Add piston-block-push-limit config
+
+Configurable piston push limit (default 12). PistonStructureResolver
+uses KoboshConfig.pistonBlockPushLimit instead of the hardcoded 12.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+diff --git a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+index b3c15349787abd4c55288bf0ebfa9cb1c51c2553..7805c6903ce81d784cd222dcfbe5175a1108403f 100644
+--- a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
++++ b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+@@ -43,6 +43,7 @@ public final class KoboshConfig {
+     public static String uptimeCommandOutput = "Server has been running for: %uptime%";
+ 
+     public static int barrelRows = 3;
++    public static int pistonBlockPushLimit = 12;
+ 
+     public static boolean tpsbarEnabled = true;
+     public static boolean memoryBarEnabled = true;
+@@ -180,6 +181,10 @@ public final class KoboshConfig {
+         if (barrelRows > 6) barrelRows = 6;
+         config.set("barrel-rows", barrelRows);
+ 
++        pistonBlockPushLimit = config.getInt("piston-block-push-limit", pistonBlockPushLimit);
++        if (pistonBlockPushLimit < 1) pistonBlockPushLimit = 1;
++        config.set("piston-block-push-limit", pistonBlockPushLimit);
++
+         try {
+             config.save(CONFIG_FILE);
+         } catch (IOException ex) {

@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Tue, 19 May 2026 19:45:21 -0700
+Subject: [PATCH] Add hunger-starvation-damage config
+
+Configurable starvation damage amount (default 1.0). FoodData uses
+KoboshConfig.hungerStarvationDamage instead of the hardcoded 1.0F.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+diff --git a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+index da23ef1c965f6350714a0e6c1b5e9c7a39e9062c..d59e76c5ff341ae4cb7a1fa4f621995455c802cf 100644
+--- a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
++++ b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+@@ -45,6 +45,7 @@ public final class KoboshConfig {
+     public static int barrelRows = 3;
+     public static int pistonBlockPushLimit = 12;
+     public static int poweredRailActivationRange = 8;
++    public static double hungerStarvationDamage = 1.0;
+ 
+     public static boolean tpsbarEnabled = true;
+     public static boolean memoryBarEnabled = true;
+@@ -190,6 +191,10 @@ public final class KoboshConfig {
+         if (poweredRailActivationRange < 1) poweredRailActivationRange = 1;
+         config.set("powered-rail-activation-range", poweredRailActivationRange);
+ 
++        hungerStarvationDamage = config.getDouble("hunger-starvation-damage", hungerStarvationDamage);
++        if (hungerStarvationDamage < 0.0) hungerStarvationDamage = 0.0;
++        config.set("hunger-starvation-damage", hungerStarvationDamage);
++
+         try {
+             config.save(CONFIG_FILE);
+         } catch (IOException ex) {
