@@ -21,6 +21,8 @@ KoboshFolia is a fork of Folia, a high-performance Minecraft server software, op
 9. Configurable hunger starvation damage (default 1.0) via `hunger-starvation-damage`.
 10. Infinity bow works without arrows in inventory, disabled by default (`infinity-bow-works-without-arrows`).
 11. FMA (fused multiply-add) `lerp` in `Mth`, ported from SuperFastMath.
+12. Lithium: optimized `PathNavigationRegion` chunk lookup — flat array + direct section access, avoids `EmptyLevelChunk` allocation.
+13. Lithium: optimized redstone wire power calculations — fewer `getBlockState` calls by skipping known-zero wire signals.
 
 ## Building
 
@@ -47,3 +49,4 @@ These projects are referenced in the creation of KoboshFolia (in no particular o
 - [Paper](https://github.com/papermc/paper) GPL-3.0/MIT
 - [Purpur](https://github.com/PurpurMC/Purpur) GPL-3.0/MIT
 - [Luminol](https://github.com/LuminolMC/Luminol) GPL-3.0/MIT
+- [Lithium](https://github.com/CaffeineMC/lithium-fabric) LGPL-3.0

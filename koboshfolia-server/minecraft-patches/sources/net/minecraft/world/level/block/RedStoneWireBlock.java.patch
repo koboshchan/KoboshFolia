@@ -1,0 +1,12 @@
+--- a/net/minecraft/world/level/block/RedStoneWireBlock.java
++++ b/net/minecraft/world/level/block/RedStoneWireBlock.java
+@@ -334,7 +_,8 @@
+ 
+     public int getBlockSignal(Level level, BlockPos pos) {
+         io.papermc.paper.threadedregions.TickRegionScheduler.getCurrentRegionizedWorldData().shouldSignal = false; // Folia - region threading
+-        int bestNeighborSignal = level.getBestNeighborSignal(pos);
++        // Kobosh - Lithium - optimized neighbor signal: avoids redundant getSignal/getDirectSignal calls on wire blocks
++        int bestNeighborSignal = net.minecraft.world.level.redstone.RedstoneWirePowerCalculations.getNeighborBlockSignal(this, this.evaluator, level, pos);
+         io.papermc.paper.threadedregions.TickRegionScheduler.getCurrentRegionizedWorldData().shouldSignal = true; // Folia - region threading
+         return bestNeighborSignal;
+     }

@@ -1,0 +1,155 @@
+--- /dev/null
++++ b/net/minecraft/world/level/redstone/RedstoneWirePowerCalculations.java
+@@ -1,0 +_,152 @@
++package net.minecraft.world.level.redstone;
++
++import net.minecraft.core.Direction;
++import net.minecraft.world.level.Level;
++import net.minecraft.world.level.block.Block;
++import net.minecraft.world.level.block.state.BlockState;
++import net.minecraft.world.level.chunk.LevelChunk;
++import net.minecraft.core.BlockPos;
++
++/**
++ * Optimized redstone wire power calculations ported from Lithium.
++ * Combines wire/non-wire neighbor checks into fewer Level.getBlockState calls
++ * and avoids calling getSignal/getDirectSignal on redstone wires (always 0).
++ *
++ * @author Space Walker (Lithium)
++ */
++public class RedstoneWirePowerCalculations {
++
++    private static final int MIN = 0;
++    private static final int MAX = 15;
++    private static final int MAX_WIRE = MAX - 1;
++
++    private static final Direction[] ALL = Direction.values();
++    private static final Direction[] VERTICAL = {Direction.DOWN, Direction.UP};
++    private static final Direction[] HORIZONTAL = {Direction.WEST, Direction.EAST, Direction.NORTH, Direction.SOUTH};
++
++    public static int getNeighborBlockSignal(Block wireBlock, RedstoneWireEvaluator evaluator, Level level, BlockPos pos) {
++        return getNeighborSignal(wireBlock, evaluator, level, pos, false, true);
++    }
++
++    public static int getNeighborWireSignal(Block wireBlock, RedstoneWireEvaluator evaluator, Level level, BlockPos pos) {
++        return getNeighborSignal(wireBlock, evaluator, level, pos, true, false);
++    }
++
++    private static int getNeighborSignal(Block wireBlock, RedstoneWireEvaluator evaluator, Level level, BlockPos pos, boolean ignoreNonWires, boolean ignoreWires) {
++        int signal = MIN;
++        LevelChunk chunk = level.getChunkAt(pos);
++
++        if (!ignoreNonWires) {
++            for (Direction dir : VERTICAL) {
++                BlockPos side = pos.relative(dir);
++                BlockState neighbor = chunk.getBlockState(side);
++
++                if (!neighbor.isAir() && !neighbor.is(wireBlock)) {
++                    signal = Math.max(signal, getSignalFromVertical(level, side, neighbor, dir, wireBlock));
++
++                    if (signal >= MAX) {
++                        return MAX;
++                    }
++                }
++            }
++        }
++
++        boolean checkWiresAbove = false;
++
++        if (!ignoreWires) {
++            BlockPos above = pos.above();
++            checkWiresAbove = !chunk.getBlockState(above).isRedstoneConductor(level, above);
++        }
++
++        for (Direction dir : HORIZONTAL) {
++            signal = Math.max(signal, getSignalFromSide(level, pos.relative(dir), dir, checkWiresAbove, ignoreNonWires, ignoreWires, wireBlock, evaluator));
++
++            if (signal >= MAX) {
++                return MAX;
++            }
++        }
++
++        return signal;
++    }
++
++    private static int getSignalFromVertical(Level level, BlockPos pos, BlockState state, Direction toDir, Block wireBlock) {
++        int signal = state.getSignal(level, pos, toDir);
++
++        if (signal >= MAX) {
++            return MAX;
++        }
++
++        if (state.isRedstoneConductor(level, pos)) {
++            return Math.max(signal, getDirectSignalTo(level, pos, toDir.getOpposite(), wireBlock));
++        }
++
++        return signal;
++    }
++
++    private static int getSignalFromSide(Level level, BlockPos pos, Direction toDir, boolean checkWiresAbove, boolean ignoreNonWires, boolean ignoreWires, Block wireBlock, RedstoneWireEvaluator evaluator) {
++        LevelChunk chunk = level.getChunkAt(pos);
++        BlockState state = chunk.getBlockState(pos);
++
++        if (state.is(wireBlock)) {
++            return !ignoreWires ? evaluator.getWireSignal(pos, state) - 1 : MIN;
++        }
++
++        int signal = MIN;
++
++        if (!ignoreNonWires) {
++            signal = state.getSignal(level, pos, toDir);
++
++            if (signal >= MAX) {
++                return MAX;
++            }
++        }
++
++        if (state.isRedstoneConductor(level, pos)) {
++            if (!ignoreNonWires) {
++                signal = Math.max(signal, getDirectSignalTo(level, pos, toDir.getOpposite(), wireBlock));
++
++                if (signal >= MAX) {
++                    return MAX;
++                }
++            }
++            if (!ignoreWires && checkWiresAbove && signal < MAX_WIRE) {
++                BlockPos above = pos.above();
++                BlockState aboveState = chunk.getBlockState(above);
++
++                if (aboveState.is(wireBlock)) {
++                    signal = Math.max(signal, evaluator.getWireSignal(above, aboveState) - 1);
++                }
++            }
++        } else if (!ignoreWires && signal < MAX_WIRE) {
++            BlockPos below = pos.below();
++            BlockState belowState = chunk.getBlockState(below);
++
++            if (belowState.is(wireBlock)) {
++                signal = Math.max(signal, evaluator.getWireSignal(below, belowState) - 1);
++            }
++        }
++
++        return signal;
++    }
++
++    private static int getDirectSignalTo(Level level, BlockPos pos, Direction ignore, Block wireBlock) {
++        int signal = MIN;
++
++        for (Direction dir : ALL) {
++            if (dir != ignore) {
++                BlockPos side = pos.relative(dir);
++                BlockState neighbor = level.getBlockState(side);
++
++                if (!neighbor.isAir() && !neighbor.is(wireBlock)) {
++                    signal = Math.max(signal, neighbor.getDirectSignal(level, side, dir));
++
++                    if (signal >= MAX) {
++                        return MAX;
++                    }
++                }
++            }
++        }
++
++        return signal;
++    }
++}
