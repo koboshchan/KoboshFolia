@@ -1,5 +1,16 @@
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
+@@ -285,6 +_,10 @@
+     public final org.bukkit.craftbukkit.attribute.CraftAttributeMap craftAttributes;
+     public boolean collides = true;
+     public Set<UUID> collidableExemptions = new java.util.HashSet<>();
++    // Kobosh start - Lithium - cache isPushable result per tick to avoid repeated onClimbable() lookups
++    private boolean kobosh$cachedIsPushable = false;
++    private int kobosh$isPushableCacheTick = Integer.MIN_VALUE;
++    // Kobosh end - Lithium - isPushable cache
+     public boolean bukkitPickUpLoot;
+     public org.bukkit.craftbukkit.entity.CraftLivingEntity getBukkitLivingEntity() { return (org.bukkit.craftbukkit.entity.CraftLivingEntity) super.getBukkitEntity(); } // Paper
+     public boolean silentDeath = false; // Paper - mark entity as dying silently for cancellable death event
 @@ -2796,6 +_,7 @@
      }
  
@@ -16,3 +27,19 @@
              if (!this.canGlide()) {
                  if (this.getSharedFlag(Entity.FLAG_FALL_FLYING) && !CraftEventFactory.callToggleGlideEvent(this, false).isCancelled()) // CraftBukkit
                  this.setSharedFlag(Entity.FLAG_FALL_FLYING, false);
+@@ -4022,7 +_,14 @@
+     // Paper start - Climbing should not bypass cramming gamerule
+     @Override
+     public boolean isPushable() {
+-        return this.isCollidable(this.level().paperConfig().collisions.fixClimbingBypassingCrammingRule);
++        // Kobosh start - Lithium - cache isPushable per tick; onClimbable() is non-trivial
++        if (this.kobosh$isPushableCacheTick == this.tickCount) {
++            return this.kobosh$cachedIsPushable;
++        }
++        this.kobosh$cachedIsPushable = this.isCollidable(this.level().paperConfig().collisions.fixClimbingBypassingCrammingRule);
++        this.kobosh$isPushableCacheTick = this.tickCount;
++        return this.kobosh$cachedIsPushable;
++        // Kobosh end - Lithium - isPushable cache
+     }
+ 
+     @Override

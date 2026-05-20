@@ -1,0 +1,47 @@
+--- a/net/minecraft/world/phys/shapes/VoxelShape.java
++++ b/net/minecraft/world/phys/shapes/VoxelShape.java
+@@ -41,6 +_,10 @@
+     private static final int MERGED_CACHE_SIZE = 16;
+     private ca.spottedleaf.moonrise.patches.collisions.shape.MergedORCache[] mergedORCache;
+ 
++    // Kobosh - Lithium - piston moving block shape cache: stores offset+simplified shapes indexed by (2*offset + 2*direction.get3DDataValue())
++    // offset 0 is special (index 0); offsets 0.5 and 1.0 use indices 1-12; total = 1 + 2*6 = 13
++    private volatile VoxelShape[] kobosh$offsetSimplifiedCache;
++
+     @Override
+     public final double moonrise$offsetX() {
+         return this.offsetX;
+@@ -958,4 +_,33 @@
+     public String toString() {
+         return this.isEmpty() ? "EMPTY" : "VoxelShape[" + this.bounds() + "]";
+     }
++
++    // Kobosh start - Lithium - piston moving block shape cache
++    public VoxelShape kobosh$getOffsetSimplifiedShape(float offset, net.minecraft.core.Direction direction) {
++        VoxelShape[] cache = this.kobosh$offsetSimplifiedCache;
++        if (cache == null) return null;
++        int idx = kobosh$cacheIndex(offset, direction);
++        return idx < 0 ? null : cache[idx];
++    }
++
++    public void kobosh$setOffsetSimplifiedShape(float offset, net.minecraft.core.Direction direction, VoxelShape shape) {
++        int idx = kobosh$cacheIndex(offset, direction);
++        if (idx < 0) return;
++        VoxelShape[] cache = this.kobosh$offsetSimplifiedCache;
++        if (cache == null) {
++            cache = new VoxelShape[1 + 2 * 6];
++        } else {
++            cache = cache.clone();
++        }
++        cache[idx] = shape;
++        this.kobosh$offsetSimplifiedCache = cache;
++    }
++
++    private static int kobosh$cacheIndex(float offset, net.minecraft.core.Direction direction) {
++        if (offset == 0f) return 0;
++        if (offset == 0.5f) return 1 + 2 * direction.get3DDataValue();
++        if (offset == 1f) return 2 + 2 * direction.get3DDataValue();
++        return -1; // unsupported offset
++    }
++    // Kobosh end - Lithium - piston moving block shape cache
+ }

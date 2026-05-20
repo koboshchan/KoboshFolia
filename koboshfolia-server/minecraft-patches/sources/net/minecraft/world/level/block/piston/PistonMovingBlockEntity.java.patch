@@ -1,0 +1,141 @@
+--- a/net/minecraft/world/level/block/piston/PistonMovingBlockEntity.java
++++ b/net/minecraft/world/level/block/piston/PistonMovingBlockEntity.java
+@@ -28,6 +_,8 @@
+ import net.minecraft.world.phys.Vec3;
+ import net.minecraft.world.phys.shapes.Shapes;
+ import net.minecraft.world.phys.shapes.VoxelShape;
++// Kobosh - Lithium - piston moving block shape cache needs PistonHeadBlock
++
+ 
+ public class PistonMovingBlockEntity extends BlockEntity {
+     private static final int TICKS_TO_EXTEND = 2;
+@@ -37,6 +_,39 @@
+     private static final float DEFAULT_PROGRESS = 0.0F;
+     private static final boolean DEFAULT_EXTENDING = false;
+     private static final boolean DEFAULT_SOURCE = false;
++
++    // Kobosh start - Lithium - precompute all 18 merged piston base+head shapes (3 offsets × 6 directions)
++    private static final VoxelShape[] PISTON_BASE_WITH_MOVING_HEAD_SHAPES = kobosh$precomputePistonShapes();
++
++    private static VoxelShape[] kobosh$precomputePistonShapes() {
++        float[] offsets = {0f, 0.5f, 1f};
++        Direction[] directions = Direction.values();
++        VoxelShape[] shapes = new VoxelShape[offsets.length * directions.length];
++        for (Direction facing : directions) {
++            VoxelShape baseShape = Blocks.PISTON.defaultBlockState()
++                    .setValue(PistonBaseBlock.EXTENDED, true)
++                    .setValue(PistonBaseBlock.FACING, facing)
++                    .getCollisionShape(null, null);
++            for (float offset : offsets) {
++                boolean isShort = offset < 0.25f; // mirrors vanilla logic: isShort = progress < 0.25f
++                VoxelShape headShape = Blocks.PISTON_HEAD.defaultBlockState()
++                        .setValue(PistonHeadBlock.FACING, facing)
++                        .setValue(PistonHeadBlock.SHORT, isShort)
++                        .getCollisionShape(null, null);
++                VoxelShape offsetHead = headShape.move(
++                        facing.getStepX() * offset,
++                        facing.getStepY() * offset,
++                        facing.getStepZ() * offset);
++                shapes[kobosh$pistonShapeIndex(offset, facing)] = Shapes.or(baseShape, offsetHead);
++            }
++        }
++        return shapes;
++    }
++
++    private static int kobosh$pistonShapeIndex(float offset, Direction direction) {
++        return (int) (2 * offset) + 3 * direction.get3DDataValue();
++    }
++    // Kobosh end - Lithium - precompute piston shapes
+     private BlockState movedState = DEFAULT_BLOCK_STATE;
+     private Direction direction = Direction.DOWN; // Paper - default to first value to avoid NPE
+     private boolean extending = false;
+@@ -370,33 +_,66 @@
+     }
+ 
+     public VoxelShape getCollisionShape(BlockGetter level, BlockPos pos) {
+-        VoxelShape collisionShape;
++        Direction noClip = NOCLIP.get();
++        if (this.progress < 1.0 && noClip == this.getMovementDirection()) {
++            // Entity is inside the piston; return base shape only (or empty), no head needed
++            if (!this.extending && this.isSourcePiston && this.movedState.getBlock() instanceof PistonBaseBlock) {
++                return this.movedState.setValue(PistonBaseBlock.EXTENDED, true).getCollisionShape(level, pos);
++            }
++            return Shapes.empty();
++        }
++
++        // Kobosh start - Lithium - use precomputed shapes for retracting source piston, cache offset shapes for others
++        float extendedProgress = this.getExtendedProgress(this.progress);
++        float absProgress = Math.abs(extendedProgress);
++
+         if (!this.extending && this.isSourcePiston && this.movedState.getBlock() instanceof PistonBaseBlock) {
+-            collisionShape = this.movedState.setValue(PistonBaseBlock.EXTENDED, true).getCollisionShape(level, pos);
+-        } else {
+-            collisionShape = Shapes.empty();
+-        }
+-
+-        Direction direction = NOCLIP.get();
+-        if (this.progress < 1.0 && direction == this.getMovementDirection()) {
+-            return collisionShape;
+-        } else {
+-            BlockState blockState;
+-            if (this.isSourcePiston()) {
+-                blockState = Blocks.PISTON_HEAD
+-                    .defaultBlockState()
++            // Retracting source piston: use precomputed merged base+head shape if offset is standard
++            if (absProgress == 0f || absProgress == 0.5f || absProgress == 1f) {
++                int idx = kobosh$pistonShapeIndex(absProgress, this.direction);
++                return PISTON_BASE_WITH_MOVING_HEAD_SHAPES[idx];
++            }
++            // Fallback for non-standard offsets (shouldn't occur in vanilla)
++            VoxelShape base = this.movedState.setValue(PistonBaseBlock.EXTENDED, true).getCollisionShape(level, pos);
++            VoxelShape head = Blocks.PISTON_HEAD.defaultBlockState()
+                     .setValue(PistonHeadBlock.FACING, this.direction)
+-                    .setValue(PistonHeadBlock.SHORT, this.extending != 1.0F - this.progress < 0.25F);
+-            } else {
+-                blockState = this.movedState;
++                    .setValue(PistonHeadBlock.SHORT, this.extending != 1.0F - this.progress < 0.25F)
++                    .getCollisionShape(level, pos)
++                    .move(this.direction.getStepX() * extendedProgress,
++                          this.direction.getStepY() * extendedProgress,
++                          this.direction.getStepZ() * extendedProgress);
++            return Shapes.or(base, head);
++        }
++
++        // Non-source or extending piston: use VoxelShape-level offset cache
++        BlockState blockState = this.isSourcePiston()
++                ? Blocks.PISTON_HEAD.defaultBlockState()
++                        .setValue(PistonHeadBlock.FACING, this.direction)
++                        .setValue(PistonHeadBlock.SHORT, this.extending != 1.0F - this.progress < 0.25F)
++                : this.movedState;
++
++        VoxelShape blockShape = blockState.getCollisionShape(level, pos);
++
++        if (absProgress == 0f || absProgress == 0.5f || absProgress == 1f) {
++            // Try cache first
++            Direction moveDir = extendedProgress < 0f ? this.direction.getOpposite() : this.direction;
++            VoxelShape cached = blockShape.kobosh$getOffsetSimplifiedShape(absProgress, moveDir);
++            if (cached == null) {
++                cached = blockShape.move(
++                        this.direction.getStepX() * extendedProgress,
++                        this.direction.getStepY() * extendedProgress,
++                        this.direction.getStepZ() * extendedProgress).optimize();
++                blockShape.kobosh$setOffsetSimplifiedShape(absProgress, moveDir, cached);
+             }
+-
+-            float extendedProgress = this.getExtendedProgress(this.progress);
+-            double d = this.direction.getStepX() * extendedProgress;
+-            double d1 = this.direction.getStepY() * extendedProgress;
+-            double d2 = this.direction.getStepZ() * extendedProgress;
+-            return Shapes.or(collisionShape, blockState.getCollisionShape(level, pos).move(d, d1, d2));
++            return cached;
+         }
++
++        // Non-standard offset fallback
++        return Shapes.or(Shapes.empty(), blockShape.move(
++                this.direction.getStepX() * extendedProgress,
++                this.direction.getStepY() * extendedProgress,
++                this.direction.getStepZ() * extendedProgress));
++        // Kobosh end - Lithium - piston shape cache
+     }
+ 
+     public long getLastTicked() {
