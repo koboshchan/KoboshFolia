@@ -1,0 +1,12 @@
+--- a/net/minecraft/world/inventory/PlayerEnderChestContainer.java
++++ b/net/minecraft/world/inventory/PlayerEnderChestContainer.java
+@@ -26,7 +_,8 @@
+     }
+ 
+     public PlayerEnderChestContainer(Player owner) {
+-        super(27);
++        // Keep full backing storage so rows 1-6 can be displayed safely without truncating saved items.
++        super(54);
+         this.owner = owner;
+         // CraftBukkit end
+     }
