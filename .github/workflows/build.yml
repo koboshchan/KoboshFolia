@@ -27,12 +27,11 @@ jobs:
       - name: Build
         run: ./gradlew build
       - name: Generate runnable JAR
-        run: ./gradlew createMojmapPaperclipJar
+        run: ./gradlew createPaperclipJar
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: folia-artifacts
           path: |
-            build/libs/*.jar
             koboshfolia-server/build/libs/*.jar
             koboshfolia-api/build/libs/*.jar
