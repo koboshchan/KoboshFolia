@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Sun, 5 Jul 2026 11:51:51 -0700
+Subject: [PATCH] Fix TickData package name
+
+
+diff --git a/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerRegionBar.java b/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerRegionBar.java
+index 020111aa211906e9af57febafb89cf5311dad5bc..f41d83b18c92734d08bb3ec2e32781a2b29542b0 100644
+--- a/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerRegionBar.java
++++ b/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerRegionBar.java
+@@ -1,6 +1,6 @@
+ package com.kobosh.koboshfolia.tpsbar;
+ 
+-import ca.spottedleaf.moonrise.common.time.TickData;
++import ca.spottedleaf.common.time.TickData;
+ import io.papermc.paper.threadedregions.ThreadedRegionizer;
+ import io.papermc.paper.threadedregions.TickRegionScheduler;
+ import io.papermc.paper.threadedregions.TickRegions;
+diff --git a/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerTpsBar.java b/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerTpsBar.java
+index e18200d8b5c80b030efe559648d1dd610ebbbcf7..864e9c850b18475f37cf876477cdd1fac9519d86 100644
+--- a/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerTpsBar.java
++++ b/src/main/java/com/kobosh/koboshfolia/tpsbar/GlobalServerTpsBar.java
+@@ -1,6 +1,6 @@
+ package com.kobosh.koboshfolia.tpsbar;
+ 
+-import ca.spottedleaf.moonrise.common.time.TickData;
++import ca.spottedleaf.common.time.TickData;
+ import io.papermc.paper.threadedregions.ThreadedRegionizer;
+ import io.papermc.paper.threadedregions.TickRegionScheduler;
+ import io.papermc.paper.threadedregions.TickRegions;
