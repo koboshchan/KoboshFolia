@@ -49,11 +49,11 @@
      private BlockState movedState = DEFAULT_BLOCK_STATE;
      private Direction direction = Direction.DOWN; // Paper - default to first value to avoid NPE
      private boolean extending = false;
-@@ -370,33 +_,66 @@
+@@ -378,33 +_,66 @@
      }
  
-     public VoxelShape getCollisionShape(BlockGetter level, BlockPos pos) {
--        VoxelShape collisionShape;
+     public VoxelShape getCollisionShape(final BlockGetter level, final BlockPos pos) {
+-        VoxelShape pistonHeadShape;
 +        Direction noClip = NOCLIP.get();
 +        if (this.progress < 1.0 && noClip == this.getMovementDirection()) {
 +            // Entity is inside the piston; return base shape only (or empty), no head needed
@@ -68,19 +68,20 @@
 +        float absProgress = Math.abs(extendedProgress);
 +
          if (!this.extending && this.isSourcePiston && this.movedState.getBlock() instanceof PistonBaseBlock) {
--            collisionShape = this.movedState.setValue(PistonBaseBlock.EXTENDED, true).getCollisionShape(level, pos);
+-            pistonHeadShape = this.movedState.setValue(PistonBaseBlock.EXTENDED, true).getCollisionShape(level, pos);
 -        } else {
--            collisionShape = Shapes.empty();
+-            pistonHeadShape = Shapes.empty();
 -        }
 -
--        Direction direction = NOCLIP.get();
--        if (this.progress < 1.0 && direction == this.getMovementDirection()) {
--            return collisionShape;
--        } else {
--            BlockState blockState;
--            if (this.isSourcePiston()) {
--                blockState = Blocks.PISTON_HEAD
--                    .defaultBlockState()
+-        Direction noClipDirection = NOCLIP.get();
+-        if (this.progress < 1.0 && noClipDirection == this.getMovementDirection()) {
+-            return pistonHeadShape;
+-        }
+-
+-        BlockState blockState;
+-        if (this.isSourcePiston()) {
+-            blockState = Blocks.PISTON_HEAD
+-                .defaultBlockState()
 +            // Retracting source piston: use precomputed merged base+head shape if offset is standard
 +            if (absProgress == 0f || absProgress == 0.5f || absProgress == 1f) {
 +                int idx = kobosh$pistonShapeIndex(absProgress, this.direction);
@@ -89,10 +90,17 @@
 +            // Fallback for non-standard offsets (shouldn't occur in vanilla)
 +            VoxelShape base = this.movedState.setValue(PistonBaseBlock.EXTENDED, true).getCollisionShape(level, pos);
 +            VoxelShape head = Blocks.PISTON_HEAD.defaultBlockState()
-                     .setValue(PistonHeadBlock.FACING, this.direction)
--                    .setValue(PistonHeadBlock.SHORT, this.extending != 1.0F - this.progress < 0.25F);
--            } else {
--                blockState = this.movedState;
+                 .setValue(PistonHeadBlock.FACING, this.direction)
+-                .setValue(PistonHeadBlock.SHORT, this.extending != 1.0F - this.progress < 0.25F);
+-        } else {
+-            blockState = this.movedState;
+-        }
+-
+-        float extendedProgress = this.getExtendedProgress(this.progress);
+-        double dx = this.direction.getStepX() * extendedProgress;
+-        double dy = this.direction.getStepY() * extendedProgress;
+-        double dz = this.direction.getStepZ() * extendedProgress;
+-        return Shapes.or(pistonHeadShape, blockState.getCollisionShape(level, pos).move(dx, dy, dz));
 +                    .setValue(PistonHeadBlock.SHORT, this.extending != 1.0F - this.progress < 0.25F)
 +                    .getCollisionShape(level, pos)
 +                    .move(this.direction.getStepX() * extendedProgress,
@@ -120,15 +128,9 @@
 +                        this.direction.getStepY() * extendedProgress,
 +                        this.direction.getStepZ() * extendedProgress).optimize();
 +                blockShape.kobosh$setOffsetSimplifiedShape(absProgress, moveDir, cached);
-             }
--
--            float extendedProgress = this.getExtendedProgress(this.progress);
--            double d = this.direction.getStepX() * extendedProgress;
--            double d1 = this.direction.getStepY() * extendedProgress;
--            double d2 = this.direction.getStepZ() * extendedProgress;
--            return Shapes.or(collisionShape, blockState.getCollisionShape(level, pos).move(d, d1, d2));
++            }
 +            return cached;
-         }
++        }
 +
 +        // Non-standard offset fallback
 +        return Shapes.or(Shapes.empty(), blockShape.move(

@@ -1,6 +1,6 @@
 --- a/io/papermc/paper/entity/activation/ActivationRange.java
 +++ b/io/papermc/paper/entity/activation/ActivationRange.java
-@@ -60,26 +_,38 @@
+@@ -61,26 +_,38 @@
          if (entity.activationType == ActivationType.VILLAGER) {
              if (inactiveFor > config.wakeUpInactiveVillagersEvery && worldData.wakeupInactiveRemainingVillagers > 0) { // Folia - threaded regions
                  worldData.wakeupInactiveRemainingVillagers--; // Folia - threaded regions

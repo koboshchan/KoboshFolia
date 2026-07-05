@@ -1,7 +1,7 @@
 --- a/net/minecraft/world/entity/npc/villager/Villager.java
 +++ b/net/minecraft/world/entity/npc/villager/Villager.java
-@@ -197,6 +_,51 @@
-         this.setVillagerData(this.getVillagerData().withType(villagerType).withProfession(level.registryAccess(), VillagerProfession.NONE));
+@@ -190,6 +_,51 @@
+         this.setCanPickUpLoot(true);
      }
  
 +    // Kobosh start - Purpur - lobotomize stuck villagers
@@ -19,7 +19,7 @@
 +        }
 +        if (this.level().getGameTime() % interval == 0) {
 +            this.isLobotomized = !(shouldCheckForTradeLocked && this.getVillagerXp() == 0)
-+                && !canTravelFrom(BlockPos.containing(this.position().x, this.getBoundingBox().minY + 0.0625D, this.position().z));
++                && !canTravelFrom(net.minecraft.core.BlockPos.containing(this.position().x, this.getBoundingBox().minY + 0.0625D, this.position().z));
 +            if (this.isLobotomized) {
 +                this.notLobotomizedCount = 0;
 +            } else {
@@ -29,11 +29,11 @@
 +        return this.isLobotomized;
 +    }
 +
-+    private boolean canTravelFrom(BlockPos pos) {
++    private boolean canTravelFrom(net.minecraft.core.BlockPos pos) {
 +        return canTravelTo(pos.east()) || canTravelTo(pos.west()) || canTravelTo(pos.north()) || canTravelTo(pos.south());
 +    }
 +
-+    private boolean canTravelTo(BlockPos pos) {
++    private boolean canTravelTo(net.minecraft.core.BlockPos pos) {
 +        net.minecraft.world.level.block.state.BlockState state = this.level().getBlockStateIfLoaded(pos);
 +        if (state == null) {
 +            return false;
@@ -52,15 +52,15 @@
      @Override
      public Brain<Villager> getBrain() {
          return (Brain<Villager>)super.getBrain();
-@@ -293,11 +_,19 @@
+@@ -259,11 +_,19 @@
          // Paper start - EAR 2
          this.customServerAiStep(level, false);
      }
 -    protected void customServerAiStep(ServerLevel level, final boolean inactive) {
 +    protected void customServerAiStep(ServerLevel level, boolean inactive) {
          // Paper end - EAR 2
-         ProfilerFiller profilerFiller = Profiler.get();
-         profilerFiller.push("villagerBrain");
+         ProfilerFiller profiler = Profiler.get();
+         profiler.push("villagerBrain");
 +        // Kobosh start - Purpur - lobotomize stuck villagers
 +        if (me.earthme.luminol.config.modules.optimizations.LobotomizeVillageConfig.villagerLobotomizeEnabled) {
 +            inactive = inactive || checkLobotomized();
@@ -70,6 +70,6 @@
 +        // Kobosh end - Purpur - lobotomize stuck villagers
          if (!inactive) this.getBrain().tick(level, this); // Paper - EAR 2
 +        else if (this.isLobotomized && shouldRestock(level)) restock(); // Kobosh - Purpur - lobotomize stuck villagers
-         profilerFiller.pop();
+         profiler.pop();
          if (this.assignProfessionWhenSpawned) {
              this.assignProfessionWhenSpawned = false;

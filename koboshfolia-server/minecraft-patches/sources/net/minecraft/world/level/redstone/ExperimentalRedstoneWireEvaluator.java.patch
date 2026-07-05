@@ -1,11 +1,11 @@
 --- a/net/minecraft/world/level/redstone/ExperimentalRedstoneWireEvaluator.java
 +++ b/net/minecraft/world/level/redstone/ExperimentalRedstoneWireEvaluator.java
-@@ -224,7 +_,7 @@
+@@ -228,7 +_,7 @@
      }
  
      @Override
--    protected int getWireSignal(BlockPos pos, BlockState state) {
+-    protected int getWireSignal(final BlockPos pos, final BlockState state) {
 +    public int getWireSignal(BlockPos pos, BlockState state) { // Kobosh - Lithium - widened to public to match base class
-         int orDefault = this.updatedWires.getOrDefault(pos, -1);
-         return orDefault != -1 ? unpackPower(orDefault) : super.getWireSignal(pos, state);
+         int packed = this.updatedWires.getOrDefault(pos, -1);
+         return packed != -1 ? unpackPower(packed) : super.getWireSignal(pos, state);
      }

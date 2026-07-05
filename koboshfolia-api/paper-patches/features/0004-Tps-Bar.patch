@@ -16,12 +16,13 @@ index d873b78f6935a23ff8f6092b80968267b182cc0f..17b914c2fdb5e40c45fc224721b4f4bf
 +    long getChunkHotAvg(); // Kobosh
  }
 diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
-index 26d9139886d851824829734228e0bcceabba92d5..d8f0477d2f8f1f2dc6dfe0be0fb1eb915a007e69 100644
+index e5947f299937a8100fd8c6b1456da9f9003c6b53..89da1f559b3d1495cea303724910a1aed360bd33 100644
 --- a/src/main/java/org/bukkit/entity/Player.java
 +++ b/src/main/java/org/bukkit/entity/Player.java
-@@ -4012,4 +4012,5 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
-      */
-     @ApiStatus.Experimental
-     PlayerGameConnection getConnection();
+@@ -4020,4 +4020,6 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
+     default ObjectContents asObjectContents() {
+         return this.getPlayerProfile().asObjectContents();
+     }
++
 +    long getNearbyChunkHot(); // Kobosh
  }

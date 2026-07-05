@@ -1,48 +1,48 @@
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
-@@ -1431,6 +_,10 @@
-         ProfilerFiller profilerFiller = Profiler.get();
+@@ -1482,6 +_,10 @@
+         ProfilerFiller profiler = Profiler.get();
          entity.tickCount++;
          entity.totalEntityAge++; // Paper - age-like counter for all entities
 +        final LevelChunk levelChunk = this.getChunkIfLoaded(entity.moonrise$getSectionX(), entity.moonrise$getSectionZ());
 +        if (levelChunk != null) {
 +            levelChunk.getChunkHot().startTicking();
 +        }
-         profilerFiller.push(() -> BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString());
-         profilerFiller.incrementCounter("tickNonPassenger");
+         profiler.push(entity.typeHolder()::getRegisteredName);
+         profiler.incrementCounter("tickNonPassenger");
          final boolean isActive = io.papermc.paper.entity.activation.ActivationRange.checkIfActive(entity); // Paper - EAR 2
-@@ -1454,7 +_,12 @@
+@@ -1505,7 +_,12 @@
          // Folia end - region threading
          } else {entity.inactiveTick();} // Paper - EAR 2
-         profilerFiller.pop();
--        } finally { profiler.stopTimer(timerId); } // Folia - profiler
+         profiler.pop();
+-        } finally { foliaProfiler.stopTimer(timerId); } // Folia - profiler
 +        } finally {
-+            profiler.stopTimer(timerId); // Folia - profiler
++            foliaProfiler.stopTimer(timerId); // Folia - profiler
 +            if (levelChunk != null) {
 +                levelChunk.getChunkHot().stopTickingAndCount();
 +            }
 +        }
  
-         for (Entity entity1 : entity.getPassengers()) {
-             this.tickPassenger(entity, entity1, isActive); // Paper - EAR 2
-@@ -1472,6 +_,10 @@
-         } else if (passengerEntity instanceof Player || this.getCurrentWorldData().hasEntityTickingEntity(passengerEntity)) { // Folia - region threading
+         for (Entity passenger : entity.getPassengers()) {
+             this.tickPassenger(entity, passenger, isActive); // Paper - EAR 2
+@@ -1523,6 +_,10 @@
+         } else if (entity instanceof Player || this.getCurrentWorldData().hasEntityTickingEntity(entity)) { // Folia - region threading
              // Folia start - profiler
-             final int timerId = isActive ? passengerEntity.getType().tickTimerId : passengerEntity.getType().inactiveTickTimerId;
-+            final LevelChunk levelChunk = !(passengerEntity instanceof Player) ? this.getChunkIfLoaded(passengerEntity.blockPosition()) : null;
+             final int timerId = isActive ? entity.getType().tickTimerId : entity.getType().inactiveTickTimerId;
++            final LevelChunk levelChunk = !(entity instanceof Player) ? this.getChunkIfLoaded(entity.blockPosition()) : null;
 +            if (levelChunk != null) {
 +                levelChunk.getChunkHot().startTicking();
 +            }
-             final ca.spottedleaf.leafprofiler.RegionizedProfiler.Handle profiler = io.papermc.paper.threadedregions.TickRegionScheduler.getProfiler();
-             profiler.startTimer(timerId);
+             final ca.spottedleaf.leafprofiler.RegionizedProfiler.Handle foliaProfiler = io.papermc.paper.threadedregions.TickRegionScheduler.getProfiler();
+             foliaProfiler.startTimer(timerId);
              try {
-@@ -1507,7 +_,12 @@
-             for (Entity entity : passengerEntity.getPassengers()) {
-                 this.tickPassenger(passengerEntity, entity, isActive); // Paper - EAR 2
+@@ -1558,7 +_,12 @@
+             for (Entity passenger : entity.getPassengers()) {
+                 this.tickPassenger(entity, passenger, isActive); // Paper - EAR 2
              }
--            } finally { profiler.stopTimer(timerId); } // Folia - profiler
+-            } finally { foliaProfiler.stopTimer(timerId); } // Folia - profiler
 +            } finally {
-+                profiler.stopTimer(timerId); // Folia - profiler
++                foliaProfiler.stopTimer(timerId); // Folia - profiler
 +                if (levelChunk != null) {
 +                    levelChunk.getChunkHot().stopTickingAndCount();
 +                }

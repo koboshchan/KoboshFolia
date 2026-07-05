@@ -23,4 +23,4 @@
 +    // Kobosh end - Gale - optimized AI attribute collections
      private final AttributeSupplier supplier;
  
-     public AttributeMap(AttributeSupplier supplier) {
+     public AttributeMap(final AttributeSupplier supplier) {

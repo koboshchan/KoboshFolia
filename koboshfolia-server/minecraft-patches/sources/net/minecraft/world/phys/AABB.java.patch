@@ -13,12 +13,12 @@
 +    }
 +    // Kobosh end - Lithium fastutil
  
-     public AABB(double x1, double y1, double z1, double x2, double y2, double z2) {
-         this.minX = Math.min(x1, x2);
+     public AABB(final double minX, final double minY, final double minZ, final double maxX, final double maxY, final double maxZ) {
+         this.minX = Math.min(minX, maxX);
 @@ -80,11 +_,31 @@
      }
  
-     public double min(Direction.Axis axis) {
+     public double min(final Direction.Axis axis) {
 -        return axis.choose(this.minX, this.minY, this.minZ);
 +        // Kobosh start - Lithium fastutil
 +        switch (axis.ordinal()) {
@@ -33,7 +33,7 @@
 +        // Kobosh end - Lithium fastutil
      }
  
-     public double max(Direction.Axis axis) {
+     public double max(final Direction.Axis axis) {
 -        return axis.choose(this.maxX, this.maxY, this.maxZ);
 +        // Kobosh start - Lithium fastutil
 +        switch (axis.ordinal()) {

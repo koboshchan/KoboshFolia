@@ -10,10 +10,10 @@
 +    // Kobosh end - Gale - optimize noise generation
  
      @Deprecated
-     public static PerlinNoise createLegacyForBlendedNoise(RandomSource random, IntStream octaves) {
+     public static PerlinNoise createLegacyForBlendedNoise(final RandomSource random, final IntStream octaves) {
 @@ -127,6 +_,10 @@
-         this.lowestFreqInputFactor = Math.pow(2.0, -i);
-         this.lowestFreqValueFactor = Math.pow(2.0, size - 1) / (Math.pow(2.0, size) - 1.0);
+         this.lowestFreqInputFactor = Math.pow(2.0, -zeroOctaveIndex);
+         this.lowestFreqValueFactor = Math.pow(2.0, octaves - 1) / (Math.pow(2.0, octaves) - 1.0);
          this.maxValue = this.edgeValue(2.0);
 +        // Kobosh start - Gale - optimize noise generation
 +        this.octaveSamplersCount = this.noiseLevels.length;
@@ -25,8 +25,8 @@
 @@ -138,7 +_,23 @@
      }
  
-     public double getValue(double x, double y, double z) {
--        return this.getValue(x, y, z, 0.0, 0.0, false);
+     public double getValue(final double x, final double y, final double z) {
+-        return this.getValue(x, y, z, 0.0, 0.0);
 +        // Kobosh start - Gale - optimize noise generation
 +        double d = 0.0;
 +        double e = this.lowestFreqInputFactor;

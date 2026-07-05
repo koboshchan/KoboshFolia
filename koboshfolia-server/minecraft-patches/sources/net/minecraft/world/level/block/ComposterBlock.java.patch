@@ -8,31 +8,31 @@
 +    private static final int[] SLOTS_EMPTY = {};      // Kobosh - Lithium - avoid int[] allocation on every hopper check
      private static final VoxelShape[] SHAPES = Util.make(
          () -> {
-             VoxelShape[] voxelShapes = Block.boxes(
-@@ -419,7 +_,7 @@
+             VoxelShape[] shapes = Block.boxes(
+@@ -434,7 +_,7 @@
  
          @Override
-         public int[] getSlotsForFace(Direction side) {
+         public int[] getSlotsForFace(final Direction direction) {
 -            return new int[0];
 +            return SLOTS_EMPTY; // Kobosh - Lithium
          }
  
          @Override
-@@ -454,7 +_,7 @@
+@@ -469,7 +_,7 @@
  
          @Override
-         public int[] getSlotsForFace(Direction side) {
--            return side == Direction.UP ? new int[]{0} : new int[0];
-+            return side == Direction.UP ? SLOTS_FOR_UP : SLOTS_EMPTY; // Kobosh - Lithium - avoid int[] allocation
+         public int[] getSlotsForFace(final Direction direction) {
+-            return direction == Direction.UP ? new int[]{0} : new int[0];
++            return direction == Direction.UP ? SLOTS_FOR_UP : SLOTS_EMPTY; // Kobosh - Lithium - avoid int[] allocation
          }
  
          @Override
-@@ -505,7 +_,7 @@
+@@ -520,7 +_,7 @@
  
          @Override
-         public int[] getSlotsForFace(Direction side) {
--            return side == Direction.DOWN ? new int[]{0} : new int[0];
-+            return side == Direction.DOWN ? SLOTS_FOR_UP : SLOTS_EMPTY; // Kobosh - Lithium - avoid int[] allocation
+         public int[] getSlotsForFace(final Direction direction) {
+-            return direction == Direction.DOWN ? new int[]{0} : new int[0];
++            return direction == Direction.DOWN ? SLOTS_FOR_UP : SLOTS_EMPTY; // Kobosh - Lithium - avoid int[] allocation
          }
  
          @Override

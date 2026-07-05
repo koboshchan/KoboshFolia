@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -2853,7 +_,7 @@
+@@ -2884,7 +_,7 @@
          } // Folia end - rewrite login process - move connection ownership to global region
          this.waitingForSwitchToConfig = true; // Folia - rewrite login process - fix bad ordering of this field write - moved down
          this.send(ClientboundStartConfigurationPacket.INSTANCE);
@@ -9,22 +9,21 @@
      }
  
      @Override
-@@ -3718,12 +_,12 @@
-             throw new IllegalStateException("Client acknowledged config, but none was requested");
-         } else {
-             final ServerConfigurationPacketListenerImpl listener = new ServerConfigurationPacketListenerImpl(this.server, this.connection, this.createCookie(this.player.clientInformation())); // Paper
--            this.connection
--                .setupInboundProtocol(
--                    ConfigurationProtocols.SERVERBOUND,
--                    listener // Paper
--                );
--            new io.papermc.paper.event.connection.configuration.PlayerConnectionReconfigureEvent(listener.paperConnection).callEvent(); // Paper
+@@ -3769,12 +_,12 @@
+         }
+ 
+         final ServerConfigurationPacketListenerImpl listener = new ServerConfigurationPacketListenerImpl(this.server, this.connection, this.createCookie(this.player.clientInformation())); // Paper
+-        this.connection
+-            .setupInboundProtocol(
 +            this.connection.setupInboundProtocolAsync(
-+                ConfigurationProtocols.SERVERBOUND,
+                 ConfigurationProtocols.SERVERBOUND,
+-                listener // Paper
+-            );
+-        new io.papermc.paper.event.connection.configuration.PlayerConnectionReconfigureEvent(listener.paperConnection).callEvent(); // Paper
 +                listener,
 +                () -> new io.papermc.paper.event.connection.configuration.PlayerConnectionReconfigureEvent(listener.paperConnection).callEvent(),
 +                true
 +            ); // Kobosh - async protocol switching optimization
-         }
      }
  
+     @Override

@@ -8,21 +8,25 @@
      private final boolean isSticky;
  
      @Override
-@@ -128,7 +_,7 @@
+@@ -126,8 +_,8 @@
      }
  
-     private boolean getNeighborSignal(SignalGetter level, BlockPos pos, Direction direction) {
--        for (Direction direction1 : Direction.values()) {
+     private boolean getNeighborSignal(final SignalGetter level, final BlockPos pos, final Direction pushDirection) {
+-        for (Direction direction : Direction.values()) {
+-            if (direction != pushDirection && level.hasSignal(pos.relative(direction), direction)) {
 +        for (Direction direction1 : ALL_DIRECTIONS) { // Kobosh - Lithium - avoid Direction.values() allocation
-             if (direction1 != direction && level.hasSignal(pos.relative(direction1), direction1)) {
++            if (direction1 != pushDirection && level.hasSignal(pos.relative(direction1), direction1)) {
                  return true;
              }
-@@ -139,7 +_,7 @@
-         } else {
-             BlockPos blockPos = pos.above();
+         }
+@@ -138,8 +_,8 @@
  
--            for (Direction direction2 : Direction.values()) {
+         BlockPos above = pos.above();
+ 
+-        for (Direction direction : Direction.values()) {
+-            if (direction != Direction.DOWN && level.hasSignal(above.relative(direction), direction)) {
 +            for (Direction direction2 : ALL_DIRECTIONS) { // Kobosh - Lithium - avoid Direction.values() allocation
-                 if (direction2 != Direction.DOWN && level.hasSignal(blockPos.relative(direction2), direction2)) {
-                     return true;
-                 }
++            if (direction2 != Direction.DOWN && level.hasSignal(above.relative(direction2), direction2)) {
+                 return true;
+             }
+         }

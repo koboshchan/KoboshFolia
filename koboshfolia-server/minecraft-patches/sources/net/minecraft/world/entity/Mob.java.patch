@@ -1,18 +1,18 @@
 --- a/net/minecraft/world/entity/Mob.java
 +++ b/net/minecraft/world/entity/Mob.java
-@@ -815,11 +_,13 @@
+@@ -835,11 +_,13 @@
              return;
          }
          // Paper end - Allow nerfed mobs to jump and float
-+        int i = this.tickCount + this.getId(); // Kobosh - Petal - reduce sensor work
-         ProfilerFiller profilerFiller = Profiler.get();
-         profilerFiller.push("sensing");
++        int idBasedTickCount = this.tickCount + this.getId(); // Kobosh - Petal - reduce sensor work
+         ProfilerFiller profiler = Profiler.get();
+         profiler.push("sensing");
 -        this.sensing.tick();
-+        if (i % me.earthme.luminol.config.modules.optimizations.PetalReduceSensorWorkConfig.delayTicks == 0 || !me.earthme.luminol.config.modules.optimizations.PetalReduceSensorWorkConfig.enabled) {
++        if (idBasedTickCount % me.earthme.luminol.config.modules.optimizations.PetalReduceSensorWorkConfig.delayTicks == 0 || !me.earthme.luminol.config.modules.optimizations.PetalReduceSensorWorkConfig.enabled) {
 +            this.sensing.tick();
 +        }
-         profilerFiller.pop();
--        int i = this.tickCount + this.getId();
-         if (i % 2 != 0 && this.tickCount > 1) {
-             profilerFiller.push("targetSelector");
+         profiler.pop();
+-        int idBasedTickCount = this.tickCount + this.getId();
+         if (idBasedTickCount % 2 != 0 && this.tickCount > 1) {
+             profiler.push("targetSelector");
              this.targetSelector.tickRunningGoals(false);

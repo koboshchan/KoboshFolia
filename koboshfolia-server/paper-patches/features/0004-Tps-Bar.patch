@@ -102,10 +102,10 @@ index 0000000000000000000000000000000000000000..387bdafe0325004757edb391cd3b2912
 +}
 \ No newline at end of file
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-index 09baa8c13a56e0f503815a436042b7b79b1698e4..d6dfa86b54d746da82e670ba279f6d3db40991b2 100644
+index f020f310c4bca49a23de91bea72ccd9941c0b03c..2d175518b8c0a1c926f30da193f30e4678e90abb 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-@@ -408,4 +408,12 @@ public class CraftChunk implements Chunk {
+@@ -406,4 +406,12 @@ public class CraftChunk implements Chunk {
      static {
          Arrays.fill(FULL_LIGHT, (byte) 0xFF);
      }

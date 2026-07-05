@@ -17,24 +17,24 @@
 -    private final ByteBuf helperBuf = Unpooled.directBuffer(3);
      private final @Nullable BandwidthDebugMonitor monitor;
  
-     public Varint21FrameDecoder(@Nullable BandwidthDebugMonitor monitor) {
-@@ -18,51 +_,90 @@
+     public Varint21FrameDecoder(final @Nullable BandwidthDebugMonitor monitor) {
+@@ -18,53 +_,90 @@
      }
  
      @Override
--    protected void handlerRemoved0(ChannelHandlerContext ctx) {
+-    protected void handlerRemoved0(final ChannelHandlerContext ctx) {
 -        this.helperBuf.release();
 -    }
 -
--    private static boolean copyVarint(ByteBuf in, ByteBuf out) {
+-    private static boolean copyVarint(final ByteBuf in, final ByteBuf out) {
 -        for (int i = 0; i < 3; i++) {
 -            if (!in.isReadable()) {
 -                return false;
 -            }
 -
--            byte _byte = in.readByte();
--            out.writeByte(_byte);
--            if (!VarInt.hasContinuationBit(_byte)) {
+-            byte b = in.readByte();
+-            out.writeByte(b);
+-            if (!VarInt.hasContinuationBit(b)) {
 -                return true;
 -            }
 -        }
@@ -43,7 +43,7 @@
 -    }
 -
 -    @Override
-     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+     protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) {
 -        // Paper start - Perf: Optimize exception handling; if channel is not active just discard the packet
          if (!ctx.channel().isActive()) {
 -            in.skipBytes(in.readableBytes());
@@ -80,22 +80,25 @@
 +        if (in.readableBytes() < length) {
              in.resetReaderIndex();
          } else {
--            int i = VarInt.read(this.helperBuf);
--            if (i == 0) {
+-            int length = VarInt.read(this.helperBuf);
+-            if (length == 0) {
 -                throw new CorruptedFrameException("Frame length cannot be zero");
--            } else if (in.readableBytes() < i) {
+-            }
+-
+-            if (in.readableBytes() < length) {
 -                in.resetReaderIndex();
 -            } else {
 -                if (this.monitor != null) {
--                    this.monitor.onReceive(i + VarInt.getByteSize(i));
+-                    this.monitor.onReceive(length + VarInt.getByteSize(length));
 -                }
 -
--                out.add(in.readBytes(i));
-+            if (this.monitor != null) {
-+                this.monitor.onReceive(length + VarInt.getByteSize(length));
-             }
+-                out.add(in.readBytes(length));
+-            }
 -        }
 -    }
++            if (this.monitor != null) {
++                this.monitor.onReceive(length + VarInt.getByteSize(length));
++            }
 +            out.add(in.readRetainedSlice(length)); // slice avoids a copy vs readBytes
 +        }
 +        // Kobosh end - Krypton

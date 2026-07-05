@@ -5,10 +5,10 @@ Subject: [PATCH] makes Alternate Current the default redstone implementation
 
 
 diff --git a/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java b/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java
-index 1d1baac8d9eff40ff41719b213fff1eab778bd3e..48e4e4c9e0f0226c00ba192f854b8fbf5aa7a9ab 100644
+index 41c7916988b7bd91fd3ebbf8ad4b8c527f01aca4..af0bc0c0674d7dbd484cea0ecc56e7844582a259 100644
 --- a/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java
 +++ b/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java
-@@ -572,7 +572,7 @@ public class WorldConfiguration extends ConfigurationPart {
+@@ -579,7 +579,7 @@ public class WorldConfiguration extends ConfigurationPart {
      public class Misc extends ConfigurationPart {
          public boolean updatePathfindingOnBlockUpdate = true;
          public boolean showSignClickCommandFailureMsgsToPlayer = false;

@@ -1,6 +1,6 @@
 --- a/net/minecraft/core/Direction.java
 +++ b/net/minecraft/core/Direction.java
-@@ -225,7 +_,7 @@
+@@ -223,7 +_,7 @@
      }
  
      public Direction getOpposite() {
@@ -8,13 +8,13 @@
 +        return VALUES[this.oppositeIndex]; // Kobosh - Lithium fastutil
      }
  
-     public Direction getClockWise(Direction.Axis axis) {
-@@ -357,7 +_,7 @@
+     public Direction getClockWise(final Direction.Axis axis) {
+@@ -355,7 +_,7 @@
      }
  
-     public static Direction getRandom(RandomSource random) {
+     public static Direction getRandom(final RandomSource random) {
 -        return Util.getRandom(VALUES, random);
 +        return VALUES[random.nextInt(VALUES.length)]; // Kobosh - Lithium fastutil
      }
  
-     public static Direction getApproximateNearest(double x, double y, double z) {
+     public static Direction getApproximateNearest(final double dx, final double dy, final double dz) {

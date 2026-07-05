@@ -1,37 +1,35 @@
 --- a/net/minecraft/network/Utf8String.java
 +++ b/net/minecraft/network/Utf8String.java
-@@ -31,24 +_,17 @@
+@@ -33,24 +_,17 @@
      }
  
-     public static void write(ByteBuf buffer, CharSequence string, int maxLength) {
+     public static void write(final ByteBuf output, final CharSequence value, final int maxLength) {
 +        // Kobosh start - Krypton network micro-optimizations
-         if (string.length() > maxLength) {
-             throw new EncoderException("String too big (was " + string.length() + " characters, max " + maxLength + ")");
--        } else {
--            int i = ByteBufUtil.utf8MaxBytes(string);
--            ByteBuf byteBuf = buffer.alloc().buffer(i);
+         if (value.length() > maxLength) {
+             throw new EncoderException("String too big (was " + value.length() + " characters, max " + maxLength + ")");
+         }
 -
--            try {
--                int i1 = ByteBufUtil.writeUtf8(byteBuf, string);
--                int i2 = ByteBufUtil.utf8MaxBytes(maxLength);
--                if (i1 > i2) {
--                    throw new EncoderException("String too big (was " + i1 + " bytes encoded, max " + i2 + ")");
--                }
+-        int maxEncodedValueLength = ByteBufUtil.utf8MaxBytes(value);
+-        ByteBuf tmp = output.alloc().buffer(maxEncodedValueLength);
 -
--                VarInt.write(buffer, i1);
--                buffer.writeBytes(byteBuf);
--            } finally {
--                byteBuf.release();
+-        try {
+-            int bytesWritten = ByteBufUtil.writeUtf8(tmp, value);
+-            int maxAllowedEncodedLength = ByteBufUtil.utf8MaxBytes(maxLength);
+-            if (bytesWritten > maxAllowedEncodedLength) {
+-                throw new EncoderException("String too big (was " + bytesWritten + " bytes encoded, max " + maxAllowedEncodedLength + ")");
 -            }
--        }
-+        }
-+        int utf8Bytes = ByteBufUtil.utf8Bytes(string);
+-
+-            VarInt.write(output, bytesWritten);
+-            output.writeBytes(tmp);
+-        } finally {
+-            tmp.release();
++        int utf8Bytes = ByteBufUtil.utf8Bytes(value);
 +        int maxBytesPermitted = ByteBufUtil.utf8MaxBytes(maxLength);
 +        if (utf8Bytes > maxBytesPermitted) {
 +            throw new EncoderException("String too big (was " + utf8Bytes + " bytes encoded, max " + maxBytesPermitted + ")");
-+        }
-+        VarInt.write(buffer, utf8Bytes);
-+        buffer.writeCharSequence(string, StandardCharsets.UTF_8);
+         }
++        VarInt.write(output, utf8Bytes);
++        output.writeCharSequence(value, StandardCharsets.UTF_8);
 +        // Kobosh end - Krypton network micro-optimizations
      }
  }

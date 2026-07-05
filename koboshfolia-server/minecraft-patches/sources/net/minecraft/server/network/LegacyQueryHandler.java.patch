@@ -3,12 +3,12 @@
 @@ -22,6 +_,11 @@
  
      @Override
-     public void channelRead(ChannelHandlerContext ctx, Object message) {
+     public void channelRead(final ChannelHandlerContext ctx, final Object msg) {
 +        // Kobosh - Krypton: discard immediately on inactive channels
 +        if (!ctx.channel().isActive()) {
-+            ((ByteBuf) message).clear();
++            ((ByteBuf) msg).clear();
 +            return;
 +        }
-         ByteBuf byteBuf = (ByteBuf)message;
+         ByteBuf in = (ByteBuf)msg;
          // Paper start - Make legacy ping handler more reliable
          if (this.buf != null) {

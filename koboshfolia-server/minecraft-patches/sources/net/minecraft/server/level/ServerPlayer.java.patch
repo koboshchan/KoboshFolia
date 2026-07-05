@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -180,6 +_,7 @@
+@@ -184,6 +_,7 @@
  import net.minecraft.world.level.block.entity.CommandBlockEntity;
  import net.minecraft.world.level.block.entity.SignBlockEntity;
  import net.minecraft.world.level.block.state.BlockState;
@@ -8,7 +8,7 @@
  import net.minecraft.world.level.gameevent.GameEvent;
  import net.minecraft.world.level.gamerules.GameRules;
  import net.minecraft.world.level.portal.TeleportTransition;
-@@ -240,6 +_,7 @@
+@@ -245,6 +_,7 @@
      private int lastSentFood = -99999999;
      private boolean lastFoodSaturationZero = true;
      public int lastSentExp = -99999999;
@@ -16,16 +16,16 @@
      private ChatVisiblity chatVisibility = ChatVisiblity.FULL;
      public ParticleStatus particleStatus = ParticleStatus.ALL;
      private boolean canChatColor = true;
-@@ -1050,6 +_,7 @@
+@@ -1052,6 +_,7 @@
  
              if (this.tickCount % 20 == 0) {
                  CriteriaTriggers.LOCATION.trigger(this);
 +                this.nearbyChunkHot = this.refreshNearbyChunkHot();
              }
- 
              // CraftBukkit start - initialize oldLevel, fire PlayerLevelChangeEvent, and tick client-sided world border
-@@ -1081,6 +_,24 @@
-                 this.connection.send(updatePacket);
+             if (this.oldLevel == -1) {
+@@ -1082,6 +_,24 @@
+                 this.connection.send(packet);
              }
          }
 +    }

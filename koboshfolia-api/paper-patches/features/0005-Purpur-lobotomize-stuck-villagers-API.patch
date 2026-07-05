@@ -6,10 +6,10 @@ Subject: [PATCH] Purpur: lobotomize stuck villagers API
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 diff --git a/src/main/java/org/bukkit/entity/Villager.java b/src/main/java/org/bukkit/entity/Villager.java
-index d1ab8a25589a016e210af6bc448385f465509618..b506c7b684c4fd700095a317008dcc2362a96bf6 100644
+index a2024b5dda030a7724c13b2446224903ae837339..ffaf56dbeb4511f25f965676674aa2518b4fdcb3 100644
 --- a/src/main/java/org/bukkit/entity/Villager.java
 +++ b/src/main/java/org/bukkit/entity/Villager.java
-@@ -165,6 +165,13 @@ public interface Villager extends AbstractVillager {
+@@ -162,6 +162,13 @@ public interface Villager extends AbstractVillager {
      @Nullable
      public ZombieVillager zombify();
  

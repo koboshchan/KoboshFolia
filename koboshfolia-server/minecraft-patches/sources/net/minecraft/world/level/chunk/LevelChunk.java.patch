@@ -19,23 +19,23 @@
      @Override
      public final BlockState moonrise$getBlock(final int x, final int y, final int z) {
          return this.getBlockStateFinal(x, y, z);
-@@ -967,6 +_,7 @@
+@@ -959,6 +_,7 @@
                      try {
-                         ProfilerFiller profilerFiller = Profiler.get();
-                         profilerFiller.push(this::getType);
+                         ProfilerFiller profiler = Profiler.get();
+                         profiler.push(this::getType);
 +                        LevelChunk.this.chunkHot.startTicking();
-                         profiler.startTimer(timerId); try { // Folia - profiler
-                         BlockState blockState = LevelChunk.this.getBlockState(blockPos);
+                         foliaProfiler.startTimer(timerId); try { // Folia - profiler
+                         BlockState blockState = LevelChunk.this.getBlockState(pos);
                          if (this.blockEntity.getType().isValid(blockState)) {
-@@ -981,7 +_,10 @@
-                             }
-                             // Paper end - Remove the Block Entity if it's invalid
+@@ -979,7 +_,10 @@
+                                 );
+                             } // Paper - Remove the Block Entity if it's invalid
                          }
--                        } finally { profiler.stopTimer(timerId); } // Folia - profiler
+-                        } finally { foliaProfiler.stopTimer(timerId); } // Folia - profiler
 +                        } finally {
-+                            profiler.stopTimer(timerId); // Folia - profiler
++                            foliaProfiler.stopTimer(timerId); // Folia - profiler
 +                            LevelChunk.this.chunkHot.stopTickingAndCount();
 +                        }
  
-                         profilerFiller.pop();
-                     } catch (Throwable var5) {
+                         profiler.pop();
+                     } catch (Throwable t) {

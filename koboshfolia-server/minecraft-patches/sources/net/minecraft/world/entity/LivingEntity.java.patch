@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
-@@ -285,6 +_,10 @@
+@@ -300,6 +_,10 @@
      public final org.bukkit.craftbukkit.attribute.CraftAttributeMap craftAttributes;
      public boolean collides = true;
      public Set<UUID> collidableExemptions = new java.util.HashSet<>();
@@ -10,8 +10,8 @@
 +    // Kobosh end - Lithium - isPushable cache
      public boolean bukkitPickUpLoot;
      public org.bukkit.craftbukkit.entity.CraftLivingEntity getBukkitLivingEntity() { return (org.bukkit.craftbukkit.entity.CraftLivingEntity) super.getBukkitEntity(); } // Paper
-     public boolean silentDeath = false; // Paper - mark entity as dying silently for cancellable death event
-@@ -2796,6 +_,7 @@
+     public boolean silentDeath = true; // Paper - mark entity as dying silently for cancellable death event
+@@ -2815,6 +_,7 @@
      }
  
      protected void updateSwingTime() {
@@ -19,7 +19,7 @@
          int currentSwingDuration = this.getCurrentSwingDuration();
          if (this.swinging) {
              this.swingTime++;
-@@ -3798,6 +_,7 @@
+@@ -3870,6 +_,7 @@
      protected void updateFallFlying() {
          this.checkFallDistanceAccumulation();
          if (!this.level().isClientSide()) {
@@ -27,7 +27,7 @@
              if (!this.canGlide()) {
                  if (this.getSharedFlag(Entity.FLAG_FALL_FLYING) && !CraftEventFactory.callToggleGlideEvent(this, false).isCancelled()) // CraftBukkit
                  this.setSharedFlag(Entity.FLAG_FALL_FLYING, false);
-@@ -4022,7 +_,14 @@
+@@ -4093,7 +_,14 @@
      // Paper start - Climbing should not bypass cramming gamerule
      @Override
      public boolean isPushable() {

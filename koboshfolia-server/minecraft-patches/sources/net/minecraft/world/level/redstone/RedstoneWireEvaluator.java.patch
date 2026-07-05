@@ -1,10 +1,10 @@
 --- a/net/minecraft/world/level/redstone/RedstoneWireEvaluator.java
 +++ b/net/minecraft/world/level/redstone/RedstoneWireEvaluator.java
-@@ -20,7 +_,7 @@
+@@ -22,7 +_,7 @@
          return this.wireBlock.getBlockSignal(level, pos);
      }
  
--    protected int getWireSignal(BlockPos pos, BlockState state) {
+-    protected int getWireSignal(final BlockPos pos, final BlockState state) {
 +    public int getWireSignal(BlockPos pos, BlockState state) { // Kobosh - Lithium - made public for RedstoneWirePowerCalculations
          return state.is(this.wireBlock) ? state.getValue(RedStoneWireBlock.POWER) : 0;
      }

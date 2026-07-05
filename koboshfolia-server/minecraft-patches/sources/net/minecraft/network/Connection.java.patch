@@ -1,7 +1,7 @@
 --- a/net/minecraft/network/Connection.java
 +++ b/net/minecraft/network/Connection.java
 @@ -367,6 +_,99 @@
-         }
+         syncAfterConfigurationChange(this.channel.writeAndFlush(configMessage));
      }
  
 +    // Kobosh start - async protocol switching optimization
@@ -97,6 +97,6 @@
 +    }
 +    // Kobosh end - async protocol switching optimization
 +
-     public void setupOutboundProtocol(ProtocolInfo<?> protocolInfo) {
-         if (protocolInfo.flow() != this.getSending()) {
-             throw new IllegalStateException("Invalid outbound protocol: " + protocolInfo.id());
+     public void setupOutboundProtocol(final ProtocolInfo<?> protocol) {
+         if (protocol.flow() != this.getSending()) {
+             throw new IllegalStateException("Invalid outbound protocol: " + protocol.id());

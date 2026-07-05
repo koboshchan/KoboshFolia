@@ -9,10 +9,10 @@ so the default 16MiB arenas are unnecessarily large.
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index c1537f47971da83596dbb95fc21547424d5fd567..2b6947345260d4f45a082a7e921df775d71bdaf2 100644
+index 585ea62cd0909123d82e1b54ae213f6a3d1efebb..e132e0282709261650baaa11a575e428160934cd 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
-@@ -24,6 +24,7 @@ public class Main {
+@@ -23,6 +23,7 @@ public class Main {
  
      public static void main(String[] args) {
          if (System.getProperty("jdk.nio.maxCachedBufferSize") == null) System.setProperty("jdk.nio.maxCachedBufferSize", "262144"); // Paper - cap per-thread NIO cache size; https://www.evanjones.ca/java-bytebuffer-leak.html

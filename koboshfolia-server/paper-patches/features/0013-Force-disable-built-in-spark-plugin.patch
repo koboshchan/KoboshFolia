@@ -6,10 +6,10 @@ Subject: [PATCH] Force-disable built-in spark plugin
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 diff --git a/src/main/java/io/papermc/paper/plugin/provider/source/FileProviderSource.java b/src/main/java/io/papermc/paper/plugin/provider/source/FileProviderSource.java
-index a0b84535a9d3833d4df692b85b272f145559dd80..84e066cd61323c38c31b07ba672114b804660b36 100644
+index 9661f033bbb2c00073f1c891e1411c2a9943a37a..2cedcd64e7cb6d5eb46917df9e22e3224d10a909 100644
 --- a/src/main/java/io/papermc/paper/plugin/provider/source/FileProviderSource.java
 +++ b/src/main/java/io/papermc/paper/plugin/provider/source/FileProviderSource.java
-@@ -87,7 +87,7 @@ public class FileProviderSource implements ProviderSource<Path, Path> {
+@@ -76,7 +76,7 @@ public class FileProviderSource implements ProviderSource<Path, Path> {
          }
  
          final PluginMeta config = type.getConfig(file);
@@ -19,10 +19,10 @@ index a0b84535a9d3833d4df692b85b272f145559dd80..84e066cd61323c38c31b07ba672114b8
              return;
          }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index daea827602977965bcb0e648098b424dfb1e0636..fdf1ea33d4dd34532d5135541f08b9add14f319d 100644
+index 595231c7c50cf47a6c513d9f106889e23b976888..79539b62d16f680d0b82d7ce80a663346839dd94 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -303,7 +303,7 @@ public final class CraftServer implements Server {
+@@ -302,7 +302,7 @@ public final class CraftServer implements Server {
      public static Exception excessiveVelEx;
      private final io.papermc.paper.logging.SysoutCatcher sysoutCatcher = new io.papermc.paper.logging.SysoutCatcher();
      private final io.papermc.paper.potion.PaperPotionBrewer potionBrewer;
@@ -31,7 +31,7 @@ index daea827602977965bcb0e648098b424dfb1e0636..fdf1ea33d4dd34532d5135541f08b9ad
      private final ServerConfiguration serverConfig = new PaperServerConfiguration();
  
      // Paper start - Folia region threading API
-@@ -484,7 +484,7 @@ public final class CraftServer implements Server {
+@@ -478,7 +478,7 @@ public final class CraftServer implements Server {
          }
          this.potionBrewer = new io.papermc.paper.potion.PaperPotionBrewer(console); // Paper - custom potion mixes
          datapackManager = new io.papermc.paper.datapack.PaperDatapackManager(console.getPackRepository()); // Paper
@@ -40,7 +40,7 @@ index daea827602977965bcb0e648098b424dfb1e0636..fdf1ea33d4dd34532d5135541f08b9ad
      }
  
      public boolean getCommandBlockOverride(String command) {
-@@ -1058,7 +1058,7 @@ public final class CraftServer implements Server {
+@@ -1051,7 +1051,7 @@ public final class CraftServer implements Server {
          org.spigotmc.SpigotConfig.registerCommands(); // Spigot
          com.kobosh.koboshfolia.tpsbar.commands.BarCommand.register(); // Kobosh
          io.papermc.paper.command.PaperCommands.registerCommands(this.console); // Paper
@@ -49,12 +49,12 @@ index daea827602977965bcb0e648098b424dfb1e0636..fdf1ea33d4dd34532d5135541f08b9ad
          this.overrideAllCommandBlockCommands = this.commandsConfiguration.getStringList("command-block-overrides").contains("*");
          this.ignoreVanillaPermissions = this.commandsConfiguration.getBoolean("ignore-vanilla-permissions");
  
-@@ -1087,7 +1087,7 @@ public final class CraftServer implements Server {
+@@ -1080,7 +1080,7 @@ public final class CraftServer implements Server {
          this.loadPlugins();
          this.enablePlugins(PluginLoadOrder.STARTUP);
          this.enablePlugins(PluginLoadOrder.POSTWORLD);
 -        this.spark.registerCommandAfterPlugins(this); // Paper - spark
 +        if (false) this.spark.registerCommandAfterPlugins(this); // Paper - spark // Kobosh - force-disable built-in spark plugin
-         if (io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper != null) io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper.pluginsEnabled(); // Paper - Remap plugins
          // Paper start - brigadier command API
          io.papermc.paper.command.brigadier.PaperCommands.INSTANCE.setValid(); // to clear invalid state for event fire below
+         io.papermc.paper.plugin.lifecycle.event.LifecycleEventRunner.INSTANCE.callReloadableRegistrarEvent(io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents.COMMANDS, io.papermc.paper.command.brigadier.PaperCommands.INSTANCE, org.bukkit.plugin.Plugin.class, io.papermc.paper.plugin.lifecycle.event.registrar.ReloadableRegistrarEvent.Cause.RELOAD); // call commands event for regular plugins

@@ -1,81 +1,80 @@
 --- a/net/minecraft/util/Mth.java
 +++ b/net/minecraft/util/Mth.java
-@@ -31,7 +_,7 @@
+@@ -32,9 +_,9 @@
      private static final int SIN_MASK = 65535;
      private static final int COS_OFFSET = 16384;
      private static final double SIN_SCALE = 10430.378350470453;
--    private static final float[] SIN = Util.make(new float[65536], floats -> {
+-    private static final float[] SIN = Util.make(new float[65536], sin -> {
+-        for (int i = 0; i < sin.length; i++) {
+-            sin[i] = (float)Math.sin(i / 10430.378350470453);
 +    public static final float[] SIN = Util.make(new float[65536], floats -> { // Kobosh - Lithium - made public for CompactSineLUT
-         for (int i1 = 0; i1 < floats.length; i1++) {
-             floats[i1] = (float)Math.sin(i1 / 10430.378350470453);
++        for (int i = 0; i < floats.length; i++) {
++            floats[i] = (float)Math.sin(i / 10430.378350470453);
          }
+     });
+     private static final int[] MULTIPLY_DE_BRUIJN_BIT_POSITION = new int[]{
 @@ -48,11 +_,11 @@
      private static final double[] COS_TAB = new double[257];
  
-     public static float sin(double value) {
--        return SIN[(int)((long)(value * 10430.378350470453) & 65535L)];
-+        return CompactSineLUT.sin(value); // Kobosh - Lithium - compact 16K sine LUT (was 64K); bit-for-bit identical
+     public static float sin(final double i) {
+-        return SIN[(int)((long)(i * 10430.378350470453) & 65535L)];
++        return CompactSineLUT.sin(i); // Kobosh - Lithium - compact 16K sine LUT (was 64K); bit-for-bit identical
      }
  
-     public static float cos(double value) {
--        return SIN[(int)((long)(value * 10430.378350470453 + 16384.0) & 65535L)];
-+        return CompactSineLUT.cos(value); // Kobosh - Lithium - compact 16K sine LUT (was 64K); bit-for-bit identical
+     public static float cos(final double i) {
+-        return SIN[(int)((long)(i * 10430.378350470453 + 16384.0) & 65535L)];
++        return CompactSineLUT.cos(i); // Kobosh - Lithium - compact 16K sine LUT (was 64K); bit-for-bit identical
      }
  
-     public static float sqrt(float value) {
-@@ -60,18 +_,15 @@
+     public static float sqrt(final float x) {
+@@ -60,15 +_,15 @@
      }
  
-     public static int floor(float value) {
--        int i = (int)value;
--        return value < i ? i - 1 : i;
-+        return (int)Math.floor(value); // Kobosh - Gale - use platform math functions
+     public static int floor(final float v) {
+-        return (int)Math.floor(v);
++        return (int)Math.floor(v); // Kobosh - Gale - use platform math functions
      }
  
-     public static int floor(double value) {
--        int i = (int)value;
--        return value < i ? i - 1 : i;
-+        return (int)Math.floor(value); // Kobosh - Gale - use platform math functions
+     public static int floor(final double v) {
+-        return (int)Math.floor(v);
++        return (int)Math.floor(v); // Kobosh - Gale - use platform math functions
      }
  
-     public static long lfloor(double value) {
--        long l = (long)value;
--        return value < l ? l - 1L : l;
-+        return (long)Math.floor(value); // Kobosh - Gale - use platform math functions
+     public static long lfloor(final double v) {
+-        return (long)Math.floor(v);
++        return (long)Math.floor(v); // Kobosh - Gale - use platform math functions
      }
  
-     public static float abs(float value) {
-@@ -83,13 +_,11 @@
+     public static float abs(final float v) {
+@@ -80,11 +_,11 @@
      }
  
-     public static int ceil(float value) {
--        int i = (int)value;
--        return value > i ? i + 1 : i;
-+        return (int)Math.ceil(value); // Kobosh - Gale - use platform math functions
+     public static int ceil(final float v) {
+-        return (int)Math.ceil(v);
++        return (int)Math.ceil(v); // Kobosh - Gale - use platform math functions
      }
  
-     public static int ceil(double value) {
--        int i = (int)value;
--        return value > i ? i + 1 : i;
-+        return (int)Math.ceil(value); // Kobosh - Gale - use platform math functions
+     public static int ceil(final double v) {
+-        return (int)Math.ceil(v);
++        return (int)Math.ceil(v); // Kobosh - Gale - use platform math functions
      }
  
-     public static long ceilLong(double value) {
-@@ -541,7 +_,7 @@
+     public static long ceilLong(final double v) {
+@@ -548,7 +_,7 @@
      }
  
-     public static float lerp(float delta, float start, float end) {
--        return start + delta * (end - start);
-+        return Math.fma(delta, end - start, start); // Kobosh - SuperFastMath - fused multiply-add lerp
+     public static float lerp(final float alpha1, final float p0, final float p1) {
+-        return p0 + alpha1 * (p1 - p0);
++        return Math.fma(alpha1, p1 - p0, p0); // Kobosh - SuperFastMath - fused multiply-add lerp
      }
  
-     public static Vec3 lerp(double delta, Vec3 start, Vec3 end) {
-@@ -549,7 +_,7 @@
+     public static Vec3 lerp(final double alpha, final Vec3 p1, final Vec3 p2) {
+@@ -556,7 +_,7 @@
      }
  
-     public static double lerp(double delta, double start, double end) {
--        return start + delta * (end - start);
-+        return Math.fma(delta, end - start, start); // Kobosh - SuperFastMath - fused multiply-add lerp
+     public static double lerp(final double alpha1, final double p0, final double p1) {
+-        return p0 + alpha1 * (p1 - p0);
++        return Math.fma(alpha1, p1 - p0, p0); // Kobosh - SuperFastMath - fused multiply-add lerp
      }
  
-     public static double lerp2(double delta1, double delta2, double start1, double end1, double start2, double end2) {
+     public static double lerp2(final double alpha1, final double alpha2, final double x00, final double x10, final double x01, final double x11) {

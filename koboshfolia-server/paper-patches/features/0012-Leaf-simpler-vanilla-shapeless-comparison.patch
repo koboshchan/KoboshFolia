@@ -6,14 +6,21 @@ Subject: [PATCH] Leaf: simpler vanilla shapeless comparison
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftShapelessRecipe.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftShapelessRecipe.java
-index 7c989318dc7ad89bb0d9143fcaac1e4bba6f5907..dca73094f24fab3072efe20baca96a8f1ea00bbf 100644
+index 6a7bb225f044c9f299d6a3e703de82a1093878b4..a637c3d80d0af42842ef36d49bbdf67858e9655a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftShapelessRecipe.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftShapelessRecipe.java
-@@ -44,6 +44,6 @@ public class CraftShapelessRecipe extends ShapelessRecipe implements CraftRecipe
-             data.add(this.toNMS(i, true));
+@@ -45,12 +45,12 @@ public class CraftShapelessRecipe extends ShapelessRecipe implements CraftRecipe
+         for (org.bukkit.inventory.RecipeChoice choice : choices) {
+             ingredients.add(CraftRecipe.toIngredient(choice, true));
          }
- 
--        MinecraftServer.getServer().getRecipeManager().addRecipe(new RecipeHolder<>(CraftRecipe.toMinecraft(this.getKey()), new net.minecraft.world.item.crafting.ShapelessRecipe(this.getGroup(), CraftRecipe.getCategory(this.getCategory()), CraftItemStack.asNMSCopy(this.getResult()), data)));
-+        MinecraftServer.getServer().getRecipeManager().addRecipe(new RecipeHolder<>(CraftRecipe.toMinecraft(this.getKey()), new net.minecraft.world.item.crafting.ShapelessRecipe(this.getGroup(), CraftRecipe.getCategory(this.getCategory()), CraftItemStack.asNMSCopy(this.getResult()), data, true))); // Kobosh - Leaf - mark Bukkit shapeless recipes
+-
+         net.minecraft.world.item.crafting.ShapelessRecipe recipe = new net.minecraft.world.item.crafting.ShapelessRecipe(
+             new net.minecraft.world.item.crafting.Recipe.CommonInfo(true),
+             new net.minecraft.world.item.crafting.CraftingRecipe.CraftingBookInfo(CraftRecipe.getCategory(this.getCategory()), this.getGroup()),
+             CraftItemStack.asTemplate(this.getResult()),
+-            ingredients
++            ingredients,
++            true // Kobosh - Leaf - mark Bukkit shapeless recipes
+         );
+         MinecraftServer.getServer().getRecipeManager().addRecipe(new RecipeHolder<>(CraftNamespacedKey.toResourceKey(Registries.RECIPE, this.getKey()), recipe));
      }
- }

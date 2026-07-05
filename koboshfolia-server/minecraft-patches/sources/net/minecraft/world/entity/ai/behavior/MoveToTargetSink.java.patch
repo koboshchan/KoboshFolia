@@ -2,16 +2,16 @@
 +++ b/net/minecraft/world/entity/ai/behavior/MoveToTargetSink.java
 @@ -117,7 +_,13 @@
  
-     private boolean tryComputePath(Mob mob, WalkTarget target, long time) {
-         BlockPos blockPos = target.getTarget().currentBlockPosition();
--        this.path = mob.getNavigation().createPath(blockPos, 0);
+     private boolean tryComputePath(final Mob body, final WalkTarget walkTarget, final long timestamp) {
+         BlockPos targetPos = walkTarget.getTarget().currentBlockPosition();
+-        this.path = body.getNavigation().createPath(targetPos, 0);
 +        // Kobosh start - Kaiiju - do not pathfind outside region
-+        if (ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(mob.level(), blockPos)) {
-+            this.path = mob.getNavigation().createPath(blockPos, 0);
++        if (ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(body.level(), targetPos)) {
++            this.path = body.getNavigation().createPath(targetPos, 0);
 +        } else {
 +            this.path = null;
 +        }
 +        // Kobosh end - Kaiiju - do not pathfind outside region
-         this.speedModifier = target.getSpeedModifier();
-         Brain<?> brain = mob.getBrain();
-         if (this.reachedTarget(mob, target)) {
+         this.speedModifier = walkTarget.getSpeedModifier();
+         Brain<?> brain = body.getBrain();
+         if (this.reachedTarget(body, walkTarget)) {

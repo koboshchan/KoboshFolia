@@ -1,17 +1,17 @@
 --- a/net/minecraft/network/VarInt.java
 +++ b/net/minecraft/network/VarInt.java
 @@ -60,7 +_,7 @@
-             int w = (value & 0x7F | 0x80) << 8 | (value >>> 7);
-             buffer.writeShort(w);
+             int s = (value & 0x7F | 0x80) << 8 | (value >>> 7);
+             output.writeShort(s);
          } else {
--            writeOld(buffer, value);
-+            writeVarIntFull(buffer, value); // Kobosh - Krypton network micro-optimizations
+-            writeSlow(output, value);
++            writeVarIntFull(output, value); // Kobosh - Krypton network micro-optimizations
          }
-         return buffer;
+         return output;
      }
 @@ -74,4 +_,27 @@
-         buffer.writeByte(value);
-         return buffer;
+         output.writeByte(value);
+         return output;
      }
 +
 +    // Kobosh start - Krypton network micro-optimizations

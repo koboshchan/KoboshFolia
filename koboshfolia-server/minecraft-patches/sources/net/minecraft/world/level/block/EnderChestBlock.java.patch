@@ -16,16 +16,16 @@
  import net.minecraft.world.inventory.PlayerEnderChestContainer;
  import net.minecraft.world.item.context.BlockPlaceContext;
  import net.minecraft.world.level.BlockGetter;
-@@ -85,7 +_,7 @@
-                 enderChestInventory.setActiveChest(enderChestBlockEntity); // Needs to happen before ChestMenu.threeRows as it is required for opening animations
-                 if (level instanceof ServerLevel serverLevel && player.openMenu(
-                     new SimpleMenuProvider(
--                        (containerId, playerInventory, player1) -> ChestMenu.threeRows(containerId, playerInventory, enderChestInventory), CONTAINER_TITLE
-+                        (containerId, playerInventory, player1) -> getEnderChestSixRows(containerId, playerInventory, player, enderChestInventory), CONTAINER_TITLE
-                     )
-                 ).isPresent()) {
-                 // Paper end - Fix InventoryOpenEvent cancellation - moved up;
-@@ -99,6 +_,34 @@
+@@ -90,7 +_,7 @@
+             // Paper start - Fix InventoryOpenEvent cancellation - moved up;
+             container.setActiveChest(enderChest); // Needs to happen before ChestMenu.threeRows as it is required for opening animations
+             if (level instanceof ServerLevel serverLevel && player.openMenu(
+-                new SimpleMenuProvider((containerId, inventory, p) -> ChestMenu.threeRows(containerId, inventory, container), CONTAINER_TITLE)
++                new SimpleMenuProvider((containerId, playerInventory, player1) -> getEnderChestSixRows(containerId, playerInventory, player, container), CONTAINER_TITLE)
+             ).isPresent()) {
+             // Paper end - Fix InventoryOpenEvent cancellation - moved up;
+                 player.awardStat(Stats.OPEN_ENDERCHEST);
+@@ -102,6 +_,34 @@
              return InteractionResult.SUCCESS;
          }
      }
@@ -59,4 +59,4 @@
 +    // Kobosh end - Barrels and enderchests 6 rows
  
      @Override
-     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+     public BlockEntity newBlockEntity(final BlockPos worldPosition, final BlockState blockState) {
