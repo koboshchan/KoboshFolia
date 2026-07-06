@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Sun, 5 Jul 2026 18:05:25 -0700
+Subject: [PATCH] Add ca.spottedleaf.moonrise.common.time remappings to
+ Commodore for backward compatibility
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/Commodore.java b/src/main/java/org/bukkit/craftbukkit/util/Commodore.java
+index 30cf868faa9393d3787fce681f77cb8167015bb0..5bf24dab67f6ab46bcb9097fa3d79c6cbb12832f 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/Commodore.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/Commodore.java
+@@ -76,16 +76,22 @@ public class Commodore {
+             "java/util/EnumMap", "org/bukkit/craftbukkit/legacy/enums/ImposterEnumMap"
+     );
+ 
+-    private static final Map<String, String> RENAMES = Map.of(
+-            "org/bukkit/entity/TextDisplay$TextAligment", "org/bukkit/entity/TextDisplay$TextAlignment", // SPIGOT-7335
+-            "org/spigotmc/event/entity/EntityMountEvent", "org/bukkit/event/entity/EntityMountEvent",
+-            "org/spigotmc/event/entity/EntityDismountEvent", "org/bukkit/event/entity/EntityDismountEvent",
+-            "org/bukkit/block/data/type/Crafter$Orientation", "org/bukkit/block/Orientation",
+-            "org/bukkit/block/data/type/Jigsaw$Orientation", "org/bukkit/block/Orientation",
+-            "org/bukkit/block/data/type/MossyCarpet$Height", "org/bukkit/block/data/type/Wall$Height",
+-            "org/bukkit/block/data/type/PinkPetals", "org/bukkit/block/data/type/FlowerBed",
+-            "org/bukkit/block/data/type/PointedDripstone", "org/bukkit/block/data/type/Speleothem",
+-            "org/bukkit/block/data/type/PointedDripstone$Thickness", "org/bukkit/block/data/type/Speleothem$Thickness"
++    private static final Map<String, String> RENAMES = Map.ofEntries(
++            Map.entry("org/bukkit/entity/TextDisplay$TextAligment", "org/bukkit/entity/TextDisplay$TextAlignment"), // SPIGOT-7335
++            Map.entry("org/spigotmc/event/entity/EntityMountEvent", "org/bukkit/event/entity/EntityMountEvent"),
++            Map.entry("org/spigotmc/event/entity/EntityDismountEvent", "org/bukkit/event/entity/EntityDismountEvent"),
++            Map.entry("org/bukkit/block/data/type/Crafter$Orientation", "org/bukkit/block/Orientation"),
++            Map.entry("org/bukkit/block/data/type/Jigsaw$Orientation", "org/bukkit/block/Orientation"),
++            Map.entry("org/bukkit/block/data/type/MossyCarpet$Height", "org/bukkit/block/data/type/Wall$Height"),
++            Map.entry("org/bukkit/block/data/type/PinkPetals", "org/bukkit/block/data/type/FlowerBed"),
++            Map.entry("org/bukkit/block/data/type/PointedDripstone", "org/bukkit/block/data/type/Speleothem"),
++            Map.entry("org/bukkit/block/data/type/PointedDripstone$Thickness", "org/bukkit/block/data/type/Speleothem$Thickness"),
++            Map.entry("ca/spottedleaf/moonrise/common/time/TickData", "ca/spottedleaf/common/time/TickData"),
++            Map.entry("ca/spottedleaf/moonrise/common/time/TickData$TickReportData", "ca/spottedleaf/common/time/TickData$TickReportData"),
++            Map.entry("ca/spottedleaf/moonrise/common/time/TickData$SegmentedAverage", "ca/spottedleaf/common/time/TickData$SegmentedAverage"),
++            Map.entry("ca/spottedleaf/moonrise/common/time/TickData$SegmentData", "ca/spottedleaf/common/time/TickData$SegmentData"),
++            Map.entry("ca/spottedleaf/moonrise/common/time/TickData$MSPTData", "ca/spottedleaf/common/time/TickData$MSPTData"),
++            Map.entry("ca/spottedleaf/moonrise/common/time/TickTime", "ca/spottedleaf/common/time/TickTime")
+     );
+ 
+     private static final Map<String, String> CLASS_TO_INTERFACE = Map.ofEntries(
