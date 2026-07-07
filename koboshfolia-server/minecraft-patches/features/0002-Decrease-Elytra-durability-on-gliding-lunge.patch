@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Mon, 6 Jul 2026 22:42:52 -0700
+Subject: [PATCH] Decrease Elytra durability on gliding lunge
+
+
+diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
+index 0571ee2fb8cd410c7913bf1c5e2ef5e7ef14711f..c3fd61504b5e549be4682a3e1f1a6b04858b145c 100644
+--- a/net/minecraft/world/entity/player/Player.java
++++ b/net/minecraft/world/entity/player/Player.java
+@@ -295,6 +295,10 @@ public abstract class Player extends Avatar implements ContainerUser {
+                         if (lungeLevel > 0) {
+                             if (isGliding) {
+                                 held.hurtAndBreak(com.kobosh.koboshfolia.KoboshConfig.lungeSpearDurabilityDamage, (ServerPlayer) this, EquipmentSlot.MAINHAND);
++                                ItemStack elytra = this.getItemBySlot(EquipmentSlot.CHEST);
++                                if (!elytra.isEmpty() && elytra.is(Items.ELYTRA)) {
++                                    elytra.hurtAndBreak(com.kobosh.koboshfolia.KoboshConfig.lungeElytraDurabilityDamage, (ServerPlayer) this, EquipmentSlot.CHEST);
++                                }
+                                 Vec3 look = this.getLookAngle();
+                                 double boost = com.kobosh.koboshfolia.KoboshConfig.lungeGlidingBoostMultiplier * (double) lungeLevel;
+                                 this.setDeltaMovement(this.getDeltaMovement().add(look.x * boost, look.y * boost, look.z * boost));
