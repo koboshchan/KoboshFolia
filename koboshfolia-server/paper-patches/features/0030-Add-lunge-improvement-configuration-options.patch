@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Mon, 6 Jul 2026 22:45:45 -0700
+Subject: [PATCH] Add lunge-improvement configuration options
+
+
+diff --git a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+index 2acae4e8e3f2e8435ad377a6f5fe52bffa45fca2..326a1e481cf42cafc4d4c295e535cb3253b80f7a 100644
+--- a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
++++ b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+@@ -48,6 +48,15 @@ public final class KoboshConfig {
+     public static double hungerStarvationDamage = 1.0;
+     public static boolean infinityBowWorksWithoutArrows = false;
+ 
++    // Lunge Improvement
++    public static boolean lungeImprovementEnabled = false;
++    public static int lungeSpearDurabilityDamage = 3;
++    public static int lungeElytraDurabilityDamage = 3;
++    public static double lungeGroundExhaustionMinDistance = 1.0;
++    public static int lungeGroundExhaustionCheckTicks = 5;
++    public static double lungeGlidingBoostMultiplier = 0.458;
++    public static int lungeGroundMinHungerLevel = 6;
++
+     public static boolean tpsbarEnabled = true;
+     public static boolean memoryBarEnabled = true;
+     public static boolean regionbarEnabled = true;
+@@ -199,6 +208,27 @@ public final class KoboshConfig {
+         infinityBowWorksWithoutArrows = config.getBoolean("infinity-bow-works-without-arrows", infinityBowWorksWithoutArrows);
+         config.set("infinity-bow-works-without-arrows", infinityBowWorksWithoutArrows);
+ 
++        lungeImprovementEnabled = config.getBoolean("lunge-improvement.enabled", lungeImprovementEnabled);
++        config.set("lunge-improvement.enabled", lungeImprovementEnabled);
++
++        lungeSpearDurabilityDamage = config.getInt("lunge-improvement.spear-durability-damage", lungeSpearDurabilityDamage);
++        config.set("lunge-improvement.spear-durability-damage", lungeSpearDurabilityDamage);
++
++        lungeElytraDurabilityDamage = config.getInt("lunge-improvement.elytra-durability-damage", lungeElytraDurabilityDamage);
++        config.set("lunge-improvement.elytra-durability-damage", lungeElytraDurabilityDamage);
++
++        lungeGroundExhaustionMinDistance = config.getDouble("lunge-improvement.ground-exhaustion-min-distance", lungeGroundExhaustionMinDistance);
++        config.set("lunge-improvement.ground-exhaustion-min-distance", lungeGroundExhaustionMinDistance);
++
++        lungeGroundExhaustionCheckTicks = config.getInt("lunge-improvement.ground-exhaustion-check-ticks", lungeGroundExhaustionCheckTicks);
++        config.set("lunge-improvement.ground-exhaustion-check-ticks", lungeGroundExhaustionCheckTicks);
++
++        lungeGlidingBoostMultiplier = config.getDouble("lunge-improvement.gliding-boost-multiplier", lungeGlidingBoostMultiplier);
++        config.set("lunge-improvement.gliding-boost-multiplier", lungeGlidingBoostMultiplier);
++
++        lungeGroundMinHungerLevel = config.getInt("lunge-improvement.ground-min-hunger-level", lungeGroundMinHungerLevel);
++        config.set("lunge-improvement.ground-min-hunger-level", lungeGroundMinHungerLevel);
++
+         try {
+             config.save(CONFIG_FILE);
+         } catch (IOException ex) {
