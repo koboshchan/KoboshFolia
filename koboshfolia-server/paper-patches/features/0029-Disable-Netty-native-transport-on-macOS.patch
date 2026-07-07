@@ -1,0 +1,18 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Mon, 6 Jul 2026 21:47:58 -0700
+Subject: [PATCH] Disable Netty native transport on macOS
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
+index e132e0282709261650baaa11a575e428160934cd..9b6bee602cdde508baf03f797c899cf97c213e08 100644
+--- a/src/main/java/org/bukkit/craftbukkit/Main.java
++++ b/src/main/java/org/bukkit/craftbukkit/Main.java
+@@ -24,6 +24,7 @@ public class Main {
+     public static void main(String[] args) {
+         if (System.getProperty("jdk.nio.maxCachedBufferSize") == null) System.setProperty("jdk.nio.maxCachedBufferSize", "262144"); // Paper - cap per-thread NIO cache size; https://www.evanjones.ca/java-bytebuffer-leak.html
+         if (System.getProperty("io.netty.allocator.maxOrder") == null) System.setProperty("io.netty.allocator.maxOrder", "9"); // Kobosh - Krypton: 4MiB Netty arenas instead of 16MiB; MC max packet is 2MiB
++        if (System.getProperty("io.netty.transport.noNative") == null && System.getProperty("os.name").toLowerCase().contains("mac")) System.setProperty("io.netty.transport.noNative", "true"); // Kobosh - KQueue native transport has selector loop bugs on macOS
+         OptionParser parser = new OptionParser() {
+             {
+                 this.acceptsAll(asList("?", "help"), "Show the help");
