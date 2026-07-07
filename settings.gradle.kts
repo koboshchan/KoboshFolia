@@ -18,7 +18,7 @@ include("koboshfolia-server")
 gradle.lifecycle.beforeProject {
     val mcVersion = providers.gradleProperty("mcVersion").get().trim()
     val koboshFoliaVersionChannel = providers.gradleProperty("channel").get().trim()
-    val koboshFoliaBuildNumber = providers.environmentVariable("BUILD_NUMBER").orNull?.trim()?.toInt()
+    val koboshFoliaBuildNumber = providers.environmentVariable("BUILD_NUMBER").orNull?.trim()
     val versionString = if (koboshFoliaBuildNumber == null) {
         "$mcVersion.local-SNAPSHOT"
     } else {
