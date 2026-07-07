@@ -26,8 +26,10 @@ jobs:
         run: echo "BUILD_NUMBER=${{ github.run_number }}" >> "$GITHUB_ENV"
       - name: Apply Patches
         run: ./gradlew applyAllPatches --no-configuration-cache --stacktrace
+      - name: Apply Server Patches
+        run: ./gradlew applyAllServerPatches --no-configuration-cache --stacktrace
       - name: Build and Bundle Server
-        run: ./gradlew clean applyAllServerPatches build createPaperclipJar --stacktrace
+        run: ./gradlew build createPaperclipJar --stacktrace
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
