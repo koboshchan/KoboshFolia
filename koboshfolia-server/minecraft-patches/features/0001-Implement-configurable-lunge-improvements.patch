@@ -1,0 +1,131 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Mon, 6 Jul 2026 22:10:43 -0700
+Subject: [PATCH] Implement configurable lunge improvements
+
+
+diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
+index 2eb5fc819e2e17c69de87f8aa1a99e02bc5a62d5..0571ee2fb8cd410c7913bf1c5e2ef5e7ef14711f 100644
+--- a/net/minecraft/world/entity/player/Player.java
++++ b/net/minecraft/world/entity/player/Player.java
+@@ -101,6 +101,7 @@ import net.minecraft.world.item.crafting.Recipe;
+ import net.minecraft.world.item.crafting.RecipeHolder;
+ import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
+ import net.minecraft.world.item.enchantment.EnchantmentHelper;
++import net.minecraft.world.item.enchantment.Enchantments;
+ import net.minecraft.world.item.equipment.Equippable;
+ import net.minecraft.world.item.trading.MerchantOffers;
+ import net.minecraft.world.level.GameType;
+@@ -179,6 +180,17 @@ public abstract class Player extends Avatar implements ContainerUser {
+     public boolean fauxSleeping;
+     public int oldLevel = -1;
+ 
++    // Kobosh - lunge improvement fields
++    public double preLungeX;
++    public double preLungeY;
++    public double preLungeZ;
++    public float pendingLungeExhaustion;
++    public int lungeCheckTicks;
++    public boolean trackingLunge;
++    public boolean isApplyingLungeExhaustion;
++    public int enhancedLungeAttackCooldown;
++    public boolean wasSwinging;
++
+     @Override
+     public org.bukkit.craftbukkit.entity.CraftHumanEntity getBukkitEntity() {
+         return (org.bukkit.craftbukkit.entity.CraftHumanEntity) super.getBukkitEntity();
+@@ -243,6 +255,67 @@ public abstract class Player extends Avatar implements ContainerUser {
+ 
+     @Override
+     public void tick() {
++        // Kobosh start - lunge improvement tick
++        if (com.kobosh.koboshfolia.KoboshConfig.lungeImprovementEnabled) {
++            // 1. Ground Lunge Movement Check
++            if (this.trackingLunge && this.lungeCheckTicks > 0) {
++                this.lungeCheckTicks--;
++                if (this.lungeCheckTicks == 0) {
++                    double dx = this.getX() - this.preLungeX;
++                    double dy = this.getY() - this.preLungeY;
++                    double dz = this.getZ() - this.preLungeZ;
++                    double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
++                    if (dist > com.kobosh.koboshfolia.KoboshConfig.lungeGroundExhaustionMinDistance) {
++                        this.isApplyingLungeExhaustion = true;
++                        this.causeFoodExhaustion(this.pendingLungeExhaustion, org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason.ENCHANTMENT_EFFECT);
++                        this.isApplyingLungeExhaustion = false;
++                    }
++                    this.trackingLunge = false;
++                    this.pendingLungeExhaustion = 0.0F;
++                }
++            }
++
++            // 2. Gliding Spear Lunge Check
++            if (this.enhancedLungeAttackCooldown > 0) {
++                this.enhancedLungeAttackCooldown--;
++            }
++
++            boolean currentlySwinging = this.swinging;
++            boolean justStartedSwinging = currentlySwinging && !this.wasSwinging && this.enhancedLungeAttackCooldown == 0;
++            this.wasSwinging = currentlySwinging;
++
++            if (justStartedSwinging && !this.level().isClientSide()) {
++                boolean isGliding = this.isFallFlying();
++                boolean isOnGround = this.onGround() && !this.isInWater() && !this.isInLava();
++                if (isGliding || isOnGround) {
++                    ItemStack held = this.getMainHandItem();
++                    if (!held.isEmpty() && held.getItem().builtInRegistryHolder().key().identifier().getPath().endsWith("_spear")) {
++                        // Find Lunge level
++                        int lungeLevel = EnchantmentHelper.getItemEnchantmentLevel(this.level().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT).getOrThrow(Enchantments.LUNGE), held);
++                        if (lungeLevel > 0) {
++                            if (isGliding) {
++                                held.hurtAndBreak(com.kobosh.koboshfolia.KoboshConfig.lungeSpearDurabilityDamage, (ServerPlayer) this, EquipmentSlot.MAINHAND);
++                                Vec3 look = this.getLookAngle();
++                                double boost = com.kobosh.koboshfolia.KoboshConfig.lungeGlidingBoostMultiplier * (double) lungeLevel;
++                                this.setDeltaMovement(this.getDeltaMovement().add(look.x * boost, look.y * boost, look.z * boost));
++                                this.hurtMarked = true;
++                            } else {
++                                FoodData food = this.getFoodData();
++                                if (food.getFoodLevel() >= com.kobosh.koboshfolia.KoboshConfig.lungeGroundMinHungerLevel) {
++                                    float cost = (float) lungeLevel * 4.0F;
++                                    this.isApplyingLungeExhaustion = true;
++                                    this.causeFoodExhaustion(cost, org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason.ENCHANTMENT_EFFECT);
++                                    this.isApplyingLungeExhaustion = false;
++                                }
++                            }
++                            this.enhancedLungeAttackCooldown = 10;
++                        }
++                    }
++                }
++            }
++        }
++        // Kobosh end
++
+         this.noPhysics = this.isSpectator();
+         if (this.isSpectator() || this.isPassenger()) {
+             this.setOnGround(false);
+@@ -1723,6 +1796,26 @@ public abstract class Player extends Avatar implements ContainerUser {
+ 
+     public void causeFoodExhaustion(final float amount, final org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason reason) {
+         // CraftBukkit end
++        // Kobosh start - lunge improvement interception
++        if (com.kobosh.koboshfolia.KoboshConfig.lungeImprovementEnabled && !this.isApplyingLungeExhaustion) {
++            // Lunge exhaustion typically ranges from 4.0 (level 1) to 12.0 (level 3)
++            if (amount >= 3.5F && amount <= 13.0F) {
++                if (this.isFallFlying()) {
++                    // Gliding lunge - durability cost instead, cancel hunger cost
++                    return;
++                } else {
++                    // Ground lunge - defer hunger cost to movement check
++                    this.preLungeX = this.getX();
++                    this.preLungeY = this.getY();
++                    this.preLungeZ = this.getZ();
++                    this.pendingLungeExhaustion = amount;
++                    this.lungeCheckTicks = com.kobosh.koboshfolia.KoboshConfig.lungeGroundExhaustionCheckTicks;
++                    this.trackingLunge = true;
++                    return;
++                }
++            }
++        }
++        // Kobosh end
+         if (!this.abilities.invulnerable) {
+             if (!this.level().isClientSide()) {
+                 // CraftBukkit start
