@@ -19,7 +19,7 @@ KoboshFolia bundles performance enhancements and customizations directly into th
 ### Customizations & Mechanics
 
 - **Gliding & Ground Lunge Improvements**: Configurable trident/gliding lunges, including customizable spear/elytra durability damage, boost multiplier adjustment, and minimum hunger requirements.
-- **6-Row Ender Chests**: Native support for 6-row ender chests. Players with the `koboshfolia.enderchest.size.six` permission automatically access the full 6 rows.
+*   **6-Row Ender Chests**: Native support for 6-row ender chests. Players with the `kobosh.enderchest.rows.six` permission automatically access the full 6 rows.
 - **Client-Side RNG Manipulation**: Option to allow clients to manipulate the random number generator (`allow-client-rng-manipulation` in `kobosh.yml`) for predicting enchantment outcomes.
 - **Custom Server Commands**:
   - `/compass`: Displays a persistent compass boss bar indicating the player's direction.

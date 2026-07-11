@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Sat, 11 Jul 2026 06:33:52 -0700
+Subject: [PATCH] Add kobosh.packetratelimit.bypass permission to bypass packet
+ rate kick
+
+
+diff --git a/net/minecraft/network/RateKickingConnection.java b/net/minecraft/network/RateKickingConnection.java
+index a6f6ba4f5461b7967fd558c6d66981a3a0045b7b..425928a2008f3c0fbb184193ab0b02cb96682f23 100644
+--- a/net/minecraft/network/RateKickingConnection.java
++++ b/net/minecraft/network/RateKickingConnection.java
+@@ -21,6 +21,15 @@ public class RateKickingConnection extends Connection {
+         super.tickSecond();
+         float averageReceivedPackets = this.getAverageReceivedPackets();
+         if (averageReceivedPackets > this.rateLimitPacketsPerSecond) {
++            // Kobosh start - packet rate limit bypass permission
++            PacketListener listener = this.getPacketListener();
++            if (listener instanceof net.minecraft.server.network.ServerGamePacketListenerImpl gameListener) {
++                net.minecraft.server.level.ServerPlayer player = gameListener.player;
++                if (player != null && player.getBukkitEntity().hasPermission("kobosh.packetratelimit.bypass")) {
++                    return;
++                }
++            }
++            // Kobosh end
+             LOGGER.warn("Player exceeded rate-limit (sent {} packets per second)", averageReceivedPackets);
+             this.send(new ClientboundDisconnectPacket(EXCEED_REASON), PacketSendListener.thenRun(() -> this.disconnect(EXCEED_REASON)));
+             this.setReadOnly();

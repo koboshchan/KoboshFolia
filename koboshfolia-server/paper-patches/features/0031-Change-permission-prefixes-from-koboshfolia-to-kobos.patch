@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Sat, 11 Jul 2026 06:34:53 -0700
+Subject: [PATCH] Change permission prefixes from koboshfolia to kobosh
+
+
+diff --git a/src/main/java/com/kobosh/koboshfolia/command/CompassCommand.java b/src/main/java/com/kobosh/koboshfolia/command/CompassCommand.java
+index ede8450b0d35b2af0560db243f0ad3052f24dab2..c6d1ed52124346f6ef84e5ce23596bd1f5cc9b19 100644
+--- a/src/main/java/com/kobosh/koboshfolia/command/CompassCommand.java
++++ b/src/main/java/com/kobosh/koboshfolia/command/CompassCommand.java
+@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
+ import java.util.List;
+ 
+ public final class CompassCommand extends Command {
+-    private static final String PERMISSION = "koboshfolia.commands.compass";
++    private static final String PERMISSION = "kobosh.commands.compass";
+ 
+     private CompassCommand() {
+         super("compass");
+diff --git a/src/main/java/com/kobosh/koboshfolia/command/UptimeCommand.java b/src/main/java/com/kobosh/koboshfolia/command/UptimeCommand.java
+index 67c6fa19b797f8a23c42df9191ec6839accb1bb0..7c99a74d87ebdb5b8ca1b50bbda750d1baa6c9d8 100644
+--- a/src/main/java/com/kobosh/koboshfolia/command/UptimeCommand.java
++++ b/src/main/java/com/kobosh/koboshfolia/command/UptimeCommand.java
+@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
+ import java.util.List;
+ 
+ public final class UptimeCommand extends Command {
+-    private static final String PERMISSION = "koboshfolia.commands.uptime";
++    private static final String PERMISSION = "kobosh.commands.uptime";
+ 
+     private UptimeCommand() {
+         super("uptime");
+diff --git a/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/BarCommand.java b/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/BarCommand.java
+index b7dbbe7d812701aff1ef2bc639f57d1444a0efde..3c93b48744a268e8ffeb76e2d445df673af01061 100644
+--- a/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/BarCommand.java
++++ b/src/main/java/com/kobosh/koboshfolia/tpsbar/commands/BarCommand.java
+@@ -20,7 +20,7 @@ import java.util.Map;
+ import java.util.UUID;
+ 
+ public final class BarCommand {
+-    private static final String PERM_BASE = "koboshfolia.commands.bar";
++    private static final String PERM_BASE = "kobosh.commands.bar";
+     private static final String ROOT_NAME = "bar";
+     private static final Map<String, Command> REGISTERED_COMMANDS = new HashMap<>();
+ 
