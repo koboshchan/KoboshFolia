@@ -10,6 +10,8 @@ jobs:
     # Only run on PRs if the source branch is on someone else's repo
     if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout Git Repository
         uses: actions/checkout@v4
@@ -37,3 +39,26 @@ jobs:
           path: |
             koboshfolia-server/build/libs/*.jar
             koboshfolia-api/build/libs/*.jar
+      - name: Prepare Release Assets
+        # Only publish releases for branch pushes (not pull requests), and only after a successful build
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          MC_VERSION="$(grep '^mcVersion=' gradle.properties | cut -d= -f2 | tr -d '[:space:]')"
+          echo "MC_VERSION=${MC_VERSION}" >> "$GITHUB_ENV"
+          cp "koboshfolia-api/build/libs/koboshfolia-api-${MC_VERSION}.build.${BUILD_NUMBER}-alpha.jar" koboshfolia-api.jar
+          cp "koboshfolia-server/build/libs/koboshfolia-paperclip-${MC_VERSION}.build.${BUILD_NUMBER}-alpha.jar" koboshfolia-server.jar
+          HASH="$(git rev-parse --short=7 HEAD)"
+          MSG="$(git log -1 --pretty=%B)"
+          printf '%s: %s\n' "${HASH}" "${MSG}" > release_body.txt
+      - name: Publish Pre-release
+        if: ${{ github.event_name == 'push' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.BUILD_NUMBER }}-alpha-MC${{ env.MC_VERSION }}
+          name: Alpha ${{ env.BUILD_NUMBER }} for MC${{ env.MC_VERSION }}
+          body_path: release_body.txt
+          prerelease: true
+          target_commitish: ${{ github.ref_name }}
+          files: |
+            koboshfolia-api.jar
+            koboshfolia-server.jar
