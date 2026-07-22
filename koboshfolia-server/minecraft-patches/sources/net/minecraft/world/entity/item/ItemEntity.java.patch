@@ -1,0 +1,48 @@
+--- a/net/minecraft/world/entity/item/ItemEntity.java
++++ b/net/minecraft/world/entity/item/ItemEntity.java
+@@ -48,7 +_,8 @@
+     private static final short DEFAULT_PICKUP_DELAY = 0;
+     public int age = 0;
+     public int pickupDelay = 0;
+-    public int health = 5;
++    public int health = com.kobosh.koboshfolia.KoboshConfig.itemHealth; // Kobosh - configurable item health
++    private int lastFireDamageTick = -20; // Kobosh - items catch fire and burn gradually instead of instantly
+     public @Nullable EntityReference<Entity> thrower;
+     public @Nullable UUID target;
+     public final float bobOffs = this.random.nextFloat() * (float) Math.PI * 2.0F;
+@@ -353,13 +_,24 @@
+             return false;
+         }
+ 
++        // Kobosh start - items catch fire and burn gradually instead of instantly
++        float appliedDamage = damage;
++        if (source.is(net.minecraft.tags.DamageTypeTags.IS_FIRE)) {
++            if (this.tickCount - this.lastFireDamageTick < 20) {
++                return false;
++            }
++            this.lastFireDamageTick = this.tickCount;
++            appliedDamage = Math.min(appliedDamage, 1.0F);
++        }
++        // Kobosh end - items catch fire and burn gradually instead of instantly
++
+         // CraftBukkit start
+-        if (org.bukkit.craftbukkit.event.CraftEventFactory.handleNonLivingEntityDamageEvent(this, source, damage)) {
++        if (org.bukkit.craftbukkit.event.CraftEventFactory.handleNonLivingEntityDamageEvent(this, source, appliedDamage)) { // Kobosh - items burn gradually
+             return false;
+         }
+         // CraftBukkit end
+         this.markHurt();
+-        this.health = (int)(this.health - damage);
++        this.health = (int)(this.health - appliedDamage); // Kobosh - items burn gradually
+         this.gameEvent(GameEvent.ENTITY_DAMAGE, source.getEntity());
+         if (this.health <= 0) {
+             this.getItem().onDestroyed(this);
+@@ -393,7 +_,7 @@
+ 
+     @Override
+     protected void readAdditionalSaveData(final ValueInput input) {
+-        this.health = input.getShortOr("Health", (short)5);
++        this.health = input.getShortOr("Health", (short) com.kobosh.koboshfolia.KoboshConfig.itemHealth); // Kobosh - configurable item health
+         this.age = input.getShortOr("Age", (short)0);
+         this.pickupDelay = input.getShortOr("PickupDelay", (short)0);
+         this.target = input.read("Owner", UUIDUtil.CODEC).orElse(null);

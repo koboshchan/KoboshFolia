@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Tue, 21 Jul 2026 17:29:59 -0700
+Subject: [PATCH] Add configurable item-health option
+
+
+diff --git a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+index 326a1e481cf42cafc4d4c295e535cb3253b80f7a..c6e255de9cd5c9b67a374828d806f7ee72a9e3f0 100644
+--- a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
++++ b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+@@ -47,6 +47,7 @@ public final class KoboshConfig {
+     public static int poweredRailActivationRange = 8;
+     public static double hungerStarvationDamage = 1.0;
+     public static boolean infinityBowWorksWithoutArrows = false;
++    public static int itemHealth = 5;
+ 
+     // Lunge Improvement
+     public static boolean lungeImprovementEnabled = false;
+@@ -201,6 +202,10 @@ public final class KoboshConfig {
+         if (poweredRailActivationRange < 1) poweredRailActivationRange = 1;
+         config.set("powered-rail-activation-range", poweredRailActivationRange);
+ 
++        itemHealth = config.getInt("item-health", itemHealth);
++        if (itemHealth < 1) itemHealth = 1;
++        config.set("item-health", itemHealth);
++
+         hungerStarvationDamage = config.getDouble("hunger-starvation-damage", hungerStarvationDamage);
+         if (hungerStarvationDamage < 0.0) hungerStarvationDamage = 0.0;
+         config.set("hunger-starvation-damage", hungerStarvationDamage);
