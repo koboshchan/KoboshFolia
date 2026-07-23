@@ -17,7 +17,7 @@
 +        if (this.notLobotomizedCount > 3) {
 +            interval *= 2;
 +        }
-+        if (this.level().getGameTime() % interval == 0) {
++        if (interval > 0 && this.level().getGameTime() % interval == 0) { // Kobosh - Purpur - guard against interval <= 0
 +            this.isLobotomized = !(shouldCheckForTradeLocked && this.getVillagerXp() == 0)
 +                && !canTravelFrom(net.minecraft.core.BlockPos.containing(this.position().x, this.getBoundingBox().minY + 0.0625D, this.position().z));
 +            if (this.isLobotomized) {

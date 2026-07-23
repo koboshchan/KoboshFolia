@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/Mob.java
 +++ b/net/minecraft/world/entity/Mob.java
-@@ -835,11 +_,13 @@
+@@ -835,11 +_,14 @@
              return;
          }
          // Paper end - Allow nerfed mobs to jump and float
@@ -8,7 +8,8 @@
          ProfilerFiller profiler = Profiler.get();
          profiler.push("sensing");
 -        this.sensing.tick();
-+        if (idBasedTickCount % me.earthme.luminol.config.modules.optimizations.PetalReduceSensorWorkConfig.delayTicks == 0 || !me.earthme.luminol.config.modules.optimizations.PetalReduceSensorWorkConfig.enabled) {
++        int sensorDelay = me.earthme.luminol.config.modules.optimizations.PetalReduceSensorWorkConfig.delayTicks; // Kobosh - Petal - guard against delayTicks <= 0
++        if (!me.earthme.luminol.config.modules.optimizations.PetalReduceSensorWorkConfig.enabled || sensorDelay <= 0 || idBasedTickCount % sensorDelay == 0) { // Kobosh - Petal - guard against delayTicks <= 0
 +            this.sensing.tick();
 +        }
          profiler.pop();
