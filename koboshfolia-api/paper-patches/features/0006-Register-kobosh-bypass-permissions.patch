@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Thu, 23 Jul 2026 14:52:39 -0700
+Subject: [PATCH] Register kobosh bypass permissions
+
+
+diff --git a/src/main/java/org/bukkit/util/permissions/DefaultPermissions.java b/src/main/java/org/bukkit/util/permissions/DefaultPermissions.java
+index 09db2ce6f571ca513b81c30f47f4ea09122dfecc..c99d7a8e4993922d2bb17ed16d76aa2b3f81e2ff 100644
+--- a/src/main/java/org/bukkit/util/permissions/DefaultPermissions.java
++++ b/src/main/java/org/bukkit/util/permissions/DefaultPermissions.java
+@@ -98,6 +98,11 @@ public final class DefaultPermissions {
+         DefaultPermissions.registerPermission("kobosh.enderchest.rows.one", "Enderchest one row", PermissionDefault.FALSE, parent);
+         // Kobosh end - Barrels and enderchests 6 rows
+ 
++        // Kobosh start - register bypass permissions
++        DefaultPermissions.registerPermission("kobosh.packetratelimit.bypass", "Bypass the packet rate-limit kick", PermissionDefault.FALSE, parent);
++        DefaultPermissions.registerPermission("kobosh.flight.bypass", "Bypass the flight (\"Flying is not enabled on this server\") kick", PermissionDefault.FALSE, parent);
++        // Kobosh end - register bypass permissions
++
+         parent.recalculatePermissibles();
+     }
+ }
