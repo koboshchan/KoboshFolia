@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Fri, 24 Jul 2026 18:30:36 -0700
+Subject: [PATCH] Add configurable EAR movement immunity duration to kobosh.yml
+
+Vanilla/Paper hardcodes a 100-tick force-activation window for entities
+that are airborne, moving, or pushed by fluid. Expose it so settled
+entities can drop back to the inactive path sooner. Defaults to 100.
+
+diff --git a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+index 06e39a33b4c58990b5a2453fc3d6a0d5105655cf..4cf3335854e0ed6b1086deab9f330d1eef22edc7 100644
+--- a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
++++ b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+@@ -50,9 +50,12 @@ public final class KoboshConfig {
+     public static int itemHealth = 5;
+ 
+     // Optimizations - every toggle below defaults to vanilla behaviour.
+-    // Aggressive farm EAR: let falling/pushed mobs far from any player go inactive.
++    // Aggressive farm EAR: shorten how long a mob stays force-activated after moving.
++    // Entities that are still airborne/moving keep re-earning immunity, so this never
++    // stops a falling mob from falling - it only lets settled mobs go inactive sooner.
+     public static boolean aggressiveFarmEarEnabled = false;
+     public static int aggressiveFarmEarPlayerRadius = 32;
++    public static int aggressiveFarmEarMovementImmunityTicks = 100;
+     // Entity broadcast update interval: multiplier applied to EntityType#updateInterval.
+     // 1 = vanilla. Per-category overrides of 0 mean "use the global multiplier".
+     public static int entityUpdateIntervalMultiplier = 1;
+@@ -237,6 +240,11 @@ public final class KoboshConfig {
+         if (aggressiveFarmEarPlayerRadius < 0) aggressiveFarmEarPlayerRadius = 0;
+         config.set("optimizations.aggressive-farm-ear.player-radius", aggressiveFarmEarPlayerRadius);
+ 
++        aggressiveFarmEarMovementImmunityTicks = config.getInt("optimizations.aggressive-farm-ear.movement-immunity-ticks", aggressiveFarmEarMovementImmunityTicks);
++        if (aggressiveFarmEarMovementImmunityTicks < 1) aggressiveFarmEarMovementImmunityTicks = 1;
++        if (aggressiveFarmEarMovementImmunityTicks > 100) aggressiveFarmEarMovementImmunityTicks = 100;
++        config.set("optimizations.aggressive-farm-ear.movement-immunity-ticks", aggressiveFarmEarMovementImmunityTicks);
++
+         entityUpdateIntervalMultiplier = config.getInt("optimizations.entity-update-interval.multiplier", entityUpdateIntervalMultiplier);
+         if (entityUpdateIntervalMultiplier < 1) entityUpdateIntervalMultiplier = 1;
+         config.set("optimizations.entity-update-interval.multiplier", entityUpdateIntervalMultiplier);

@@ -43,3 +43,49 @@
  
      //static AABB maxBB = new AABB(0, 0, 0, 0, 0, 0); // Folia - threaded regions - replaced by local variable
  
+@@ -217,12 +_,14 @@
+             return 1;
+         }
+         final long inactiveFor = io.papermc.paper.threadedregions.RegionizedServer.getCurrentTick() - entity.activatedTick; // Folia - threaded regions
++        // Kobosh start - configurable movement immunity duration
+         if ((entity.activationType != ActivationType.WATER && entity.isInWater() && entity.isPushedByFluid())) {
+-            return 100;
++            return movementImmunityTicks(entity);
+         }
+         if (!entity.onGround() || entity.getDeltaMovement().horizontalDistanceSqr() > 9.999999747378752E-6D) {
+-            return 100;
++            return movementImmunityTicks(entity);
+         }
++        // Kobosh end - configurable movement immunity duration
+         if (!(entity instanceof final AbstractArrow arrow)) {
+             if ((!entity.onGround() && !isEntityThatFlies(entity))) {
+                 return 10;
+@@ -291,6 +_,28 @@
+         }
+         return -1;
+     }
++
++    // Kobosh start - configurable movement immunity duration
++    /**
++     * How long an entity stays force-activated after being airborne, moving, or pushed by fluid.
++     *
++     * <p>Vanilla/Paper hardcodes 100 ticks. Because {@link #checkEntityImmunities} re-runs once the
++     * granted immunity lapses, an entity that is still airborne or still moving simply re-earns its
++     * immunity - so lowering this never leaves a falling entity stuck mid-air. It only shortens the
++     * tail during which an entity that has already settled keeps ticking at full cost.
++     */
++    private static int movementImmunityTicks(final Entity entity) {
++        if (!com.kobosh.koboshfolia.KoboshConfig.aggressiveFarmEarEnabled) {
++            return 100;
++        }
++        // Keep vanilla behaviour anywhere a player could be watching.
++        final int radius = com.kobosh.koboshfolia.KoboshConfig.aggressiveFarmEarPlayerRadius;
++        if (radius > 0 && entity.level().hasNearbyAlivePlayer(entity.getX(), entity.getY(), entity.getZ(), radius)) {
++            return 100;
++        }
++        return com.kobosh.koboshfolia.KoboshConfig.aggressiveFarmEarMovementImmunityTicks;
++    }
++    // Kobosh end - configurable movement immunity duration
+ 
+     /**
+      * Checks if the entity is active for this tick.

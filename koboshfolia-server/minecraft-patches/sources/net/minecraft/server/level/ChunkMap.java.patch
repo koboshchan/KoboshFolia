@@ -1,0 +1,56 @@
+--- a/net/minecraft/server/level/ChunkMap.java
++++ b/net/minecraft/server/level/ChunkMap.java
+@@ -986,7 +_,7 @@
+             int range = type.clientTrackingRange() * 16;
+             range = org.spigotmc.TrackingRange.getEntityTrackingRange(entity, range); // Spigot
+             if (range != 0) {
+-                int updateInterval = type.updateInterval();
++                int updateInterval = koboshUpdateInterval(entity, type); // Kobosh - configurable entity broadcast update interval
+                 if (entity.moonrise$getTrackedEntity() != null) { // Folia - region threading
+                     throw (IllegalStateException)Util.pauseInIde(new IllegalStateException("Entity is already tracked!"));
+                 }
+@@ -1018,6 +_,44 @@
+             }
+         }
+     }
++
++    // Kobosh start - configurable entity broadcast update interval
++    /**
++     * Scales {@link EntityType#updateInterval()} by the multiplier configured in kobosh.yml.
++     *
++     * <p>The interval controls how often movement/rotation packets are broadcast for an entity, so
++     * raising it cuts clientbound packet volume proportionally at the cost of coarser client-side
++     * interpolation. Players are never throttled. A multiplier of 1 (the default) is vanilla.
++     */
++    private static int koboshUpdateInterval(final Entity entity, final EntityType<?> type) {
++        final int vanillaInterval = type.updateInterval();
++        if (entity instanceof ServerPlayer) {
++            return vanillaInterval;
++        }
++
++        final int categoryOverride = switch (type.getCategory()) {
++            case MONSTER -> com.kobosh.koboshfolia.KoboshConfig.entityUpdateIntervalMonsters;
++            case CREATURE, AMBIENT, AXOLOTLS, UNDERGROUND_WATER_CREATURE, WATER_CREATURE, WATER_AMBIENT ->
++                com.kobosh.koboshfolia.KoboshConfig.entityUpdateIntervalAnimals;
++            case MISC -> com.kobosh.koboshfolia.KoboshConfig.entityUpdateIntervalMisc;
++        };
++        // A per-category value of 0 means "fall back to the global multiplier".
++        final int multiplier = categoryOverride > 0
++            ? categoryOverride
++            : com.kobosh.koboshfolia.KoboshConfig.entityUpdateIntervalMultiplier;
++        if (multiplier <= 1) {
++            return vanillaInterval;
++        }
++
++        // Types that never broadcast use Integer.MAX_VALUE; scaling those would overflow, and there
++        // is nothing to save anyway. Check before multiplying.
++        if (vanillaInterval >= Integer.MAX_VALUE / multiplier) {
++            return vanillaInterval;
++        }
++
++        return vanillaInterval * multiplier;
++    }
++    // Kobosh end - configurable entity broadcast update interval
+ 
+     protected void removeEntity(final Entity entity) {
+         org.spigotmc.AsyncCatcher.catchOp("entity untrack"); // Spigot

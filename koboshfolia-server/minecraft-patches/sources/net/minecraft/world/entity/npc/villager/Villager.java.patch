@@ -12,8 +12,8 @@
 +    private int notLobotomizedCount = 0;
 +
 +    private boolean checkLobotomized() {
-+        int interval = me.earthme.luminol.config.modules.optimizations.LobotomizeVillageConfig.villagerLobotomizeCheckInterval;
-+        boolean shouldCheckForTradeLocked = me.earthme.luminol.config.modules.optimizations.LobotomizeVillageConfig.villagerLobotomizeWaitUntilTradeLocked;
++        int interval = com.kobosh.koboshfolia.KoboshConfig.villagerLobotomizeStuckCheckInterval; // Kobosh - configurable in kobosh.yml
++        boolean shouldCheckForTradeLocked = com.kobosh.koboshfolia.KoboshConfig.villagerLobotomizeWaitUntilTradeLocked; // Kobosh - configurable in kobosh.yml
 +        if (this.notLobotomizedCount > 3) {
 +            interval *= 2;
 +        }
@@ -52,7 +52,7 @@
      @Override
      public Brain<Villager> getBrain() {
          return (Brain<Villager>)super.getBrain();
-@@ -259,11 +_,19 @@
+@@ -259,11 +_,27 @@
          // Paper start - EAR 2
          this.customServerAiStep(level, false);
      }
@@ -61,13 +61,21 @@
          // Paper end - EAR 2
          ProfilerFiller profiler = Profiler.get();
          profiler.push("villagerBrain");
-+        // Kobosh start - Purpur - lobotomize stuck villagers
-+        if (me.earthme.luminol.config.modules.optimizations.LobotomizeVillageConfig.villagerLobotomizeEnabled) {
-+            inactive = inactive || checkLobotomized();
++        // Kobosh start - Purpur - lobotomize stuck villagers - throttle the brain instead of freezing it
++        if (com.kobosh.koboshfolia.KoboshConfig.villagerLobotomizeEnabled) {
++            if (checkLobotomized()) {
++                // Rather than skipping the brain entirely, tick it every N ticks so a stuck
++                // villager still functions (restock, trade, react) at a reduced cadence.
++                // The entity id offset spreads lobotomized villagers across ticks instead of
++                // bunching them all onto the same one.
++                int brainTickInterval = com.kobosh.koboshfolia.KoboshConfig.villagerLobotomizeBrainTickInterval;
++                inactive = inactive
++                    || (brainTickInterval > 1 && (this.level().getGameTime() + this.getId()) % brainTickInterval != 0L);
++            }
 +        } else {
 +            this.isLobotomized = false;
 +        }
-+        // Kobosh end - Purpur - lobotomize stuck villagers
++        // Kobosh end - Purpur - lobotomize stuck villagers - throttle the brain instead of freezing it
          if (!inactive) this.getBrain().tick(level, this); // Paper - EAR 2
 +        else if (this.isLobotomized && shouldRestock(level)) restock(); // Kobosh - Purpur - lobotomize stuck villagers
          profiler.pop();

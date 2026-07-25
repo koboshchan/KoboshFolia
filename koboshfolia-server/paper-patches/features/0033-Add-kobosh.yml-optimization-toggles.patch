@@ -1,0 +1,90 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <lucaszhang1001@gmail.com>
+Date: Fri, 24 Jul 2026 18:26:34 -0700
+Subject: [PATCH] Add kobosh.yml optimization toggles
+
+Add the configuration surface for three opt-in optimizations, all
+defaulting to vanilla behaviour:
+
+- optimizations.aggressive-farm-ear.*: allow falling/pushed mobs with no
+  nearby player to use the EAR inactive path.
+- optimizations.entity-update-interval.*: multiplier (and per-category
+  overrides) applied to EntityType#updateInterval to reduce clientbound
+  movement packet volume.
+- optimizations.villager-lobotomize.*: throttle a stuck villager's brain
+  on an interval instead of freezing it outright.
+
+Consumers are wired up in follow-up commits.
+
+diff --git a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+index c6e255de9cd5c9b67a374828d806f7ee72a9e3f0..06e39a33b4c58990b5a2453fc3d6a0d5105655cf 100644
+--- a/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
++++ b/src/main/java/com/kobosh/koboshfolia/KoboshConfig.java
+@@ -49,6 +49,22 @@ public final class KoboshConfig {
+     public static boolean infinityBowWorksWithoutArrows = false;
+     public static int itemHealth = 5;
+ 
++    // Optimizations - every toggle below defaults to vanilla behaviour.
++    // Aggressive farm EAR: let falling/pushed mobs far from any player go inactive.
++    public static boolean aggressiveFarmEarEnabled = false;
++    public static int aggressiveFarmEarPlayerRadius = 32;
++    // Entity broadcast update interval: multiplier applied to EntityType#updateInterval.
++    // 1 = vanilla. Per-category overrides of 0 mean "use the global multiplier".
++    public static int entityUpdateIntervalMultiplier = 1;
++    public static int entityUpdateIntervalAnimals = 0;
++    public static int entityUpdateIntervalMonsters = 0;
++    public static int entityUpdateIntervalMisc = 0;
++    // Villager lobotomize: throttle a stuck villager's brain instead of freezing it.
++    public static boolean villagerLobotomizeEnabled = false;
++    public static int villagerLobotomizeBrainTickInterval = 20;
++    public static int villagerLobotomizeStuckCheckInterval = 100;
++    public static boolean villagerLobotomizeWaitUntilTradeLocked = false;
++
+     // Lunge Improvement
+     public static boolean lungeImprovementEnabled = false;
+     public static int lungeSpearDurabilityDamage = 3;
+@@ -213,6 +229,44 @@ public final class KoboshConfig {
+         infinityBowWorksWithoutArrows = config.getBoolean("infinity-bow-works-without-arrows", infinityBowWorksWithoutArrows);
+         config.set("infinity-bow-works-without-arrows", infinityBowWorksWithoutArrows);
+ 
++        // Optimizations - defaults preserve vanilla behaviour.
++        aggressiveFarmEarEnabled = config.getBoolean("optimizations.aggressive-farm-ear.enabled", aggressiveFarmEarEnabled);
++        config.set("optimizations.aggressive-farm-ear.enabled", aggressiveFarmEarEnabled);
++
++        aggressiveFarmEarPlayerRadius = config.getInt("optimizations.aggressive-farm-ear.player-radius", aggressiveFarmEarPlayerRadius);
++        if (aggressiveFarmEarPlayerRadius < 0) aggressiveFarmEarPlayerRadius = 0;
++        config.set("optimizations.aggressive-farm-ear.player-radius", aggressiveFarmEarPlayerRadius);
++
++        entityUpdateIntervalMultiplier = config.getInt("optimizations.entity-update-interval.multiplier", entityUpdateIntervalMultiplier);
++        if (entityUpdateIntervalMultiplier < 1) entityUpdateIntervalMultiplier = 1;
++        config.set("optimizations.entity-update-interval.multiplier", entityUpdateIntervalMultiplier);
++
++        entityUpdateIntervalAnimals = config.getInt("optimizations.entity-update-interval.animals", entityUpdateIntervalAnimals);
++        if (entityUpdateIntervalAnimals < 0) entityUpdateIntervalAnimals = 0;
++        config.set("optimizations.entity-update-interval.animals", entityUpdateIntervalAnimals);
++
++        entityUpdateIntervalMonsters = config.getInt("optimizations.entity-update-interval.monsters", entityUpdateIntervalMonsters);
++        if (entityUpdateIntervalMonsters < 0) entityUpdateIntervalMonsters = 0;
++        config.set("optimizations.entity-update-interval.monsters", entityUpdateIntervalMonsters);
++
++        entityUpdateIntervalMisc = config.getInt("optimizations.entity-update-interval.misc", entityUpdateIntervalMisc);
++        if (entityUpdateIntervalMisc < 0) entityUpdateIntervalMisc = 0;
++        config.set("optimizations.entity-update-interval.misc", entityUpdateIntervalMisc);
++
++        villagerLobotomizeEnabled = config.getBoolean("optimizations.villager-lobotomize.enabled", villagerLobotomizeEnabled);
++        config.set("optimizations.villager-lobotomize.enabled", villagerLobotomizeEnabled);
++
++        villagerLobotomizeBrainTickInterval = config.getInt("optimizations.villager-lobotomize.brain-tick-interval", villagerLobotomizeBrainTickInterval);
++        if (villagerLobotomizeBrainTickInterval < 1) villagerLobotomizeBrainTickInterval = 1;
++        config.set("optimizations.villager-lobotomize.brain-tick-interval", villagerLobotomizeBrainTickInterval);
++
++        villagerLobotomizeStuckCheckInterval = config.getInt("optimizations.villager-lobotomize.stuck-check-interval", villagerLobotomizeStuckCheckInterval);
++        if (villagerLobotomizeStuckCheckInterval < 1) villagerLobotomizeStuckCheckInterval = 1;
++        config.set("optimizations.villager-lobotomize.stuck-check-interval", villagerLobotomizeStuckCheckInterval);
++
++        villagerLobotomizeWaitUntilTradeLocked = config.getBoolean("optimizations.villager-lobotomize.wait-until-trade-locked", villagerLobotomizeWaitUntilTradeLocked);
++        config.set("optimizations.villager-lobotomize.wait-until-trade-locked", villagerLobotomizeWaitUntilTradeLocked);
++
+         lungeImprovementEnabled = config.getBoolean("lunge-improvement.enabled", lungeImprovementEnabled);
+         config.set("lunge-improvement.enabled", lungeImprovementEnabled);
+ 
