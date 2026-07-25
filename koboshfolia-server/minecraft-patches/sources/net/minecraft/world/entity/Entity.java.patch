@@ -9,31 +9,3 @@
      public int tickCount;
      private int remainingFireTicks;
      private final EntityFluidInteraction fluidInteraction = new EntityFluidInteraction(Set.of(FluidTags.WATER, FluidTags.LAVA));
-@@ -1150,9 +_,15 @@
-     private double moveStartX;
-     private double moveStartY;
-     private double moveStartZ;
-+    private boolean boundingBoxChanged = false; // Kobosh - Gale - skip entity move if movement is zero
-     // Paper end - detailed watchdog information
- 
-     public void move(final MoverType moverType, Vec3 delta) {
-+        // Kobosh start - Gale - skip entity move if movement is zero
-+        if (!this.boundingBoxChanged && delta.equals(Vec3.ZERO)) {
-+            return;
-+        }
-+        // Kobosh end - Gale - skip entity move if movement is zero
-         final Vec3 originalMovement = delta; // Paper - Expose pre-collision velocity
-         // Paper start - detailed watchdog information
-         ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread("Cannot move an entity off-main");
-@@ -5397,6 +_,11 @@
-     }
- 
-     public final void setBoundingBox(final AABB bb) {
-+        // Kobosh start - Gale - skip entity move if movement is zero
-+        if (!this.bb.equals(bb)) {
-+            this.boundingBoxChanged = true;
-+        }
-+        // Kobosh end - Gale - skip entity move if movement is zero
-         // CraftBukkit start - block invalid bounding boxes
-         double minX = bb.minX,
-                 minY = bb.minY,
