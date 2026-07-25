@@ -1,0 +1,49 @@
+--- a/net/minecraft/world/level/NaturalSpawner.java
++++ b/net/minecraft/world/level/NaturalSpawner.java
+@@ -84,6 +_,12 @@
+         // Paper end - Optional per player mob spawns
+         PotentialCalculator spawnPotential = new PotentialCalculator();
+         Object2IntOpenHashMap<MobCategory> mobCounts = new Object2IntOpenHashMap<>();
++        // Kobosh start - Lithium - cache rough biome lookups while counting mobs
++        // Dense mob farms put hundreds of entities inside a handful of quart positions, and this
++        // loop runs every tick for every loaded entity. The biome for a given quart position cannot
++        // change while we iterate, so memoising it keeps the result identical.
++        final it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap<Biome> roughBiomeCache = new it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap<>();
++        // Kobosh end - Lithium - cache rough biome lookups while counting mobs
+ 
+         for (Entity entity : entities) {
+             if (!(entity instanceof Mob mob && (mob.isPersistenceRequired() || mob.requiresCustomPersistence()))) {
+@@ -98,7 +_,7 @@
+                     // Paper end - Only count natural spawns
+                     BlockPos pos = entity.blockPosition();
+                     chunkGetter.query(ChunkPos.pack(pos), chunk -> {
+-                        MobSpawnSettings.MobSpawnCost mobSpawnCost = getRoughBiome(pos, chunk).getMobSettings().getMobSpawnCost(entity.getType());
++                        MobSpawnSettings.MobSpawnCost mobSpawnCost = getRoughBiome(pos, chunk, roughBiomeCache).getMobSettings().getMobSpawnCost(entity.getType()); // Kobosh - Lithium - cache rough biome lookups while counting mobs
+                         if (mobSpawnCost != null) {
+                             spawnPotential.addCharge(entity.blockPosition(), mobSpawnCost.charge());
+                         }
+@@ -124,6 +_,24 @@
+     private static Biome getRoughBiome(final BlockPos pos, final ChunkAccess chunk) {
+         return chunk.getNoiseBiome(QuartPos.fromBlock(pos.getX()), QuartPos.fromBlock(pos.getY()), QuartPos.fromBlock(pos.getZ())).value();
+     }
++
++    // Kobosh start - Lithium - cache rough biome lookups while counting mobs
++    private static Biome getRoughBiome(final BlockPos pos, final ChunkAccess chunk, final it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap<Biome> cache) {
++        final int quartX = QuartPos.fromBlock(pos.getX());
++        final int quartY = QuartPos.fromBlock(pos.getY());
++        final int quartZ = QuartPos.fromBlock(pos.getZ());
++        // Quart coordinates are world-absolute, so this key is unique across chunks. The packing
++        // range (26/12/26 bits) comfortably covers quart-space for the maximum world size.
++        final long key = BlockPos.asLong(quartX, quartY, quartZ);
++        Biome cached = cache.get(key);
++        if (cached == null) {
++            cached = chunk.getNoiseBiome(quartX, quartY, quartZ).value();
++            cache.put(key, cached);
++        }
++
++        return cached;
++    }
++    // Kobosh end - Lithium - cache rough biome lookups while counting mobs
+ 
+     // CraftBukkit start - add server
+     public static List<MobCategory> getFilteredSpawningCategories(
