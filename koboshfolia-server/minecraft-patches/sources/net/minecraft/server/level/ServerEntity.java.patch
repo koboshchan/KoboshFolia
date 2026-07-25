@@ -1,0 +1,61 @@
+--- a/net/minecraft/server/level/ServerEntity.java
++++ b/net/minecraft/server/level/ServerEntity.java
+@@ -200,30 +_,45 @@
+                     sentRotation = true;
+                 }
+ 
++                // Kobosh start - coalesce movement packets into a single bundle
++                // A moving entity commonly emits both a motion and a position packet in the same
++                // tick. Sending them as one bundle halves the pipeline traversals and write calls
++                // per viewer. Only packets with the same recipient set are combined - entity data
++                // goes to tracking players *and self*, so it stays a separate send, and it is still
++                // sent after the movement packets to preserve the original ordering.
++                Packet<? super ClientGamePacketListener> motionPacket = null;
++                Packet<? super ClientGamePacketListener> projectilePowerPacket = null;
+                 if (this.entity.needsSync || this.trackDelta || this.entity instanceof LivingEntity livingEntity && livingEntity.isFallFlying()) {
+                     Vec3 movement = this.entity.getDeltaMovement();
+                     double diff = movement.distanceToSqr(this.lastSentMovement);
+                     if (diff > 1.0E-7 || diff > 0.0 && movement.lengthSqr() == 0.0) {
+                         this.lastSentMovement = movement;
++                        motionPacket = new ClientboundSetEntityMotionPacket(this.entity.getId(), this.lastSentMovement);
+                         if (this.entity instanceof AbstractHurtingProjectile projectile) {
+-                            this.synchronizer
+-                                .sendToTrackingPlayers(
+-                                    new ClientboundBundlePacket(
+-                                        List.of(
+-                                            new ClientboundSetEntityMotionPacket(this.entity.getId(), this.lastSentMovement),
+-                                            new ClientboundProjectilePowerPacket(projectile.getId(), projectile.accelerationPower)
+-                                        )
+-                                    )
+-                                );
+-                        } else {
+-                            this.synchronizer.sendToTrackingPlayers(new ClientboundSetEntityMotionPacket(this.entity.getId(), this.lastSentMovement));
++                            projectilePowerPacket = new ClientboundProjectilePowerPacket(projectile.getId(), projectile.accelerationPower);
+                         }
+                     }
+                 }
+ 
+-                if (packet != null) {
+-                    this.synchronizer.sendToTrackingPlayers(packet);
++                // Only allocate a list when there is actually more than one packet to bundle; the
++                // single-packet case is by far the most common and must not add per-tick garbage.
++                final int movementPacketCount = (motionPacket != null ? 1 : 0) + (projectilePowerPacket != null ? 1 : 0) + (packet != null ? 1 : 0);
++                if (movementPacketCount == 1) {
++                    this.synchronizer.sendToTrackingPlayers(motionPacket != null ? motionPacket : packet);
++                } else if (movementPacketCount > 1) {
++                    final List<Packet<? super ClientGamePacketListener>> bundled = new ArrayList<>(movementPacketCount);
++                    if (motionPacket != null) {
++                        bundled.add(motionPacket);
++                    }
++                    if (projectilePowerPacket != null) {
++                        bundled.add(projectilePowerPacket);
++                    }
++                    if (packet != null) {
++                        bundled.add(packet);
++                    }
++                    this.synchronizer.sendToTrackingPlayers(new ClientboundBundlePacket(bundled));
+                 }
++                // Kobosh end - coalesce movement packets into a single bundle
+ 
+                 this.sendDirtyEntityData();
+                 if (sentPosition) {
