@@ -9,3 +9,43 @@
      public int tickCount;
      private int remainingFireTicks;
      private final EntityFluidInteraction fluidInteraction = new EntityFluidInteraction(Set.of(FluidTags.WATER, FluidTags.LAVA));
+@@ -1782,17 +_,35 @@
+             return movement;
+         }
+ 
+-        Vec3 resolvedMovement = Vec3.ZERO;
++        // Kobosh start - avoid per-axis Vec3 allocation while resolving collisions
++        // Vanilla rebuilt the accumulated offset as a new Vec3 on every axis that moved, so a
++        // three-axis move allocated three throwaway vectors per entity per tick. Track the offset
++        // in primitives and build the result once. The AABB is still translated per axis because
++        // threading an offset any deeper would mean patching Moonrise's CollisionUtil.
++        double resolvedX = 0.0;
++        double resolvedY = 0.0;
++        double resolvedZ = 0.0;
+ 
+         for (Direction.Axis axis : Direction.axisStepOrder(movement)) {
+             double axisMovement = movement.get(axis);
+             if (axisMovement != 0.0) {
+-                double collision = Shapes.collide(axis, boundingBox.move(resolvedMovement), shapes, axisMovement);
+-                resolvedMovement = resolvedMovement.with(axis, collision);
++                double collision = Shapes.collide(axis, boundingBox.move(resolvedX, resolvedY, resolvedZ), shapes, axisMovement);
++                switch (axis) {
++                    case X:
++                        resolvedX = collision;
++                        break;
++                    case Y:
++                        resolvedY = collision;
++                        break;
++                    case Z:
++                        resolvedZ = collision;
++                        break;
++                }
+             }
+         }
+ 
+-        return resolvedMovement;
++        return new Vec3(resolvedX, resolvedY, resolvedZ);
++        // Kobosh end - avoid per-axis Vec3 allocation while resolving collisions
+     }
+ 
+     protected float nextStep() {
