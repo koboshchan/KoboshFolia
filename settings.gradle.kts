@@ -14,6 +14,9 @@ rootProject.name = "koboshfolia"
 
 include("koboshfolia-api")
 include("koboshfolia-server")
+// Gradle 9 requires included project directories during the bootstrap configure phase.
+file("folia-checkstyle").mkdirs()
+include("folia-checkstyle")
 
 gradle.lifecycle.beforeProject {
     val mcVersion = providers.gradleProperty("mcVersion").get().trim()

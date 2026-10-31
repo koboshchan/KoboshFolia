@@ -11,9 +11,9 @@
  import com.mojang.authlib.GameProfile;
  import com.mojang.logging.LogUtils;
  import java.io.File;
-@@ -237,9 +_,7 @@
+@@ -239,9 +_,7 @@
          // only after setting the connection listener to game type, add the connection to this regions list
-         level.getCurrentWorldData().connections.add(connection);
+         level.getCurrentWorldData().addConnection(player);
          // Folia end - rewrite login process
 -        connection.setupInboundProtocol(
 -            GameProtocols.SERVERBOUND_TEMPLATE.bind(RegistryFriendlyByteBuf.decorator(this.server.registryAccess()), playerConnection), playerConnection
@@ -22,7 +22,7 @@
          playerConnection.suspendFlushing();
          GameRules gameRules = level.getGameRules();
          boolean immediateRespawn = gameRules.get(GameRules.IMMEDIATE_RESPAWN);
-@@ -403,6 +_,14 @@
+@@ -406,6 +_,14 @@
              );
          }
          // Paper end - Send empty chunk
@@ -37,7 +37,7 @@
      }
  
      public void updateEntireScoreboard(final ServerScoreboard scoreboard, final ServerPlayer player) {
-@@ -946,6 +_,7 @@
+@@ -955,6 +_,7 @@
          player.getBukkitEntity().recalculatePermissions(); // CraftBukkit
          this.server.getCommands().sendCommands(player);
          } // Paper - Add sendOpLevel API

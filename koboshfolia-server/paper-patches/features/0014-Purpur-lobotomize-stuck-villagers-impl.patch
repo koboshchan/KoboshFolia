@@ -6,7 +6,7 @@ Subject: [PATCH] Purpur: lobotomize stuck villagers impl
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftVillager.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftVillager.java
-index 92eab10ec20f44e81d9e38bd9d4b6cf64dd6ef37..4cbd2c8833371f340989628375c5bd45ec75da68 100644
+index 1ad99732f60f2182285fba1b52c01c61418b6262..778b61778533960a17f5d01ead0c438e744e3731 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftVillager.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftVillager.java
 @@ -244,4 +244,9 @@ public class CraftVillager extends CraftAbstractVillager implements Villager {

@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/piston/PistonMovingBlockEntity.java
 +++ b/net/minecraft/world/level/block/piston/PistonMovingBlockEntity.java
-@@ -28,6 +_,8 @@
+@@ -26,6 +_,8 @@
  import net.minecraft.world.phys.Vec3;
  import net.minecraft.world.phys.shapes.Shapes;
  import net.minecraft.world.phys.shapes.VoxelShape;
@@ -9,7 +9,7 @@
  
  public class PistonMovingBlockEntity extends BlockEntity {
      private static final int TICKS_TO_EXTEND = 2;
-@@ -37,6 +_,39 @@
+@@ -35,6 +_,39 @@
      private static final float DEFAULT_PROGRESS = 0.0F;
      private static final boolean DEFAULT_EXTENDING = false;
      private static final boolean DEFAULT_SOURCE = false;
@@ -49,7 +49,7 @@
      private BlockState movedState = DEFAULT_BLOCK_STATE;
      private Direction direction = Direction.DOWN; // Paper - default to first value to avoid NPE
      private boolean extending = false;
-@@ -378,33 +_,66 @@
+@@ -362,33 +_,66 @@
      }
  
      public VoxelShape getCollisionShape(final BlockGetter level, final BlockPos pos) {

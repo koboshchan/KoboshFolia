@@ -9,14 +9,14 @@ so the default 16MiB arenas are unnecessarily large.
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index 585ea62cd0909123d82e1b54ae213f6a3d1efebb..e132e0282709261650baaa11a575e428160934cd 100644
+index 8a4c9335d57cdf2177cd88ffc5a6a8e6cc902c57..da5d57b76ee67a18849f8d96112ef98483977b74 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -23,6 +23,7 @@ public class Main {
  
      public static void main(String[] args) {
          if (System.getProperty("jdk.nio.maxCachedBufferSize") == null) System.setProperty("jdk.nio.maxCachedBufferSize", "262144"); // Paper - cap per-thread NIO cache size; https://www.evanjones.ca/java-bytebuffer-leak.html
-+        if (System.getProperty("io.netty.allocator.maxOrder") == null) System.setProperty("io.netty.allocator.maxOrder", "9"); // Kobosh - Krypton: 4MiB Netty arenas instead of 16MiB; MC max packet is 2MiB
-         OptionParser parser = new OptionParser() {
-             {
-                 this.acceptsAll(asList("?", "help"), "Show the help");
++        if (System.getProperty("io.netty.allocator.maxOrder") == null) System.setProperty("io.netty.allocator.maxOrder", "9"); // Kobosh - Krypton: 4MiB Netty arenas
+ 
+         if (System.getProperty("joml.nounsafe") == null) {
+             System.setProperty("joml.nounsafe", "true");

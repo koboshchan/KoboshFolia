@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/item/ItemEntity.java
 +++ b/net/minecraft/world/entity/item/ItemEntity.java
-@@ -48,7 +_,8 @@
+@@ -49,7 +_,8 @@
      private static final short DEFAULT_PICKUP_DELAY = 0;
      public int age = 0;
      public int pickupDelay = 0;
@@ -10,7 +10,7 @@
      public @Nullable EntityReference<Entity> thrower;
      public @Nullable UUID target;
      public final float bobOffs = this.random.nextFloat() * (float) Math.PI * 2.0F;
-@@ -353,13 +_,24 @@
+@@ -346,13 +_,24 @@
              return false;
          }
  
@@ -37,7 +37,7 @@
          this.gameEvent(GameEvent.ENTITY_DAMAGE, source.getEntity());
          if (this.health <= 0) {
              this.getItem().onDestroyed(this);
-@@ -393,7 +_,7 @@
+@@ -386,7 +_,7 @@
  
      @Override
      protected void readAdditionalSaveData(final ValueInput input) {

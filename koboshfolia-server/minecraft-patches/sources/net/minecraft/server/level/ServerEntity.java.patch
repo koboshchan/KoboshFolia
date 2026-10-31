@@ -1,7 +1,7 @@
 --- a/net/minecraft/server/level/ServerEntity.java
 +++ b/net/minecraft/server/level/ServerEntity.java
-@@ -200,30 +_,45 @@
-                     sentRotation = true;
+@@ -190,29 +_,46 @@
+                     packet = this.createMovePacket(position, yRotn, xRotn, shouldSendPosition, shouldSendRotation);
                  }
  
 +                // Kobosh start - coalesce movement packets into a single bundle
@@ -35,8 +35,6 @@
                      }
                  }
  
--                if (packet != null) {
--                    this.synchronizer.sendToTrackingPlayers(packet);
 +                // Only allocate a list when there is actually more than one packet to bundle; the
 +                // single-packet case is by far the most common and must not add per-tick garbage.
 +                final int movementPacketCount = (motionPacket != null ? 1 : 0) + (projectilePowerPacket != null ? 1 : 0) + (packet != null ? 1 : 0);
@@ -54,8 +52,10 @@
 +                        bundled.add(packet);
 +                    }
 +                    this.synchronizer.sendToTrackingPlayers(new ClientboundBundlePacket(bundled));
-                 }
++                }
 +                // Kobosh end - coalesce movement packets into a single bundle
- 
-                 this.sendDirtyEntityData();
-                 if (sentPosition) {
+                 if (packet != null) {
+-                    this.synchronizer.sendToTrackingPlayers(packet);
+                     this.sendDirtyEntityData();
+                     if (packet.hasPosition()) {
+                         this.positionCodec.setBase(currentPosition);

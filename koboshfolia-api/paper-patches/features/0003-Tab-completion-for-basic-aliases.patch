@@ -5,10 +5,10 @@ Subject: [PATCH] Tab completion for basic aliases
 
 
 diff --git a/src/main/java/org/bukkit/command/FormattedCommandAlias.java b/src/main/java/org/bukkit/command/FormattedCommandAlias.java
-index 59fada9b1eb78238d280c6bbb711f52facba52c6..2be9c69d07be5fb516b7c1e4f8822a32545dc9ec 100644
+index 7a15cfccc2e5c38f683701d18e7e978a8c1093ee..ea127695cdc5847d83c731f69d6469be3150924b 100644
 --- a/src/main/java/org/bukkit/command/FormattedCommandAlias.java
 +++ b/src/main/java/org/bukkit/command/FormattedCommandAlias.java
-@@ -42,6 +42,22 @@ public class FormattedCommandAlias extends Command {
+@@ -49,6 +49,22 @@ public class FormattedCommandAlias extends Command {
          return result;
      }
  

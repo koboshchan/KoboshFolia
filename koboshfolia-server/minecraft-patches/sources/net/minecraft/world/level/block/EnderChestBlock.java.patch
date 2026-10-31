@@ -1,14 +1,13 @@
 --- a/net/minecraft/world/level/block/EnderChestBlock.java
 +++ b/net/minecraft/world/level/block/EnderChestBlock.java
-@@ -1,6 +_,7 @@
+@@ -1,5 +_,6 @@
  package net.minecraft.world.level.block;
  
- import com.mojang.serialization.MapCodec;
 +import com.kobosh.koboshfolia.KoboshConfig;
  import net.minecraft.core.BlockPos;
  import net.minecraft.core.Direction;
  import net.minecraft.core.particles.ParticleTypes;
-@@ -13,6 +_,7 @@
+@@ -12,6 +_,7 @@
  import net.minecraft.world.entity.monster.piglin.PiglinAi;
  import net.minecraft.world.entity.player.Player;
  import net.minecraft.world.inventory.ChestMenu;
@@ -16,7 +15,7 @@
  import net.minecraft.world.inventory.PlayerEnderChestContainer;
  import net.minecraft.world.item.context.BlockPlaceContext;
  import net.minecraft.world.level.BlockGetter;
-@@ -90,7 +_,7 @@
+@@ -83,7 +_,7 @@
              // Paper start - Fix InventoryOpenEvent cancellation - moved up;
              container.setActiveChest(enderChest); // Needs to happen before ChestMenu.threeRows as it is required for opening animations
              if (level instanceof ServerLevel serverLevel && player.openMenu(
@@ -25,7 +24,7 @@
              ).isPresent()) {
              // Paper end - Fix InventoryOpenEvent cancellation - moved up;
                  player.awardStat(Stats.OPEN_ENDERCHEST);
-@@ -102,6 +_,34 @@
+@@ -95,6 +_,34 @@
              return InteractionResult.SUCCESS;
          }
      }

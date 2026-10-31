@@ -9,7 +9,7 @@
      }
  
      public Direction getClockWise(final Direction.Axis axis) {
-@@ -355,7 +_,7 @@
+@@ -363,7 +_,7 @@
      }
  
      public static Direction getRandom(final RandomSource random) {

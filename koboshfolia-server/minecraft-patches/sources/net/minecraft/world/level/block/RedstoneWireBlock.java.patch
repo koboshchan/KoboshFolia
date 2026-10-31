@@ -1,40 +1,37 @@
---- a/net/minecraft/world/level/block/RedStoneWireBlock.java
-+++ b/net/minecraft/world/level/block/RedStoneWireBlock.java
-@@ -62,6 +_,7 @@
+--- a/net/minecraft/world/level/block/RedstoneWireBlock.java
++++ b/net/minecraft/world/level/block/RedstoneWireBlock.java
+@@ -60,6 +_,7 @@
          }
      });
      private static final float PARTICLE_DENSITY = 0.2F;
-+    private static final Direction[] ALL_DIRECTIONS = Direction.values(); // Kobosh - Lithium - avoid Direction.values() allocation in hot loops
++    private static final Direction[] ALL_DIRECTIONS = Direction.values(); // Kobosh - avoid allocation in hot loops
      private final Function<BlockState, VoxelShape> shapes;
      private final BlockState crossState;
      private final RedstoneWireEvaluator evaluator = new DefaultRedstoneWireEvaluator(this);
-@@ -341,16 +_,17 @@
+@@ -334,7 +_,7 @@
  
      public int getBlockSignal(final Level level, final BlockPos pos) {
          io.papermc.paper.threadedregions.TickRegionScheduler.getCurrentRegionizedWorldData().shouldSignal = false; // Folia - region threading
 -        int blockSignal = level.getBestNeighborSignal(pos);
-+        // Kobosh - Lithium - optimized neighbor signal: avoids redundant getSignal/getDirectSignal calls on wire blocks
-+        int bestNeighborSignal = net.minecraft.world.level.redstone.RedstoneWirePowerCalculations.getNeighborBlockSignal(this, this.evaluator, level, pos);
++        int blockSignal = net.minecraft.world.level.redstone.RedstoneWirePowerCalculations.getNeighborBlockSignal(this, this.evaluator, level, pos); // Kobosh - optimized neighbor signal
          io.papermc.paper.threadedregions.TickRegionScheduler.getCurrentRegionizedWorldData().shouldSignal = true; // Folia - region threading
--        return blockSignal;
-+        return bestNeighborSignal;
+         return blockSignal;
      }
- 
-     private void checkCornerChangeAt(final Level level, final BlockPos pos) {
+@@ -343,7 +_,7 @@
          if (level.getBlockState(pos).is(this)) {
              level.updateNeighborsAt(pos, this);
  
 -            for (Direction direction : Direction.values()) {
-+            for (Direction direction : ALL_DIRECTIONS) { // Kobosh - Lithium - avoid Direction.values() allocation
++            for (Direction direction : ALL_DIRECTIONS) {
                  level.updateNeighborsAt(pos.relative(direction), this);
              }
          }
-@@ -378,7 +_,7 @@
+@@ -371,7 +_,7 @@
      @Override
      protected void affectNeighborsAfterRemoval(final BlockState state, final ServerLevel level, final BlockPos pos, final boolean movedByPiston) {
          if (!movedByPiston) {
 -            for (Direction direction : Direction.values()) {
-+            for (Direction direction : ALL_DIRECTIONS) { // Kobosh - Lithium - avoid Direction.values() allocation
++            for (Direction direction : ALL_DIRECTIONS) {
                  level.updateNeighborsAt(pos.relative(direction), this);
              }
  

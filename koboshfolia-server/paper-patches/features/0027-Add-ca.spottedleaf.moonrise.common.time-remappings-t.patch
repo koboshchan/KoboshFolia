@@ -6,10 +6,10 @@ Subject: [PATCH] Add ca.spottedleaf.moonrise.common.time remappings to
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/Commodore.java b/src/main/java/org/bukkit/craftbukkit/util/Commodore.java
-index 30cf868faa9393d3787fce681f77cb8167015bb0..5bf24dab67f6ab46bcb9097fa3d79c6cbb12832f 100644
+index 172fdec7c41c2dcd028979c7387371fbc754d0d3..41ff8d91bfed7550d5a99f4a863a4dad370771d0 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/Commodore.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/Commodore.java
-@@ -76,16 +76,22 @@ public class Commodore {
+@@ -72,16 +72,22 @@ public class Commodore {
              "java/util/EnumMap", "org/bukkit/craftbukkit/legacy/enums/ImposterEnumMap"
      );
  

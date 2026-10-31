@@ -68,8 +68,8 @@
 +        return Math.fma(alpha1, p1 - p0, p0); // Kobosh - SuperFastMath - fused multiply-add lerp
      }
  
-     public static Vec3 lerp(final double alpha, final Vec3 p1, final Vec3 p2) {
-@@ -556,7 +_,7 @@
+     public static float lerp2(final float alpha1, final float alpha2, final float x00, final float x10, final float x01, final float x11) {
+@@ -576,7 +_,7 @@
      }
  
      public static double lerp(final double alpha1, final double p0, final double p1) {

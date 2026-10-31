@@ -787,7 +787,7 @@ index e7ddd522666aad0304c50fa22751f05e38b1b121..6d9f21d11c96d985bd467cf5d44a2cca
      }
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-index 2d175518b8c0a1c926f30da193f30e4678e90abb..3efbf231b211511fe72636641bcbe649d0a5101a 100644
+index cb2906a123065169ce907c95c2da1ca216bfc11e..7b92bde7ab39a0f0ba95bdd524de6f81ae8f656a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 @@ -410,8 +410,7 @@ public class CraftChunk implements Chunk {
@@ -801,10 +801,10 @@ index 2d175518b8c0a1c926f30da193f30e4678e90abb..3efbf231b211511fe72636641bcbe649
      // KioCG end
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 3d7def71d03d3ec3b3c3565ec07b46a3c1263aab..14e7a1db9e997424985538d70a7e6f529ca9a37d 100644
+index 24f7cf40ffd6bbb154dc664bc9f7e6661247f2ac..e791de0157b2dde6b16ec95f1c603285288d13c8 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -287,6 +287,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
+@@ -292,6 +292,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
          return (ServerPlayer) this.entity; // Folia - region threading - no checks for players, as it's a total mess
      }
  

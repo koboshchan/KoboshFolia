@@ -6,6 +6,6 @@
  
 -    protected int getWireSignal(final BlockPos pos, final BlockState state) {
 +    public int getWireSignal(BlockPos pos, BlockState state) { // Kobosh - Lithium - made public for RedstoneWirePowerCalculations
-         return state.is(this.wireBlock) ? state.getValue(RedStoneWireBlock.POWER) : 0;
+         return state.is(this.wireBlock) ? state.getValue(RedstoneWireBlock.POWER) : 0;
      }
  

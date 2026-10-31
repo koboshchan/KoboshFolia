@@ -9,17 +9,9 @@
 +    private int kobosh$isPushableCacheTick = Integer.MIN_VALUE;
 +    // Kobosh end - Lithium - isPushable cache
      public boolean bukkitPickUpLoot;
-     public org.bukkit.craftbukkit.entity.CraftLivingEntity getBukkitLivingEntity() { return (org.bukkit.craftbukkit.entity.CraftLivingEntity) super.getBukkitEntity(); } // Paper
      public boolean silentDeath = true; // Paper - mark entity as dying silently for cancellable death event
-@@ -2815,6 +_,7 @@
-     }
- 
-     protected void updateSwingTime() {
-+        if (!this.swinging && this.swingTime == 0) return; // Kobosh - Lithium - skip swing update when idle
-         int currentSwingDuration = this.getCurrentSwingDuration();
-         if (this.swinging) {
-             this.swingTime++;
-@@ -3870,6 +_,7 @@
+     public net.kyori.adventure.util.TriState frictionState = net.kyori.adventure.util.TriState.NOT_SET; // Paper - Friction API
+@@ -3867,6 +_,7 @@
      protected void updateFallFlying() {
          this.checkFallDistanceAccumulation();
          if (!this.level().isClientSide()) {
@@ -28,18 +20,27 @@
                  if (this.getSharedFlag(Entity.FLAG_FALL_FLYING) && !CraftEventFactory.callToggleGlideEvent(this, false).isCancelled()) // CraftBukkit
                  this.setSharedFlag(Entity.FLAG_FALL_FLYING, false);
 @@ -4093,7 +_,14 @@
-     // Paper start - Climbing should not bypass cramming gamerule
      @Override
      public boolean isPushable() {
+         // Paper start - Climbing should not bypass cramming gamerule
 -        return this.isCollidable(this.level().paperConfig().collisions.fixClimbingBypassingCrammingRule);
-+        // Kobosh start - Lithium - cache isPushable per tick; onClimbable() is non-trivial
++        // Kobosh start - Lithium - cache isPushable per tick
 +        if (this.kobosh$isPushableCacheTick == this.tickCount) {
 +            return this.kobosh$cachedIsPushable;
 +        }
 +        this.kobosh$cachedIsPushable = this.isCollidable(this.level().paperConfig().collisions.fixClimbingBypassingCrammingRule);
 +        this.kobosh$isPushableCacheTick = this.tickCount;
 +        return this.kobosh$cachedIsPushable;
-+        // Kobosh end - Lithium - isPushable cache
++        // Kobosh end - Lithium - cache isPushable per tick
      }
  
      @Override
+@@ -5039,6 +_,8 @@
+         }
+ 
+         public void tick() {
++            // Kobosh - skip idle swings only after the previous interpolation value has cleared
++            if (this.currentSwing == null && this.animation == 0.0F && this.oldAnimation == 0.0F) return;
+             this.oldAnimation = this.animation;
+             if (this.currentSwing != null) {
+                 if (this.currentSwing.durationTicks > 0) {

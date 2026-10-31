@@ -19,10 +19,10 @@ index 9661f033bbb2c00073f1c891e1411c2a9943a37a..2cedcd64e7cb6d5eb46917df9e22e322
              return;
          }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 595231c7c50cf47a6c513d9f106889e23b976888..79539b62d16f680d0b82d7ce80a663346839dd94 100644
+index bec3c5508ba3c6aba5fc6a5ae432acbefaa19a28..42bee6a46c2c8d297ac3816c09b31c74d99d07d6 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -302,7 +302,7 @@ public final class CraftServer implements Server {
+@@ -285,7 +285,7 @@ public final class CraftServer implements Server {
      public static Exception excessiveVelEx;
      private final io.papermc.paper.logging.SysoutCatcher sysoutCatcher = new io.papermc.paper.logging.SysoutCatcher();
      private final io.papermc.paper.potion.PaperPotionBrewer potionBrewer;
@@ -31,7 +31,7 @@ index 595231c7c50cf47a6c513d9f106889e23b976888..79539b62d16f680d0b82d7ce80a66334
      private final ServerConfiguration serverConfig = new PaperServerConfiguration();
  
      // Paper start - Folia region threading API
-@@ -478,7 +478,7 @@ public final class CraftServer implements Server {
+@@ -461,7 +461,7 @@ public final class CraftServer implements Server {
          }
          this.potionBrewer = new io.papermc.paper.potion.PaperPotionBrewer(console); // Paper - custom potion mixes
          datapackManager = new io.papermc.paper.datapack.PaperDatapackManager(console.getPackRepository()); // Paper
@@ -40,7 +40,7 @@ index 595231c7c50cf47a6c513d9f106889e23b976888..79539b62d16f680d0b82d7ce80a66334
      }
  
      public boolean getCommandBlockOverride(String command) {
-@@ -1051,7 +1051,7 @@ public final class CraftServer implements Server {
+@@ -1034,7 +1034,7 @@ public final class CraftServer implements Server {
          org.spigotmc.SpigotConfig.registerCommands(); // Spigot
          com.kobosh.koboshfolia.tpsbar.commands.BarCommand.register(); // Kobosh
          io.papermc.paper.command.PaperCommands.registerCommands(this.console); // Paper
@@ -49,7 +49,7 @@ index 595231c7c50cf47a6c513d9f106889e23b976888..79539b62d16f680d0b82d7ce80a66334
          this.overrideAllCommandBlockCommands = this.commandsConfiguration.getStringList("command-block-overrides").contains("*");
          this.ignoreVanillaPermissions = this.commandsConfiguration.getBoolean("ignore-vanilla-permissions");
  
-@@ -1080,7 +1080,7 @@ public final class CraftServer implements Server {
+@@ -1063,7 +1063,7 @@ public final class CraftServer implements Server {
          this.loadPlugins();
          this.enablePlugins(PluginLoadOrder.STARTUP);
          this.enablePlugins(PluginLoadOrder.POSTWORLD);

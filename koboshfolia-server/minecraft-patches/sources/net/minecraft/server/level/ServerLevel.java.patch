@@ -1,17 +1,19 @@
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
-@@ -1482,6 +_,10 @@
-         ProfilerFiller profiler = Profiler.get();
-         entity.tickCount++;
-         entity.totalEntityAge++; // Paper - age-like counter for all entities
+@@ -1491,6 +_,12 @@
+         profiler.push(entity.typeHolder()::getRegisteredName);
+         profiler.incrementCounter("tickNonPassenger");
+         entity.commonTick();
++        // Kobosh start - account for entity work in chunk heat
 +        final LevelChunk levelChunk = this.getChunkIfLoaded(entity.moonrise$getSectionX(), entity.moonrise$getSectionZ());
 +        if (levelChunk != null) {
 +            levelChunk.getChunkHot().startTicking();
 +        }
-         profiler.push(entity.typeHolder()::getRegisteredName);
-         profiler.incrementCounter("tickNonPassenger");
++        // Kobosh end - account for entity work in chunk heat
          final boolean isActive = io.papermc.paper.entity.activation.ActivationRange.checkIfActive(entity); // Paper - EAR 2
-@@ -1505,7 +_,12 @@
+         // Folia start - profiler
+         final int timerId = isActive ? entity.getType().tickTimerId : entity.getType().inactiveTickTimerId;
+@@ -1512,7 +_,12 @@
          // Folia end - region threading
          } else {entity.inactiveTick();} // Paper - EAR 2
          profiler.pop();
@@ -25,7 +27,7 @@
  
          for (Entity passenger : entity.getPassengers()) {
              this.tickPassenger(entity, passenger, isActive); // Paper - EAR 2
-@@ -1523,6 +_,10 @@
+@@ -1530,6 +_,10 @@
          } else if (entity instanceof Player || this.getCurrentWorldData().hasEntityTickingEntity(entity)) { // Folia - region threading
              // Folia start - profiler
              final int timerId = isActive ? entity.getType().tickTimerId : entity.getType().inactiveTickTimerId;
@@ -36,7 +38,7 @@
              final ca.spottedleaf.leafprofiler.RegionizedProfiler.Handle foliaProfiler = io.papermc.paper.threadedregions.TickRegionScheduler.getProfiler();
              foliaProfiler.startTimer(timerId);
              try {
-@@ -1558,7 +_,12 @@
+@@ -1563,7 +_,12 @@
              for (Entity passenger : entity.getPassengers()) {
                  this.tickPassenger(entity, passenger, isActive); // Paper - EAR 2
              }

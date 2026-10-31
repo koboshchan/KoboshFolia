@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
-@@ -188,7 +_,7 @@
+@@ -197,7 +_,7 @@
      public void handleConfigurationFinished(final ServerboundFinishConfigurationPacket packet) {
          PacketUtils.ensureRunningOnSameThread(packet, this, this.server.packetProcessor());
          this.finishCurrentTask(JoinWorldTask.TYPE);
@@ -9,7 +9,7 @@
  
          try {
              PlayerList playerList = this.server.getPlayerList();
-@@ -235,6 +_,14 @@
+@@ -244,6 +_,14 @@
              LOGGER.error("Couldn't place player in world", e);
              this.disconnect(DISCONNECT_REASON_INVALID_DATA);
          }

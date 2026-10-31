@@ -5,7 +5,7 @@ Subject: [PATCH] Decrease Elytra durability on gliding lunge
 
 
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
-index 0571ee2fb8cd410c7913bf1c5e2ef5e7ef14711f..c3fd61504b5e549be4682a3e1f1a6b04858b145c 100644
+index d1eec99905f58c8e9778800c427c8130e0791892..2991c938df3f26f7392dadd6ac0970ff91d59f80 100644
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
 @@ -295,6 +295,10 @@ public abstract class Player extends Avatar implements ContainerUser {

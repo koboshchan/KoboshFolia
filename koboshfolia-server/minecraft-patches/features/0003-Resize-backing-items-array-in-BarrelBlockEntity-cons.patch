@@ -5,10 +5,10 @@ Subject: [PATCH] Resize backing items array in BarrelBlockEntity constructor
 
 
 diff --git a/net/minecraft/world/level/block/entity/BarrelBlockEntity.java b/net/minecraft/world/level/block/entity/BarrelBlockEntity.java
-index 1ab18541ebf7afdf8c701eab05f292444283c3c0..6d3cdc07a0e72e11504de8cb8f6f3b5682b362a8 100644
+index 4fc596ad20269d3a0457eb02f21e98185fe448e0..feecb50de7d4f32b5f3cca90fb09aa90363441aa 100644
 --- a/net/minecraft/world/level/block/entity/BarrelBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/BarrelBlockEntity.java
-@@ -97,6 +97,7 @@ public class BarrelBlockEntity extends RandomizableContainerBlockEntity {
+@@ -96,6 +96,7 @@ public class BarrelBlockEntity extends RandomizableContainerBlockEntity {
  
      public BarrelBlockEntity(final BlockPos worldPosition, final BlockState blockState) {
          super(BlockEntityTypes.BARREL, worldPosition, blockState);

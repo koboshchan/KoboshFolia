@@ -30,10 +30,10 @@ index 2f41a92465b9da28e026297cc3528898bb1c8412..459ece39afe258c116279cea4317f68e
              case DROPPER:
                  this.delegate = new DispenserMenu(windowId, bottom, top);
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java
-index 9d5fe6fc727948955d89f9ed5e181185393a9611..30a255d92b5a2ca7e01b7bc1d33f38ac61e55d1e 100644
+index a65075cd9393e935819ac8f07b295017f6a708b3..f519cf32fe0593e257b94276a1cce55c3eb00ba1 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java
-@@ -45,7 +45,7 @@ public class CraftInventory implements Inventory {
+@@ -46,7 +46,7 @@ public class CraftInventory implements Inventory {
  
      @Override
      public int getSize() {

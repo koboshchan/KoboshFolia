@@ -247,10 +247,10 @@ index fc26b94d240a740b4fbdb0927bea4840f93e891a..e7ddd522666aad0304c50fa22751f05e
  import net.kyori.adventure.text.format.TextColor;
  import org.bukkit.Bukkit;
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 54c37bdf8384c6424b391d99d1359d032d2a2ba1..01378a039e34eb9b27735dc8df00baf687fd1891 100644
+index 1cfdddee1d6377fba3389ce2f3c02c4c1fb64240..025f619d1d2b1b35cb33118574c200f59818eb14 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -1017,7 +1017,7 @@ public final class CraftServer implements Server {
+@@ -1000,7 +1000,7 @@ public final class CraftServer implements Server {
          }
  
          org.spigotmc.SpigotConfig.init((File) this.console.options.valueOf("spigot-settings")); // Spigot

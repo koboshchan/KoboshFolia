@@ -5,7 +5,7 @@
 KoboshFolia is a high-performance Minecraft server software, built as a fork of Folia. It optimizes server performance, implements select optimization patches from Lithium and Krypton, and offers highly configurable gameplay modifications.
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](#building)
-[![Java Version](https://img.shields.io/badge/Java-21%2B-blue)](https://openjdk.org/)
+[![Java Version](https://img.shields.io/badge/Java-25-blue)](https://openjdk.org/)
 [![License](https://img.shields.io/badge/License-GPL--3.0-orange)](#thank-you)
 
 </div>
@@ -69,9 +69,21 @@ Configure KoboshFolia customizations through the `kobosh.yml` configuration file
 
 ---
 
+## Minecraft 26.3 port
+
+This branch targets Minecraft 26.3 and requires Java 25. Existing gameplay settings,
+permissions, packet batching, entity update throttling and chunk heat accounting
+are retained. Spawn-count caching follows 26.3 environment attributes and uses exact
+block positions rather than the old quart-biome lookup.
+
+Minecraft 26.3 replaced the old noise stack. Its primitive layer amplitudes and
+Paper's packed permutation/gradient lookup already supersede the old Gale
+`PerlinNoise`/`ImprovedNoise` patches. Keep the upstream float-based noise algorithm
+rather than restoring obsolete double-based sampling and changing world generation.
+
 ## Building
 
-To compile and package KoboshFolia, ensure you have **Java 21 or higher** installed. Build the project using the wrapper scripts:
+To compile and package KoboshFolia, ensure you have **Java 25** installed. Build the project using the wrapper scripts:
 
 1. **Apply Patches**:
    ```bash
@@ -83,7 +95,7 @@ To compile and package KoboshFolia, ensure you have **Java 21 or higher** instal
    ```
 3. **Assemble Paperclip**:
    ```bash
-   ./gradlew createMojmapPaperclipJar
+   ./gradlew createPaperclipJar
    ```
 
 The compiled Paperclip executable will be located at:

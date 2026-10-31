@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/npc/villager/Villager.java
 +++ b/net/minecraft/world/entity/npc/villager/Villager.java
-@@ -190,6 +_,51 @@
+@@ -187,6 +_,51 @@
          this.setCanPickUpLoot(true);
      }
  
@@ -52,7 +52,7 @@
      @Override
      public Brain<Villager> getBrain() {
          return (Brain<Villager>)super.getBrain();
-@@ -259,11 +_,27 @@
+@@ -252,11 +_,27 @@
          // Paper start - EAR 2
          this.customServerAiStep(level, false);
      }
@@ -79,5 +79,5 @@
          if (!inactive) this.getBrain().tick(level, this); // Paper - EAR 2
 +        else if (this.isLobotomized && shouldRestock(level)) restock(); // Kobosh - Purpur - lobotomize stuck villagers
          profiler.pop();
-         if (this.assignProfessionWhenSpawned) {
-             this.assignProfessionWhenSpawned = false;
+         if (this.lastTradedPlayer != null) {
+             level.onReputationEvent(ReputationEventType.TRADE, this.lastTradedPlayer, this);

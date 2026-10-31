@@ -19,3 +19,8 @@ build
 .vscode/
 
 .DS_Store
+
+/folia-checkstyle/
+/paper-checkstyle/
+/.checkstyle/
+*.patch.rej

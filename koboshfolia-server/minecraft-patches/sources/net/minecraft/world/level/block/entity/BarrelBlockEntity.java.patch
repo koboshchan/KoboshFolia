@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/entity/BarrelBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/BarrelBlockEntity.java
-@@ -118,7 +_,7 @@
+@@ -117,7 +_,7 @@
  
      @Override
      public int getContainerSize() {
@@ -9,7 +9,7 @@
      }
  
      @Override
-@@ -138,7 +_,16 @@
+@@ -137,7 +_,16 @@
  
      @Override
      protected AbstractContainerMenu createMenu(final int containerId, final Inventory inventory) {

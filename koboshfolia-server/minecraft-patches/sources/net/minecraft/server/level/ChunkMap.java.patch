@@ -1,15 +1,15 @@
 --- a/net/minecraft/server/level/ChunkMap.java
 +++ b/net/minecraft/server/level/ChunkMap.java
-@@ -986,7 +_,7 @@
-             int range = type.clientTrackingRange() * 16;
-             range = org.spigotmc.TrackingRange.getEntityTrackingRange(entity, range); // Spigot
-             if (range != 0) {
--                int updateInterval = type.updateInterval();
-+                int updateInterval = koboshUpdateInterval(entity, type); // Kobosh - configurable entity broadcast update interval
-                 if (entity.moonrise$getTrackedEntity() != null) { // Folia - region threading
+@@ -990,7 +_,7 @@
                      throw (IllegalStateException)Util.pauseInIde(new IllegalStateException("Entity is already tracked!"));
                  }
-@@ -1018,6 +_,44 @@
+ 
+-                UpdateInterval updateInterval = type.hasUpdateInterval() ? UpdateInterval.periodic(type.updateInterval()) : UpdateInterval.NEVER;
++                UpdateInterval updateInterval = type.hasUpdateInterval() ? UpdateInterval.periodic(koboshUpdateInterval(entity, type)) : UpdateInterval.NEVER;
+                 ChunkMap.TrackedEntity trackedEntity = new ChunkMap.TrackedEntity(entity, range, updateInterval, type.trackDeltas());
+                 //this.entityMap.put(entity.getId(), trackedEntity); // Folia - region threading
+                 // Paper start - optimise entity tracker
+@@ -1020,6 +_,44 @@
              }
          }
      }

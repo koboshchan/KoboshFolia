@@ -2,7 +2,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    id("io.papermc.paperweight.patcher") version "2.0.0-beta.21"
+    id("io.papermc.paperweight.patcher") version "2.0.0-beta.24"
 }
 
 paperweight {
@@ -19,6 +19,21 @@ paperweight {
             path = "folia-api/build.gradle.kts"
             outputFile = file("koboshfolia-api/build.gradle.kts")
             patchFile = file("koboshfolia-api/build.gradle.kts.patch")
+        }
+        patchDir("foliaCheckstyle") {
+            upstreamPath = "folia-checkstyle"
+            patchesDir = file("build-data/foliaCheckstyle-patches")
+            outputDir = file("folia-checkstyle")
+        }
+        patchRepo("paperCheckstyle") {
+            upstreamPath = "paper-checkstyle"
+            patchesDir = file("build-data/paperCheckstyle-patches")
+            outputDir = file("paper-checkstyle")
+        }
+        patchRepo("checkstyleConfig") {
+            upstreamPath = ".checkstyle"
+            patchesDir = file("build-data/checkstyleConfig-patches")
+            outputDir = file(".checkstyle")
         }
         patchRepo("paperApi") {
             upstreamPath = "paper-api"

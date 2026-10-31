@@ -21,7 +21,7 @@ of how to use git is required. A basic tutorial can be found here:
 Assuming you have already forked the repository:
 
 1. Clone your fork to your local machine;
-2. Type `./gradlew applyPatches` in a terminal to apply the patches.
+2. Run `sh patch.sh` in a terminal to apply the patches.
    On Windows, remove the `./` the beginning of `gradlew` commands;
 3. cd into `paper-server` for server changes, and `paper-api` for API changes.
    **Only changes made in `koboshfolia-server/src/minecraft` have to deal with the patch system.**

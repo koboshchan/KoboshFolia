@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -298,7 +_,7 @@
+@@ -301,7 +_,7 @@
      public double yOld;
      public double zOld;
      public boolean noPhysics;
@@ -8,8 +8,8 @@
 +    public final RandomSource random = com.kobosh.koboshfolia.KoboshConfig.allowClientRngManipulation ? RandomSource.create() : SHARED_RANDOM; // Kobosh - allow-client-rng-manipulation
      public int tickCount;
      private int remainingFireTicks;
-     private final EntityFluidInteraction fluidInteraction = new EntityFluidInteraction(Set.of(FluidTags.WATER, FluidTags.LAVA));
-@@ -1782,17 +_,35 @@
+     private final EntityFluidInteraction fluidInteraction = new EntityFluidInteraction(FLUIDS_WITH_CURRENT);
+@@ -1826,17 +_,35 @@
              return movement;
          }
  

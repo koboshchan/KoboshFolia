@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/chunk/LevelChunk.java
 +++ b/net/minecraft/world/level/chunk/LevelChunk.java
-@@ -100,6 +_,7 @@
+@@ -99,6 +_,7 @@
      private final Int2ObjectMap<GameEventListenerRegistry> gameEventListenerRegistrySections;
      private final LevelChunkTicks<Block> blockTicks;
      private final LevelChunkTicks<Fluid> fluidTicks;
@@ -8,7 +8,7 @@
      private LevelChunk.UnsavedListener unsavedListener = chunkPos -> {};
      // CraftBukkit start
      public boolean mustNotSave;
-@@ -137,6 +_,10 @@
+@@ -136,6 +_,10 @@
      private final boolean debug;
      private final BlockState defaultBlockState;
  
@@ -19,7 +19,7 @@
      @Override
      public final BlockState moonrise$getBlock(final int x, final int y, final int z) {
          return this.getBlockStateFinal(x, y, z);
-@@ -959,6 +_,7 @@
+@@ -961,6 +_,7 @@
                      try {
                          ProfilerFiller profiler = Profiler.get();
                          profiler.push(this::getType);
@@ -27,7 +27,7 @@
                          foliaProfiler.startTimer(timerId); try { // Folia - profiler
                          BlockState blockState = LevelChunk.this.getBlockState(pos);
                          if (this.blockEntity.getType().isValid(blockState)) {
-@@ -979,7 +_,10 @@
+@@ -981,7 +_,10 @@
                                  );
                              } // Paper - Remove the Block Entity if it's invalid
                          }

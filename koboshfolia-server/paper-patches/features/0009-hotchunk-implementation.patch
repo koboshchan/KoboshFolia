@@ -74,7 +74,7 @@ index 23b91597c7da941477881cdb6465853d5908f0ca..e18200d8b5c80b030efe559648d1dd61
          final String colorString = colorBukkit.name();
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-index 3efbf231b211511fe72636641bcbe649d0a5101a..e4548f914170cde217559c3a33fe1fd207c2b997 100644
+index 7b92bde7ab39a0f0ba95bdd524de6f81ae8f656a..fc2f9ff8eb2a351573b01ca492613fb5c996a481 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 @@ -410,7 +410,8 @@ public class CraftChunk implements Chunk {
@@ -88,10 +88,10 @@ index 3efbf231b211511fe72636641bcbe649d0a5101a..e4548f914170cde217559c3a33fe1fd2
      // KioCG end
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 14e7a1db9e997424985538d70a7e6f529ca9a37d..fb070a65d356589c7a4254567131b1fe735ff4a4 100644
+index e791de0157b2dde6b16ec95f1c603285288d13c8..6698e849822f71df616d56d4d60c1ed2e516babf 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -289,7 +289,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
+@@ -294,7 +294,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
  
      @Override
      public long getNearbyChunkHot() {

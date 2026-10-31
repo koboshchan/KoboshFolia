@@ -5,10 +5,10 @@ Subject: [PATCH] Implement configurable lunge improvements
 
 
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
-index 2eb5fc819e2e17c69de87f8aa1a99e02bc5a62d5..0571ee2fb8cd410c7913bf1c5e2ef5e7ef14711f 100644
+index 978d6f657f4ff84b773e5c320b3e08fce5ba168e..d1eec99905f58c8e9778800c427c8130e0791892 100644
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
-@@ -101,6 +101,7 @@ import net.minecraft.world.item.crafting.Recipe;
+@@ -99,6 +99,7 @@ import net.minecraft.world.item.component.ResolvableProfile;
  import net.minecraft.world.item.crafting.RecipeHolder;
  import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
  import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -63,7 +63,7 @@ index 2eb5fc819e2e17c69de87f8aa1a99e02bc5a62d5..0571ee2fb8cd410c7913bf1c5e2ef5e7
 +                this.enhancedLungeAttackCooldown--;
 +            }
 +
-+            boolean currentlySwinging = this.swinging;
++            boolean currentlySwinging = this.isSwinging();
 +            boolean justStartedSwinging = currentlySwinging && !this.wasSwinging && this.enhancedLungeAttackCooldown == 0;
 +            this.wasSwinging = currentlySwinging;
 +
@@ -81,7 +81,7 @@ index 2eb5fc819e2e17c69de87f8aa1a99e02bc5a62d5..0571ee2fb8cd410c7913bf1c5e2ef5e7
 +                                Vec3 look = this.getLookAngle();
 +                                double boost = com.kobosh.koboshfolia.KoboshConfig.lungeGlidingBoostMultiplier * (double) lungeLevel;
 +                                this.setDeltaMovement(this.getDeltaMovement().add(look.x * boost, look.y * boost, look.z * boost));
-+                                this.hurtMarked = true;
++                                this.syncVelocity = true;
 +                            } else {
 +                                FoodData food = this.getFoodData();
 +                                if (food.getFoodLevel() >= com.kobosh.koboshfolia.KoboshConfig.lungeGroundMinHungerLevel) {
@@ -102,7 +102,7 @@ index 2eb5fc819e2e17c69de87f8aa1a99e02bc5a62d5..0571ee2fb8cd410c7913bf1c5e2ef5e7
          this.noPhysics = this.isSpectator();
          if (this.isSpectator() || this.isPassenger()) {
              this.setOnGround(false);
-@@ -1723,6 +1796,26 @@ public abstract class Player extends Avatar implements ContainerUser {
+@@ -1722,6 +1795,26 @@ public abstract class Player extends Avatar implements ContainerUser {
  
      public void causeFoodExhaustion(final float amount, final org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason reason) {
          // CraftBukkit end
