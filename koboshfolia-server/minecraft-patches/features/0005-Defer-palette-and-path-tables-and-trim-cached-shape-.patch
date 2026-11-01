@@ -1,0 +1,134 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: koboshchan <91501777+koboshchan@users.noreply.github.com>
+Date: Sat, 31 Oct 2026 23:29:57 -0700
+Subject: [PATCH] Defer palette and path tables and trim cached shape lists
+
+
+diff --git a/ca/spottedleaf/moonrise/patches/fast_palette/FastHashMapPalette.java b/ca/spottedleaf/moonrise/patches/fast_palette/FastHashMapPalette.java
+index 91f790178c51b2caab353877d5531b0f913854d6..75f350808aa842fa6ed1ecc9bfd0b71342bb71a4 100644
+--- a/ca/spottedleaf/moonrise/patches/fast_palette/FastHashMapPalette.java
++++ b/ca/spottedleaf/moonrise/patches/fast_palette/FastHashMapPalette.java
+@@ -12,16 +12,13 @@ import java.util.function.Predicate;
+ 
+ public final class FastHashMapPalette<T> implements Palette<T> {
+ 
+-    private final T[] valueToIdKeys;
+-    private final int[] valueToIdValues;
++    private T[] valueToIdKeys;
++    private int[] valueToIdValues;
+     private final T[] idToValue;
+     private final int bits;
+     private int size;
+ 
+     private FastHashMapPalette(final int bits, final List<T> palette) {
+-        final int mapSize = 1 << (bits + 1);
+-        this.valueToIdKeys = (T[])new Object[mapSize];
+-        this.valueToIdValues = new int[mapSize];
+         this.idToValue = (T[])new Object[1 << bits];
+         this.bits = bits;
+         // note: we need to be careful, palette may actually contain duplicates
+@@ -34,8 +31,8 @@ public final class FastHashMapPalette<T> implements Palette<T> {
+     }
+ 
+     private FastHashMapPalette(final FastHashMapPalette<T> other) {
+-        this.valueToIdKeys = other.valueToIdKeys.clone();
+-        this.valueToIdValues = other.valueToIdValues.clone();
++        this.valueToIdKeys = other.valueToIdKeys == null ? null : other.valueToIdKeys.clone();
++        this.valueToIdValues = other.valueToIdValues == null ? null : other.valueToIdValues.clone();
+         this.idToValue = other.idToValue.clone();
+         this.bits = other.bits;
+         this.size = other.size;
+@@ -44,8 +41,10 @@ public final class FastHashMapPalette<T> implements Palette<T> {
+     private void clear() {
+         if (this.size != 0) {
+             this.size = 0;
+-            Arrays.fill(this.valueToIdKeys, null);
+-            Arrays.fill(this.valueToIdValues, 0);
++            if (this.valueToIdKeys != null) {
++                Arrays.fill(this.valueToIdKeys, null);
++                Arrays.fill(this.valueToIdValues, 0);
++            }
+             Arrays.fill(this.idToValue, null);
+         }
+     }
+@@ -58,6 +57,9 @@ public final class FastHashMapPalette<T> implements Palette<T> {
+     // duplicate id), but at the same time it preserves the behaviour for LinearPalette (always
+     // returns the smallest duplicate id)
+     private void insertEntryIfAbsent(final T key, final int value) {
++        if (this.valueToIdKeys == null) {
++            return; // Kobosh - linear palettes need no reverse hash tables.
++        }
+         final int hash = System.identityHashCode(key);
+ 
+         final T[] keys = this.valueToIdKeys;
+@@ -92,6 +94,14 @@ public final class FastHashMapPalette<T> implements Palette<T> {
+             }
+             return ENTRY_NOT_FOUND;
+         } else {
++            // Kobosh - allocate and populate only on the first hashed lookup.
++            if (this.valueToIdKeys == null) {
++                this.valueToIdKeys = (T[])new Object[1 << (this.bits + 1)];
++                this.valueToIdValues = new int[1 << (this.bits + 1)];
++                for (int i = 0; i < size; ++i) {
++                    this.insertEntryIfAbsent(this.idToValue[i], i);
++                }
++            }
+             int index = System.identityHashCode(key);
+ 
+             final T[] keys = this.valueToIdKeys;
+diff --git a/net/minecraft/world/level/pathfinder/PathTypeCache.java b/net/minecraft/world/level/pathfinder/PathTypeCache.java
+index 1a50ec0d56bb4b9c3b0958a0281028c8eff1000c..baf970afea922e0fad845f9c624a6e1e8c7323d6 100644
+--- a/net/minecraft/world/level/pathfinder/PathTypeCache.java
++++ b/net/minecraft/world/level/pathfinder/PathTypeCache.java
+@@ -8,8 +8,8 @@ import org.jspecify.annotations.Nullable;
+ public class PathTypeCache {
+     private static final int SIZE = 4096;
+     private static final int MASK = 4095;
+-    private final long[] positions = new long[4096];
+-    private final PathType[] pathTypes = new PathType[4096];
++    private long @Nullable [] positions;
++    private PathType @Nullable [] pathTypes;
+ 
+     public PathType getOrCompute(final BlockGetter level, final BlockPos pos) {
+         long key = pos.asLong();
+@@ -19,11 +19,16 @@ public class PathTypeCache {
+     }
+ 
+     private @Nullable PathType get(final int index, final long key) {
+-        return this.positions[index] == key ? this.pathTypes[index] : null;
++        return this.positions != null && this.positions[index] == key ? this.pathTypes[index] : null;
+     }
+ 
+     private PathType compute(final BlockGetter level, final BlockPos pos, final int index, final long key) {
+         PathType pathType = WalkNodeEvaluator.getPathTypeFromState(level, pos);
++        // Kobosh - invalidation-only regions never allocate the 4096-entry tables.
++        if (this.positions == null) {
++            this.positions = new long[SIZE];
++            this.pathTypes = new PathType[SIZE];
++        }
+         this.positions[index] = key;
+         this.pathTypes[index] = pathType;
+         return pathType;
+@@ -32,7 +37,7 @@ public class PathTypeCache {
+     public void invalidate(final BlockPos pos) {
+         long key = pos.asLong();
+         int index = index(key);
+-        if (this.positions[index] == key) {
++        if (this.positions != null && this.positions[index] == key) {
+             this.pathTypes[index] = null;
+         }
+     }
+diff --git a/net/minecraft/world/phys/shapes/VoxelShape.java b/net/minecraft/world/phys/shapes/VoxelShape.java
+index 6975483fc78e41b831c6bafd67c873eba83c22e2..4e9f6970d1ca5695a9d2088c7a8c927444c9e7ad 100644
+--- a/net/minecraft/world/phys/shapes/VoxelShape.java
++++ b/net/minecraft/world/phys/shapes/VoxelShape.java
+@@ -320,6 +320,9 @@ public abstract class VoxelShape implements ca.spottedleaf.moonrise.patches.coll
+             }, true);
+         }
+ 
++        // Kobosh - retain exact-sized backing arrays for long-lived shape caches.
++        ((java.util.ArrayList<AABB>)ret).trimToSize();
++
+         // cache result
+         this.cachedToAABBs = new ca.spottedleaf.moonrise.patches.collisions.shape.CachedToAABBs(ret, false, 0.0, 0.0, 0.0);
+ 

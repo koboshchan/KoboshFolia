@@ -101,6 +101,16 @@ To compile and package KoboshFolia, ensure you have **Java 25** installed. Build
 The compiled Paperclip executable will be located at:
 `koboshfolia-server/build/libs/`
 
+## Running
+
+Use Java 25 and G1 with compact object headers enabled:
+
+```bash
+java -Xms2G -Xmx2G -XX:+UseG1GC -XX:+UseCompactObjectHeaders -jar koboshfolia.jar --nogui
+```
+
+Replace `koboshfolia.jar` with your Paperclip jar filename and size the heap for your workload. Compact object headers are a supported Java 25 option and do not need experimental options unlocked. Keep your existing heap and collector settings when comparing memory use; savings depend on your world and plugins. See [JEP 519](https://openjdk.org/jeps/519).
+
 ## Contributing
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute to the project.
